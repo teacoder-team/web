@@ -1,0 +1,45 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+[*.{ts,tsx,js,cjs,mjs}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+max_line_length = 100
+
+[*.{json,jsonc,yml,yaml}]
+indent_style = space
+indent_size = 2
+tab_width = 4
+
+[*.md]
+indent_style = space
+indent_size = 2
+tab_width = 4
+
+trim_trailing_whitespace = false
+max_line_length = off
+
+[*.env]
+indent_style = space
+indent_size = 2
+tab_width = 4
+
+[*.env.*]
+indent_style = space
+indent_size = 2
+tab_width = 4
+
+[{dist,node_modules}/**]
+trim_trailing_whitespace = false
+insert_final_newline = false
