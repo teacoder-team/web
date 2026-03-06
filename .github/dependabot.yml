@@ -1,0 +1,70 @@
+version: 2
+
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+
+    schedule:
+      interval: "daily"
+      time: "05:00"
+      timezone: "Europe/Moscow"
+
+    versioning-strategy: increase
+
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+    labels:
+      - "dependencies"
+      - "npm"
+      - "automated"
+
+    assignees:
+      - "teacoder52"
+
+    reviewers:
+      - "teacoder52"
+
+    rebase-strategy: "auto"
+
+    ignore:
+      - dependency-name: "next"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "react"
+        update-types:
+          - "version-update:semver-major"
+
+      - dependency-name: "react-dom"
+        update-types:
+          - "version-update:semver-major"
+
+    allow:
+      - dependency-type: "direct"
+      - dependency-type: "indirect"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "06:00"
+      timezone: "Europe/Moscow"
+
+    commit-message:
+      prefix: "ci"
+
+    labels:
+      - "ci"
+      - "dependencies"
+
+    assignees:
+      - "teacoder52"
+
+    reviewers:
+      - "teacoder52"
+
+    rebase-strategy: "auto"
