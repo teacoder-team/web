@@ -5925,11 +5925,11 @@ __metadata:
   linkType: hard
 
 "motion-dom@npm:^12.34.5":
-  version: 12.34.5
-  resolution: "motion-dom@npm:12.34.5"
+  version: 12.35.0
+  resolution: "motion-dom@npm:12.35.0"
   dependencies:
     motion-utils: "npm:^12.29.2"
-  checksum: 10c0/49a5ade7c59b1c54be0fdc8f77ed49201401bd8ec89e583af431f0d0815d101c61ec1e63dd941ddf2c1e5dbaddfe28acde681692305f07e5520f2f1507e2faf5
+  checksum: 10c0/0f9491bae66baf2d09c02b57208a45f9bd2bc9292726c8115b8196d2bf65c56f1dd97ac36d5be3f40a581dee815fb2a745ff06c559cee9d5d6d6929fb70b9856
   languageName: node
   linkType: hard
 
