@@ -1,28 +1,29 @@
-import type { Metadata } from "next";
-import { APP } from "../constants/app";
+import type { Metadata } from 'next'
+
+import { APP } from '../constants/app'
 
 type MetadataParams = {
-	title?: string;
-	description?: string;
-	path?: string;
-	image?: string;
-	keywords?: string[];
-	noIndex?: boolean;
-};
+	title?: string
+	description?: string
+	path?: string
+	image?: string
+	keywords?: string[]
+	noIndex?: boolean
+}
 
-const DEFAULT_IMAGE = `${APP.url}/og.png`;
+const DEFAULT_IMAGE = `${APP.url}/og.png`
 
 export function createMetadata({
 	title,
 	description = APP.description,
-	path = "",
+	path = '',
 	image = DEFAULT_IMAGE,
 	keywords = [],
-	noIndex = false,
+	noIndex = false
 }: MetadataParams = {}): Metadata {
-	const fullTitle = title ? `${title} | ${APP.name}` : APP.name;
+	const fullTitle = title ? `${title} | ${APP.name}` : APP.name
 
-	const url = `${APP.url}${path}`;
+	const url = `${APP.url}${path}`
 
 	return {
 		title: fullTitle,
@@ -30,7 +31,7 @@ export function createMetadata({
 		keywords,
 		metadataBase: new URL(APP.url),
 		alternates: {
-			canonical: url,
+			canonical: url
 		},
 		robots: {
 			index: !noIndex,
@@ -38,14 +39,14 @@ export function createMetadata({
 			googleBot: {
 				index: !noIndex,
 				follow: !noIndex,
-				"max-video-preview": -1,
-				"max-image-preview": "large",
-				"max-snippet": -1,
-			},
+				'max-video-preview': -1,
+				'max-image-preview': 'large',
+				'max-snippet': -1
+			}
 		},
 		openGraph: {
-			type: "website",
-			locale: "ru_RU",
+			type: 'website',
+			locale: 'ru_RU',
 			url,
 			title: fullTitle,
 			description,
@@ -55,42 +56,42 @@ export function createMetadata({
 					url: image,
 					width: 1200,
 					height: 630,
-					alt: fullTitle,
-				},
-			],
+					alt: fullTitle
+				}
+			]
 		},
 		twitter: {
-			card: "summary_large_image",
+			card: 'summary_large_image',
 			title: fullTitle,
 			description,
-			images: [image],
-		},
-	};
+			images: [image]
+		}
+	}
 }
 
 export function createCourseMetadata({
 	title,
 	description,
 	slug,
-	image,
+	image
 }: {
-	title: string;
-	description: string;
-	slug: string;
-	image?: string;
+	title: string
+	description: string
+	slug: string
+	image?: string
 }): Metadata {
 	return createMetadata({
 		title,
 		description,
 		path: `/courses/${slug}`,
-		image,
-	});
+		image
+	})
 }
 
 export function createNoIndexMetadata(title: string, description?: string): Metadata {
 	return createMetadata({
 		title,
 		description,
-		noIndex: true,
-	});
+		noIndex: true
+	})
 }

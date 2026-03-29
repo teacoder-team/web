@@ -1,61 +1,72 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "./Button";
+import type { Meta, StoryObj } from '@storybook/react'
+
+import { Button } from './Button'
 
 const meta = {
-	title: "UI/Button",
+	title: 'UI/Button',
 	component: Button,
-	tags: ["autodocs"],
+	tags: ['autodocs'],
 	argTypes: {
 		variant: {
-			control: { type: "select" },
-			options: ["default", "outline", "secondary", "destructive", "ghost"],
+			control: { type: 'select' },
+			options: ['default', 'outline', 'secondary', 'destructive', 'ghost']
 		},
 		size: {
-			control: { type: "select" },
-			options: ["sm", "md", "md-plus", "lg", "icon"],
+			control: { type: 'select' },
+			options: ['sm', 'md', 'md-plus', 'lg', 'icon']
 		},
-		isLoading: { control: "boolean" },
-		disabled: { control: "boolean" },
-		children: { control: "text" },
-	},
-} satisfies Meta<typeof Button>;
+		isLoading: { control: 'boolean' },
+		disabled: { control: 'boolean' },
+		children: { control: 'text' }
+	}
+} satisfies Meta<typeof Button>
 
-export default meta;
-type Story = StoryObj<typeof Button>;
+export default meta
+type Story = StoryObj<typeof Button>
 
 export const Default: Story = {
 	args: {
-		children: "Button",
-		variant: "default",
-		size: "md",
-	},
-};
+		children: 'Button',
+		variant: 'default',
+		size: 'md'
+	}
+}
 
-export const Variants: Story = {
-	render: (args) => (
-		<div className="flex flex-wrap gap-4">
-			<Button {...args} variant="default">
-				Default
-			</Button>
-			<Button {...args} variant="outline">
-				Outline
-			</Button>
-			<Button {...args} variant="secondary">
-				Secondary
-			</Button>
-			<Button {...args} variant="destructive">
-				Destructive
-			</Button>
-			<Button {...args} variant="ghost">
-				Ghost
-			</Button>
-		</div>
-	),
-};
+export const Outline: Story = {
+	args: {
+		children: 'Outline',
+		variant: 'outline',
+		size: 'md'
+	}
+}
+
+export const Secondary: Story = {
+	args: {
+		children: 'Secondary',
+		variant: 'secondary',
+		size: 'md'
+	}
+}
+
+export const Destructive: Story = {
+	args: {
+		children: 'Destructive',
+		variant: 'destructive',
+		size: 'md'
+	}
+}
+
+export const Ghost: Story = {
+	args: {
+		children: 'Ghost',
+		variant: 'ghost',
+		size: 'md'
+	}
+}
 
 export const Sizes: Story = {
-	render: (args) => (
-		<div className="flex flex-wrap gap-4 items-center">
+	render: args => (
+		<div className="flex flex-wrap items-center gap-4">
 			<Button {...args} size="sm">
 				SM
 			</Button>
@@ -72,11 +83,11 @@ export const Sizes: Story = {
 				Icon
 			</Button>
 		</div>
-	),
-};
+	)
+}
 
 export const Loading: Story = {
-	render: (args) => (
+	render: args => (
 		<div className="flex gap-4">
 			<Button {...args} isLoading>
 				Loading...
@@ -85,15 +96,15 @@ export const Loading: Story = {
 				Disabled
 			</Button>
 		</div>
-	),
-};
+	)
+}
 
 export const AsChild: Story = {
-	render: (args) => (
+	render: args => (
 		<Button {...args} asChild>
 			<a href="#" className="underline">
 				Link Button
 			</a>
 		</Button>
-	),
-};
+	)
+}

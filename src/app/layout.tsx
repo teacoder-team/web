@@ -1,20 +1,21 @@
-import type { Metadata } from "next";
-import { Geist } from "next/font/google";
-import type { ReactNode } from "react";
+import type { Metadata } from 'next'
+import { Geist, Golos_Text } from 'next/font/google'
+import Script from 'next/script'
+import type { ReactNode } from 'react'
 
-import "@/assets/styles/globals.css";
-import { cn } from "@/lib/utils/cn";
-import { websiteJsonLd } from "@/lib/seo/structured-data";
-import { createMetadata } from "@/lib/seo/metadata";
-import { ThemeProvider } from "@/providers/ThemeProvider";
-import Script from "next/script";
+import '@/assets/styles/globals.css'
+import { createMetadata } from '@/lib/seo/metadata'
+import { websiteJsonLd } from '@/lib/seo/structured-data'
+import { cn } from '@/lib/utils/cn'
+import { ReactQueryProvider } from '@/providers/ReactQueryProvider'
+import { ThemeProvider } from '@/providers/ThemeProvider'
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin", "cyrillic"],
-});
+const geistSans = Golos_Text({
+	variable: '--font-geist-sans',
+	subsets: ['latin', 'cyrillic']
+})
 
-export const metadata: Metadata = createMetadata();
+export const metadata: Metadata = createMetadata()
 
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
@@ -31,11 +32,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
 				/>
 			</head>
-			<body className={cn("antialiased", geistSans.variable)}>
-				<ThemeProvider>{children}</ThemeProvider>
+			<body className={cn('antialiased', geistSans.variable)}>
+				<ThemeProvider>
+					<ReactQueryProvider>{children}</ReactQueryProvider>
+				</ThemeProvider>
 			</body>
 		</html>
-	);
+	)
 }
 
 export function getInlineThemeScript(): string {
@@ -47,5 +50,5 @@ export function getInlineThemeScript(): string {
        if(resolved==='dark') document.documentElement.classList.add('dark');
        else document.documentElement.classList.remove('dark');
      } catch(e){}
-  })();`;
+  })();`
 }

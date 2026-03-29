@@ -1,0 +1,18 @@
+{
+	"editor.formatOnSave": true,
+	"editor.formatOnPaste": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"files.associations": {
+		"*.ts": "typescript",
+		"*.tsx": "typescriptreact"
+	},
+	"prettier.requireConfig": true,
+	"prettier.useEditorConfig": true,
+	"tailwindCSS.includeLanguages": {
+		"typescript": "javascript",
+		"typescriptreact": "javascriptreact"
+	},
+	"terminal.integrated.defaultProfile.linux": "bash",
+	"terminal.integrated.defaultProfile.osx": "zsh",
+	"terminal.integrated.defaultProfile.windows": "PowerShell"
+}

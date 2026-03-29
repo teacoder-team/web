@@ -1,23 +1,22 @@
-import type { Preview } from "@storybook/nextjs-vite";
+import type { Preview } from '@storybook/nextjs-vite'
 
-import "../src/assets/styles/globals.css";
+import '../src/assets/styles/globals.css'
+
+import { withProviders } from './decorators/withProviders'
 
 const preview: Preview = {
 	parameters: {
 		controls: {
 			matchers: {
 				color: /(background|color)$/i,
-				date: /Date$/i,
-			},
+				date: /Date$/i
+			}
 		},
-
 		a11y: {
-			// 'todo' - show a11y violations in the test UI only
-			// 'error' - fail CI on a11y violations
-			// 'off' - skip a11y checks entirely
-			test: "todo",
-		},
+			test: 'todo'
+		}
 	},
-};
+	decorators: [withProviders]
+}
 
-export default preview;
+export default preview
