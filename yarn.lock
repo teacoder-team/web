@@ -324,9 +324,9 @@ __metadata:
   linkType: hard
 
 "@commitlint/message@npm:^20.4.0":
-  version: 20.4.0
-  resolution: "@commitlint/message@npm:20.4.0"
-  checksum: 10c0/ded99c7863665d36bec2f2f5e13891d1c855fc6d38c9732b8ab9801a0d8917d0a036760c23d6dbbb5a5e1447712cad7d304570fa679775aa7a00dfcc38fcdf28
+  version: 20.4.3
+  resolution: "@commitlint/message@npm:20.4.3"
+  checksum: 10c0/16f7a67d17df916830a9d6b2cdbaef0d680afcc47e9de53b18c7580bcbb50d8241b86c0e26a4ae71bd1d4a1025b318eb6c920e75fbc97aee7341744d4ef5dcbc
   languageName: node
   linkType: hard
 
