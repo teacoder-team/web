@@ -1,22 +1,15 @@
-import { useQuery } from '@tanstack/react-query'
+'use client'
+
 import { BookOpen, Crown, Medal, Trophy } from 'lucide-react'
-import React from 'react'
 import { CircularProgressbar } from 'react-circular-progressbar'
 import 'react-circular-progressbar/dist/styles.css'
 
-import { getMeStatistics } from '@/src/api/requests'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle
-} from '@/src/components/ui/card'
+import { useGetUsersMeStatisticsQuery } from '@/generated/api'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function UserStats() {
-	const { data, isLoading } = useQuery({
-		queryKey: ['get me statistics'],
-		queryFn: () => getMeStatistics()
-	})
+	const { data, isLoading } = useGetUsersMeStatisticsQuery()
 
 	return isLoading ? (
 		<div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
@@ -36,7 +29,7 @@ export function UserStats() {
 					<div className='flex items-center justify-between'>
 						<div>
 							<div className='text-3xl font-bold'>
-								{data?.totalPoints}
+								{data?.points}
 							</div>
 							<div className='text-sm text-muted-foreground'>
 								Всего очков
@@ -57,7 +50,7 @@ export function UserStats() {
 					<div className='flex items-center justify-between'>
 						<div>
 							<div className='text-3xl font-bold'>
-								{data?.lessonsCompleted}
+								{data?.completedLessons}
 							</div>
 							<div className='text-sm text-muted-foreground'>
 								Пройдено уроков
@@ -65,8 +58,8 @@ export function UserStats() {
 						</div>
 						<div className='size-20'>
 							<CircularProgressbar
-								value={data?.learningProgressPercentage ?? 0}
-								text={`${data?.learningProgressPercentage ?? 0}%`}
+								value={data?.progress ?? 0}
+								text={`${data?.progress ?? 0}%`}
 								styles={{
 									trail: {
 										color: '#E2E8F0'

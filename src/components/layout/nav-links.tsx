@@ -1,7 +1,7 @@
 import type { Route } from 'next'
 import Link from 'next/link'
 
-import { ROUTES } from '@/src/constants'
+import { ROUTES } from '@/constants/routes'
 
 interface NavLink {
 	title: string

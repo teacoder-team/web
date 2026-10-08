@@ -1,9 +1,9 @@
+import type { CourseListResponseItem } from '@/generated/model'
+
 import { CourseCard } from '../course/course-card'
 
-import { CoursesResponse } from '@/src/api/generated'
-
 interface PopularProps {
-	courses: CoursesResponse[]
+	courses: CourseListResponseItem[]
 }
 
 export function Popular({ courses }: PopularProps) {
@@ -16,8 +16,8 @@ export function Popular({ courses }: PopularProps) {
 				Cамые популярные курсы среди пользователей платформы
 			</p>
 			<div className='mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-6 px-5 text-sm sm:mt-20 sm:grid-cols-2 md:gap-y-10 md:px-0 lg:max-w-none lg:grid-cols-3 xl:grid-cols-4'>
-				{courses.map((course, index) => (
-					<CourseCard key={index} course={course} />
+				{courses.map(course => (
+					<CourseCard key={course.id} course={course} />
 				))}
 			</div>
 		</div>

@@ -1,12 +1,19 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import { usePostAuthResetPasswordMutation } from '@/generated/api'
+
+import { ROUTES } from '@/constants/routes'
+
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useSignInResult } from '@/lib/auth/use-sign-in'
 
 import { Button } from '../ui/button'
 import {
@@ -20,12 +27,9 @@ import {
 import { Input } from '../ui/input'
 
 import { AuthWrapper } from './auth-wrapper'
-import { passwordReset } from '@/src/api/requests'
-import { ROUTES } from '@/src/constants'
-import { analytics } from '@/src/lib/analytics'
+import { MfaForm } from './mfa/mfa-form'
 
 const newPasswordSchema = z.object({
-	token: z.string().max(128, { message: 'Некорректный токен' }),
 	password: z
 		.string()
 		.min(6, { message: 'Пароль должен содержать хотя бы 6 символов' })
@@ -34,31 +38,37 @@ const newPasswordSchema = z.object({
 
 export type NewPassword = z.infer<typeof newPasswordSchema>
 
+/** Opened from the link in the reset email; the token is single-use. */
 export function NewPasswordForm() {
-	const { push } = useRouter()
+	const router = useRouter()
 	const { token } = useParams<{ token: string }>()
 
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['password reset'],
-		mutationFn: (data: NewPassword) => passwordReset(data),
-		onSuccess() {
-			analytics.auth.newPassword.success()
-			push('/auth/login')
-		},
-		onError(error: any) {
-			const message =
-				error.response?.data?.message ?? 'Ошибка при сбросе пароля'
-			analytics.auth.newPassword.fail(message)
-
-			toast.error(message)
-		}
-	})
+	const { mfa, handleSignIn } = useSignInResult()
 
 	const form = useForm<NewPassword>({
 		resolver: zodResolver(newPasswordSchema),
 		defaultValues: {
-			token: '',
 			password: ''
+		}
+	})
+
+	const { mutate, isPending } = usePostAuthResetPasswordMutation({
+		mutation: {
+			onSuccess(data) {
+				analytics.auth.newPassword.success()
+
+				form.reset()
+				handleSignIn(data)
+			},
+			onError(error) {
+				const message = getErrorMessage(
+					error,
+					'Ошибка при сбросе пароля'
+				)
+				analytics.auth.newPassword.fail(message)
+
+				toast.error(message)
+			}
 		}
 	})
 
@@ -66,17 +76,19 @@ export function NewPasswordForm() {
 		analytics.auth.newPassword.view()
 	}, [])
 
-	useEffect(() => {
-		form.reset()
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
-
-	async function onSubmit(data: NewPassword) {
+	function onSubmit({ password }: NewPassword) {
 		analytics.auth.newPassword.submit()
 
-		await mutateAsync({
-			token,
-			password: data.password
-		})
+		mutate({ data: { token, newPassword: password } })
+	}
+
+	if (mfa) {
+		return (
+			<MfaForm
+				ticket={mfa}
+				onBack={() => router.push(ROUTES.AUTH.LOGIN())}
+			/>
+		)
 	}
 
 	return (

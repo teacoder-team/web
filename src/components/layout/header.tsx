@@ -3,18 +3,20 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { ROUTES } from '@/constants/routes'
+
+import { useSession } from '@/lib/auth/auth-provider'
+import { cn } from '@/lib/utils'
+
 import { Logo } from '../shared/logo'
 import { Button } from '../ui/button'
 
 import { MobileNav } from './mobile-nav'
 import { NavLinks } from './nav-links'
 import { UserMenu } from './user-menu'
-import { ROUTES } from '@/src/constants'
-import { useAuth } from '@/src/hooks'
-import { cn } from '@/src/lib/utils'
 
 export function Header() {
-	const { isAuthorized } = useAuth()
+	const { isAuthorized } = useSession()
 
 	const [isScrolled, setIsScrolled] = useState(false)
 

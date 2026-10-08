@@ -1,26 +1,35 @@
+'use client'
+
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+	getGetSessionsQueryQueryKey,
+	useDeleteSessionsMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'
-
-import { useRemoveAllSessions } from '@/src/api/hooks'
 
 export function RemoveAllSessions() {
 	const [isOpen, setIsOpen] = useState(false)
 
 	const queryClient = useQueryClient()
 
-	const { mutate, isPending } = useRemoveAllSessions({
-		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: ['get sessions'] })
-			setIsOpen(false)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при отключении'
-			)
+	const { mutate, isPending } = useDeleteSessionsMutation({
+		mutation: {
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: getGetSessionsQueryQueryKey()
+				})
+				setIsOpen(false)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при отключении'))
+			}
 		}
 	})
 

@@ -5,10 +5,11 @@ import { BookOpenIcon, CheckCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
-import { Card, CardContent, CardDescription } from '../ui/card'
+import { Button } from '@/components/ui/button'
 
-import { Button } from '@/src/components/ui/button'
-import { ROUTES } from '@/src/constants'
+import { ROUTES } from '@/constants/routes'
+
+import { Card, CardContent, CardDescription } from '../ui/card'
 
 export function PaymentSuccess() {
 	useEffect(() => {

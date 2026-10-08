@@ -1,9 +1,18 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import {
+	getGetMfaQueryQueryKey,
+	usePostMfaTotpDisableMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
 
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'
@@ -17,12 +26,11 @@ import {
 } from '../../ui/form'
 import { Input } from '../../ui/input'
 
-import { totpDisable } from '@/src/api/requests'
-
 const disableTotpSchema = z.object({
-	password: z
+	code: z
 		.string()
-		.min(6, { message: 'Пароль должен содержать хотя бы 6 символов' })
+		.trim()
+		.min(6, { message: 'Введите код из приложения или резервный код' })
 })
 
 export type DisableTotp = z.infer<typeof disableTotpSchema>
@@ -32,33 +40,30 @@ export function DisableTotpForm() {
 
 	const queryClient = useQueryClient()
 
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['totp disable'],
-		mutationFn: (data: DisableTotp) => totpDisable(data),
-		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: ['mfa status'] })
-			setIsOpen(false)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при отключении'
-			)
-		}
-	})
-
 	const form = useForm<DisableTotp>({
 		resolver: zodResolver(disableTotpSchema),
 		defaultValues: {
-			password: ''
+			code: ''
 		}
 	})
 
-	useEffect(() => {
-		form.reset()
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
+	const { mutate, isPending } = usePostMfaTotpDisableMutation({
+		mutation: {
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: getGetMfaQueryQueryKey()
+				})
+				form.reset()
+				setIsOpen(false)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при отключении'))
+			}
+		}
+	})
 
-	async function onSubmit(data: DisableTotp) {
-		await mutateAsync(data)
+	function onSubmit(data: DisableTotp) {
+		mutate({ data })
 	}
 
 	return (
@@ -78,14 +83,15 @@ export function DisableTotpForm() {
 						>
 							<FormField
 								control={form.control}
-								name='password'
+								name='code'
 								render={({ field }) => (
 									<FormItem className='text-foreground'>
-										<FormLabel>Пароль</FormLabel>
+										<FormLabel>
+											Код из приложения или резервный код
+										</FormLabel>
 										<FormControl>
 											<Input
-												type='password'
-												placeholder='******'
+												placeholder='XXXXXX'
 												disabled={isPending}
 												{...field}
 											/>

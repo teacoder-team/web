@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 
-import { Premium } from '@/src/components/premium/premium'
+import { Premium } from '@/components/premium/premium'
 
 export const metadata: Metadata = {
 	title: 'Подписка'

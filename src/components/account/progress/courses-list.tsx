@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+'use client'
+
 import { BookOpen, ChevronRight } from 'lucide-react'
 
-import { CourseProgress } from '../../shared/course-progress'
+import { useGetUsersMeProgressQuery } from '@/generated/api'
 
-import { getMeProgress } from '@/src/api/requests'
-import { Button } from '@/src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
@@ -12,17 +12,16 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle
-} from '@/src/components/ui/card'
+} from '@/components/ui/card'
+
+import { CourseProgress } from '../../shared/course-progress'
 
 interface CoursesListProps {
 	onViewAll: () => void
 }
 
 export function CoursesList({ onViewAll }: CoursesListProps) {
-	const { data } = useQuery({
-		queryKey: ['get me progress'],
-		queryFn: () => getMeProgress()
-	})
+	const { data } = useGetUsersMeProgressQuery()
 
 	return (
 		<Card>

@@ -1,10 +1,20 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
 import { KeyRound } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import {
+	usePostUsersMePasswordChangeMutation,
+	usePostUsersMePasswordConfirmMutation
+} from '@/generated/api'
+import type { ChangePasswordPayload, UserResponse } from '@/generated/model'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { setAccessToken } from '@/lib/auth/token'
 
 import { Button } from '../../ui/button'
 import {
@@ -27,10 +37,11 @@ import {
 } from '../../ui/form'
 import { Input } from '../../ui/input'
 
-import { changePassword } from '@/src/api/requests'
+import { ConfirmCodeStep } from './confirm-code-step'
 
 const passwordSchema = z
 	.object({
+		currentPassword: z.string(),
 		newPassword: z
 			.string()
 			.min(6, {
@@ -48,36 +59,61 @@ const passwordSchema = z
 
 export type Password = z.infer<typeof passwordSchema>
 
-export function PasswordForm() {
-	const [isOpen, setIsOpen] = useState(false)
+interface PasswordFormProps {
+	user: UserResponse | undefined
+}
 
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['change password'],
-		mutationFn: (data: Password) => changePassword(data),
-		onSuccess() {
-			setIsOpen(false)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при смене пароля'
-			)
-		}
-	})
+export function PasswordForm({ user }: PasswordFormProps) {
+	const [isOpen, setIsOpen] = useState(false)
+	const [isCodeSent, setIsCodeSent] = useState(false)
 
 	const form = useForm<Password>({
 		resolver: zodResolver(passwordSchema),
 		defaultValues: {
+			currentPassword: '',
 			newPassword: '',
 			confirmPassword: ''
 		}
 	})
 
-	useEffect(() => {
-		form.reset()
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
+	const { mutate, isPending } = usePostUsersMePasswordChangeMutation({
+		mutation: {
+			onSuccess() {
+				form.reset()
+				setIsCodeSent(true)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при смене пароля'))
+			}
+		}
+	})
 
-	async function onSubmit(data: Password) {
-		await mutateAsync(data)
+	const { mutate: confirm, isPending: isConfirming } =
+		usePostUsersMePasswordConfirmMutation({
+			mutation: {
+				onSuccess({ accessToken }) {
+					// Every session, this one included, was ended - this token opens the new one.
+					setAccessToken(accessToken)
+					setIsCodeSent(false)
+					setIsOpen(false)
+					toast.success('Пароль изменён')
+				},
+				onError(error) {
+					toast.error(
+						getErrorMessage(error, 'Ошибка при смене пароля')
+					)
+				}
+			}
+		})
+
+	function onSubmit({ currentPassword, newPassword }: Password) {
+		// The spec drops the optional `currentPassword`, though the API reads it.
+		const data: ChangePasswordPayload & { currentPassword?: string } = {
+			newPassword,
+			currentPassword: user?.hasPassword ? currentPassword : undefined
+		}
+
+		mutate({ data })
 	}
 
 	return (
@@ -100,6 +136,7 @@ export function PasswordForm() {
 					open={isOpen}
 					onOpenChange={state => {
 						form.reset()
+						setIsCodeSent(false)
 						setIsOpen(state)
 					}}
 				>
@@ -107,71 +144,110 @@ export function PasswordForm() {
 						<Button variant='outline'>Изменить</Button>
 					</DialogTrigger>
 					<DialogContent>
-						<DialogHeader>
-							<DialogTitle>Обновление пароля</DialogTitle>
-							<DialogDescription>
-								Введите текущий и новый пароль для обновления.
-							</DialogDescription>
-						</DialogHeader>
-						<Form {...form}>
-							<form
-								onSubmit={form.handleSubmit(onSubmit)}
-								className='grid gap-4'
-							>
-								<FormField
-									control={form.control}
-									name='newPassword'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Новый пароль</FormLabel>
-											<FormControl>
-												<Input
-													type='password'
-													placeholder='******'
-													disabled={isPending}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name='confirmPassword'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>
-												Подтвердите новый пароль
-											</FormLabel>
-											<FormControl>
-												<Input
-													type='password'
-													placeholder='******'
-													disabled={isPending}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<DialogFooter>
-									<DialogClose asChild>
-										<Button variant='outline'>
-											Отмена
-										</Button>
-									</DialogClose>
-									<Button
-										type='submit'
-										variant='primary'
-										isLoading={isPending}
+						{isCodeSent ? (
+							<ConfirmCodeStep
+								title='Обновление пароля'
+								description={`Мы отправили 6-значный код на ${user?.email ?? 'вашу почту'}.`}
+								isLoading={isConfirming}
+								onSubmit={code => confirm({ data: { code } })}
+							/>
+						) : (
+							<>
+								<DialogHeader>
+									<DialogTitle>Обновление пароля</DialogTitle>
+									<DialogDescription>
+										{user?.hasPassword
+											? 'Введите текущий и новый пароль для обновления.'
+											: 'Введите новый пароль.'}
+									</DialogDescription>
+								</DialogHeader>
+								<Form {...form}>
+									<form
+										onSubmit={form.handleSubmit(onSubmit)}
+										className='grid gap-4'
 									>
-										Обновить
-									</Button>
-								</DialogFooter>
-							</form>
-						</Form>
+										{user?.hasPassword && (
+											<FormField
+												control={form.control}
+												name='currentPassword'
+												render={({ field }) => (
+													<FormItem>
+														<FormLabel>
+															Текущий пароль
+														</FormLabel>
+														<FormControl>
+															<Input
+																type='password'
+																placeholder='******'
+																disabled={
+																	isPending
+																}
+																{...field}
+															/>
+														</FormControl>
+														<FormMessage />
+													</FormItem>
+												)}
+											/>
+										)}
+										<FormField
+											control={form.control}
+											name='newPassword'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>
+														Новый пароль
+													</FormLabel>
+													<FormControl>
+														<Input
+															type='password'
+															placeholder='******'
+															disabled={isPending}
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<FormField
+											control={form.control}
+											name='confirmPassword'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>
+														Подтвердите новый пароль
+													</FormLabel>
+													<FormControl>
+														<Input
+															type='password'
+															placeholder='******'
+															disabled={isPending}
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<DialogFooter>
+											<DialogClose asChild>
+												<Button variant='outline'>
+													Отмена
+												</Button>
+											</DialogClose>
+											<Button
+												type='submit'
+												variant='primary'
+												isLoading={isPending}
+											>
+												Обновить
+											</Button>
+										</DialogFooter>
+									</form>
+								</Form>
+							</>
+						)}
 					</DialogContent>
 				</Dialog>
 			</div>

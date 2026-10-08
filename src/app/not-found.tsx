@@ -2,8 +2,9 @@ import { ChevronLeft } from 'lucide-react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { Button } from '../components/ui/button'
-import { ROUTES } from '../constants/routes'
+import { Button } from '@/components/ui/button'
+
+import { ROUTES } from '@/constants/routes'
 
 export const metadata: Metadata = {
 	title: 'Страница не найдена'

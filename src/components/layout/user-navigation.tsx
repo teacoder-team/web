@@ -1,13 +1,20 @@
 'use client'
 
-import { ChartArea, LinkIcon, MonitorSmartphone, Settings } from 'lucide-react'
+import {
+	ChartArea,
+	GemIcon,
+	LinkIcon,
+	MonitorSmartphone,
+	Settings
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { buttonVariants } from '../ui/button'
+import { ROUTES } from '@/constants/routes'
 
-import { ROUTES } from '@/src/constants'
-import { cn } from '@/src/lib/utils'
+import { cn } from '@/lib/utils'
+
+import { buttonVariants } from '../ui/button'
 
 export const links = [
 	{
@@ -19,6 +26,11 @@ export const links = [
 		title: 'Настройки аккаунта',
 		href: ROUTES.ACCOUNT.SETTINGS,
 		icon: Settings
+	},
+	{
+		title: 'Подписка',
+		href: ROUTES.ACCOUNT.SUBSCRIPTION,
+		icon: GemIcon
 	},
 	{
 		title: 'Устройства',

@@ -1,9 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
+'use client'
+
 import { ChartArea, LogOut, Menu, Settings } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { toast } from 'sonner'
+
+import { ROUTES } from '@/constants/routes'
+
+import { useSession } from '@/lib/auth/auth-provider'
+import { useSignOut } from '@/lib/auth/use-sign-out'
 
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
@@ -16,33 +20,15 @@ import {
 } from '../ui/sheet'
 
 import { navLinks } from './nav-links'
-import { useLogout } from '@/src/api/hooks'
-import { instance } from '@/src/api/instance'
-import { ROUTES } from '@/src/constants'
-import { useAuth } from '@/src/hooks'
-import { cookies } from '@/src/lib/cookie'
 
 export function MobileNav() {
 	const [isOpen, setIsOpen] = useState(false)
 
 	const router = useRouter()
 
-	const { isAuthorized } = useAuth()
+	const { isAuthorized } = useSession()
 
-	const { mutate } = useLogout({
-		onSuccess() {
-			cookies.remove('token')
-
-			delete instance.defaults.headers['X-Session-Token']
-
-			setIsOpen(false)
-
-			router.push(ROUTES.AUTH.LOGIN())
-		},
-		onError(error: any) {
-			toast.error(error.response?.data?.message ?? 'Ошибка при выходе')
-		}
-	})
+	const { mutate } = useSignOut(() => setIsOpen(false))
 
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>

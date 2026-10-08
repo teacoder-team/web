@@ -1,64 +1,48 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
 
-import { api } from '@/src/api/instance'
-import { getCourseLessons, getLesson } from '@/src/api/requests'
-import { LessonCompleteButton } from '@/src/components/lesson/lesson-complete-button'
-import { LessonContainer } from '@/src/components/lesson/lesson-container'
-import { LessonPlayer } from '@/src/components/lesson/lesson-player'
-import { LessonSidebar } from '@/src/components/lesson/lesson-sidebar'
+import {
+	getCoursesBySlugLessonsQuery,
+	getLessonsByIdQuery
+} from '@/generated/api'
 
-export const revalidate = 60
+import { LessonCompleteButton } from '@/components/lesson/lesson-complete-button'
+import { LessonContainer } from '@/components/lesson/lesson-container'
+import { LessonPlayer } from '@/components/lesson/lesson-player'
+import { LessonSidebar } from '@/components/lesson/lesson-sidebar'
 
-async function getUserProgress(courseId: string) {
-	const cookieStore = await cookies()
-	const token = cookieStore.get('token')?.value
+// Rendered without the user's token: progress loads on the client.
+const getLesson = cache((id: string) =>
+	getLessonsByIdQuery(id).catch(error => {
+		console.error('[LessonPage] getLesson failed', { id, error })
 
-	const [{ data: progressCount }, { data: completedLessons }] =
-		await Promise.all([
-			api.get<number>(`/progress/${courseId}`, {
-				headers: {
-					'X-Session-Token': token ?? ''
-				}
-			}),
-			api.get<string[]>(`/lessons/${courseId}/progress`, {
-				headers: {
-					'X-Session-Token': token ?? ''
-				}
-			})
-		])
-
-	return { progressCount, completedLessons }
-}
+		return null
+	})
+)
 
 export async function generateMetadata({
 	params
 }: {
-	params: { id: string }
+	params: Promise<{ id: string }>
 }): Promise<Metadata> {
 	const { id } = await params
 
-	try {
-		const lesson = await getLesson(id)
+	const lesson = await getLesson(id)
 
-		if (!lesson)
-			return {
-				title: 'Урок не найден'
-			}
-
+	if (!lesson) {
 		return {
-			title: lesson.title,
-			description: lesson.description ?? ''
+			title: 'Урок не найден'
 		}
-	} catch (error) {
-		console.error('[generateMetadata] getLesson failed', {
-			id,
-			error
-		})
+	}
 
-		return {
-			title: 'Урок'
+	return {
+		title: lesson.title,
+		description: lesson.description ?? '',
+		referrer: 'no-referrer',
+		robots: {
+			index: false,
+			follow: false
 		}
 	}
 }
@@ -70,29 +54,15 @@ export default async function LessonPage({
 }) {
 	const { id } = await params
 
-	const lesson = await getLesson(id).catch(error => {
-		console.error('[LessonPage] getLesson failed', {
-			id,
-			error
-		})
-		return null
-	})
+	const lesson = await getLesson(id)
 
 	if (!lesson) notFound()
 
-	const [lessons, { progressCount, completedLessons }] = await Promise.all([
-		getCourseLessons(lesson.course.id),
-		getUserProgress(lesson.course.id)
-	])
+	const lessons = await getCoursesBySlugLessonsQuery(lesson.course.slug)
 
 	return (
 		<div className='h-full'>
-			<LessonSidebar
-				course={lesson.course}
-				lessons={lessons}
-				completedLessons={completedLessons}
-				progressCount={progressCount}
-			/>
+			<LessonSidebar course={lesson.course} lessons={lessons} />
 			<LessonContainer>
 				<h1 className='mb-4 text-3xl font-bold'>{lesson.title}</h1>
 
@@ -103,13 +73,10 @@ export default async function LessonPage({
 				)}
 
 				<div className='space-y-8'>
-					<LessonPlayer videoId={lesson.kinescopeId} />
+					<LessonPlayer videoId={lesson.kinescopeId ?? ''} />
 
 					<div className='flex justify-end'>
-						<LessonCompleteButton
-							lesson={lesson}
-							completedLessons={completedLessons}
-						/>
+						<LessonCompleteButton lesson={lesson} />
 					</div>
 				</div>
 			</LessonContainer>

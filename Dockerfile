@@ -12,16 +12,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_APP_URL
-ARG NEXT_PUBLIC_API_URL
-ARG NEXT_PUBLIC_STORAGE_URL
-ARG NEXT_PUBLIC_COOKIE_DOMAIN
-
-ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_STORAGE_URL=$NEXT_PUBLIC_STORAGE_URL
-ENV NEXT_PUBLIC_COOKIE_DOMAIN=$NEXT_PUBLIC_COOKIE_DOMAIN
-
+RUN test -f .env || (echo 'Missing .env: create it from .env.example before building' >&2; exit 1)
 RUN bun run build
 
 FROM node:22-alpine AS runner
@@ -40,9 +31,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
 
-EXPOSE 14702
-
-ENV PORT=14702
+ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 CMD ["node", "server.js"]

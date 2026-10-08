@@ -1,12 +1,19 @@
+'use client'
+
 import Image from 'next/image'
 
+import type {
+	CourseLessonListResponseItem,
+	CourseResponse
+} from '@/generated/model'
+
+import { useMediaSource } from '@/hooks/use-media-source'
+
 import { CourseLessons } from './course-lessons'
-import type { CourseResponse, LessonResponse } from '@/src/api/generated'
-import { getMediaSource } from '@/src/lib/utils'
 
 interface CourseContentProps {
 	course: CourseResponse
-	lessons: LessonResponse[]
+	lessons: CourseLessonListResponseItem[]
 	completedLessons: string[]
 }
 
@@ -15,11 +22,13 @@ export function CourseContent({
 	lessons,
 	completedLessons
 }: CourseContentProps) {
+	const getMediaSource = useMediaSource()
+
 	return (
 		<div className='order-1 col-span-1 flex flex-col space-y-6 lg:col-span-4'>
 			<div className='relative aspect-video overflow-hidden rounded-xl border bg-white'>
 				<Image
-					src={getMediaSource(course.thumbnail!, 'courses')}
+					src={getMediaSource(course.thumbnail, 'courses')}
 					alt={course.title}
 					fill
 				/>

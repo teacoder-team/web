@@ -1,10 +1,10 @@
-import { APP_CONFIG } from './app'
+import { env } from '@/lib/config/env'
 
 export const SEO = {
 	name: 'TeaCoder',
 	description:
 		'Образовательная платформа для программистов и IT-специалистов. Здесь вы найдёте качественные курсы по веб-разработке, актуальные новости IT-сферы, полезные статьи и активное сообщество разработчиков.',
-	url: APP_CONFIG.baseUrl,
+	url: env.APP_URL,
 	keywords: [
 		'веб-разработка',
 		'курсы по программированию',

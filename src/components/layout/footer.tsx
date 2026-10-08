@@ -7,7 +7,10 @@ import { JSX } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { FaTelegram, FaYoutube } from 'react-icons/fa6'
 
-import { ROUTES } from '@/src/constants'
+import { ROUTES } from '@/constants/routes'
+
+import { env } from '@/lib/config/env'
+import { useConsent } from '@/lib/consent/consent-provider'
 
 interface NavLink {
 	title: string
@@ -61,6 +64,8 @@ const socialLinks: SocialLink[] = [
 ]
 
 export function Footer() {
+	const { openSettings } = useConsent()
+
 	return (
 		<footer className='border-t'>
 			<div className='relative mx-auto max-w-[1340px] px-4 py-8 lg:px-8'>
@@ -72,10 +77,10 @@ export function Footer() {
 							<br /> В случае возникновения вопросов, обращайтесь
 							на почту{' '}
 							<Link
-								href='mailto:support@teacoder.ru'
+								href={`mailto:${env.SUPPORT_EMAIL}`}
 								className='text-blue-500 hover:underline'
 							>
-								support@teacoder.ru
+								{env.SUPPORT_EMAIL}
 							</Link>
 							.
 						</p>
@@ -95,6 +100,15 @@ export function Footer() {
 							{documentsLinks.map((link, index) => (
 								<FooterLink key={index} {...link} />
 							))}
+							<li>
+								<button
+									type='button'
+									onClick={openSettings}
+									className='inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary'
+								>
+									Настройки cookie
+								</button>
+							</li>
 						</ul>
 					</div>
 

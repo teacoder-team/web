@@ -1,34 +1,17 @@
-import { useRouter } from 'next/navigation'
+'use client'
+
 import { useState } from 'react'
-import { toast } from 'sonner'
+
+import { useSignOut } from '@/lib/auth/use-sign-out'
 
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'
 import { Card, CardContent } from '../../ui/card'
 
-import { useLogout } from '@/src/api/hooks'
-import { instance } from '@/src/api/instance'
-import { ROUTES } from '@/src/constants'
-import { cookies } from '@/src/lib/cookie'
-
 export function AccountActions() {
 	const [isOpen, setIsOpen] = useState(false)
 
-	const { push } = useRouter()
-
-	const { mutate } = useLogout({
-		onSuccess() {
-			cookies.remove('token')
-
-			delete instance.defaults.headers['X-Session-Token']
-
-			setIsOpen(false)
-			push(ROUTES.AUTH.LOGIN())
-		},
-		onError(error: any) {
-			toast.error(error.response?.data?.message ?? 'Ошибка при выходе')
-		}
-	})
+	const { mutate } = useSignOut(() => setIsOpen(false))
 
 	return (
 		<div className='flex flex-col gap-y-3 pb-10'>

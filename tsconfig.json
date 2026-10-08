@@ -23,8 +23,14 @@
     ],
     "baseUrl": ".",
     "paths": {
+      "@/generated/*": [
+        "./generated/*"
+      ],
+      "@/src/*": [
+        "./src/*"
+      ],
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     },
     "target": "ES2017"

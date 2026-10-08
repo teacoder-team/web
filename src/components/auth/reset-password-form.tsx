@@ -1,13 +1,19 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Captcha } from '../shared/captcha'
+import { usePostAuthForgotPasswordMutation } from '@/generated/api'
+
+import { ROUTES } from '@/constants/routes'
+
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useCaptchaRequired } from '@/lib/captcha/captcha'
+
 import { Button } from '../ui/button'
 import {
 	Form,
@@ -20,9 +26,7 @@ import {
 import { Input } from '../ui/input'
 
 import { AuthWrapper } from './auth-wrapper'
-import { sendPasswordReset } from '@/src/api/requests'
-import { ROUTES } from '@/src/constants'
-import { analytics } from '@/src/lib/analytics'
+import { CaptchaField } from './captcha-field'
 
 const resetPasswordSchema = z.object({
 	email: z
@@ -34,23 +38,9 @@ const resetPasswordSchema = z.object({
 export type ResetPassword = z.infer<typeof resetPasswordSchema>
 
 export function ResetPasswordForm() {
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['send password reset'],
-		mutationFn: (data: ResetPassword) => sendPasswordReset(data),
-		onSuccess() {
-			analytics.auth.resetPassword.success()
+	const [captchaKey, setCaptchaKey] = useState(0)
 
-			form.reset()
-			toast.success('Письмо с инструкциями отправлено на вашу почту')
-		},
-		onError(error: any) {
-			const message =
-				error.response?.data?.message ?? 'Ошибка при сбросе пароля'
-			analytics.auth.resetPassword.fail(message)
-
-			toast.error(message)
-		}
-	})
+	const isCaptchaRequired = useCaptchaRequired()
 
 	const form = useForm<ResetPassword>({
 		resolver: zodResolver(resetPasswordSchema),
@@ -60,25 +50,43 @@ export function ResetPasswordForm() {
 		}
 	})
 
+	const { mutate, isPending } = usePostAuthForgotPasswordMutation({
+		mutation: {
+			onSuccess() {
+				analytics.auth.resetPassword.success()
+
+				form.reset()
+				setCaptchaKey(key => key + 1)
+				toast.success('Письмо с инструкциями отправлено на вашу почту')
+			},
+			onError(error) {
+				const message = getErrorMessage(
+					error,
+					'Ошибка при сбросе пароля'
+				)
+				analytics.auth.resetPassword.fail(message)
+
+				toast.error(message)
+
+				form.setValue('captcha', '')
+				setCaptchaKey(key => key + 1)
+			}
+		}
+	})
+
 	useEffect(() => {
 		analytics.auth.resetPassword.view()
 	}, [])
 
-	useEffect(() => {
-		if (form.formState.isSubmitSuccessful && form.getValues('captcha')) {
-			form.reset()
-		}
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
-
-	async function onSubmit(data: ResetPassword) {
+	function onSubmit({ email, captcha }: ResetPassword) {
 		analytics.auth.resetPassword.submit()
 
-		if (!data.captcha) {
+		if (isCaptchaRequired && !captcha) {
 			toast.warning('Пройдите капчу!')
 			return
 		}
 
-		await mutateAsync(data)
+		mutate({ data: { email, captchaToken: captcha || undefined } })
 	}
 
 	return (
@@ -112,21 +120,11 @@ export function ResetPasswordForm() {
 								</FormItem>
 							)}
 						/>
-						<FormField
+						<CaptchaField
 							control={form.control}
 							name='captcha'
-							render={({ field }) => (
-								<FormItem className='flex flex-col items-center justify-center'>
-									<FormControl>
-										<Captcha
-											onVerify={token =>
-												form.setValue('captcha', token)
-											}
-											{...field}
-										/>
-									</FormControl>
-								</FormItem>
-							)}
+							resetKey={captchaKey}
+							className='flex flex-col items-center justify-center'
 						/>
 						<Button
 							type='submit'

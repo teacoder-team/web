@@ -2,12 +2,14 @@
 
 import Script from 'next/script'
 
-import { env } from '@/src/config/env'
+import { env } from '@/lib/config/env'
+import { useConsent } from '@/lib/consent/consent-provider'
 
 export function YandexMetrikaScript() {
 	const id = env.YANDEX_METRIKA_ID
+	const { consent } = useConsent()
 
-	if (!id) return null
+	if (!id || !consent?.analytics) return null
 
 	return (
 		<>

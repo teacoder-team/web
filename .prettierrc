@@ -8,6 +8,7 @@
 	"arrowParens": "avoid",
 	"importOrder": [
 		"<THIRD_PARTY_MODULES>",
+		"^@/generated/(.*)$",
 		"^@/app/(.*)$",
 		"^@/components/(.*)$",
 		"^@/constants/(.*)$",

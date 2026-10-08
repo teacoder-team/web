@@ -3,17 +3,22 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { FaYoutube } from 'react-icons/fa'
 
+import type { CourseListResponseItem } from '@/generated/model'
+
+import { ROUTES } from '@/constants/routes'
+
+import { getAppConfig } from '@/lib/config/app-config'
+import { getLessonLabel, getMediaSource } from '@/lib/utils'
+
 import { Badge } from '../ui/badge'
 
-import type { CoursesResponse } from '@/src/api/generated'
-import { ROUTES } from '@/src/constants'
-import { getLessonLabel, getMediaSource } from '@/src/lib/utils'
-
 interface CourseCardProps {
-	course: CoursesResponse
+	course: CourseListResponseItem
 }
 
-export function CourseCard({ course }: CourseCardProps) {
+export async function CourseCard({ course }: CourseCardProps) {
+	const config = await getAppConfig()
+
 	return (
 		<Link
 			href={ROUTES.COURSES.SINGLE(course.slug)}
@@ -21,7 +26,11 @@ export function CourseCard({ course }: CourseCardProps) {
 		>
 			<div className='relative aspect-video overflow-hidden rounded-md transition-all'>
 				<Image
-					src={getMediaSource(course.thumbnail ?? '', 'courses')}
+					src={getMediaSource(
+						course.thumbnail,
+						'courses',
+						config?.features.orion.url
+					)}
 					alt={course.title}
 					fill
 				/>

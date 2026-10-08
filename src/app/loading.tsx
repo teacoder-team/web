@@ -1,4 +1,4 @@
-import { EllipsisLoader } from '../components/shared/ellipsis-loader'
+import { EllipsisLoader } from '@/components/shared/ellipsis-loader'
 
 export default function LoadingPage() {
 	return (

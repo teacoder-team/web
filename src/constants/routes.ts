@@ -14,12 +14,13 @@ export const ROUTES = {
 	},
 	COURSES: {
 		ROOT: '/courses',
-		SINGLE: (slug: string) => `/courses/${slug}` as any,
-		LESSON: (id: string) => `/lesson/${id}` as any
+		SINGLE: (slug: string) => `/courses/${slug}`,
+		LESSON: (id: string) => `/lesson/${id}`
 	},
 	ACCOUNT: {
 		ROOT: '/account',
 		SETTINGS: '/account/settings',
+		SUBSCRIPTION: '/account/subscription',
 		SESSIONS: '/account/sessions',
 		CONNECTIONS: '/account/connections'
 	}

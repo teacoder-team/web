@@ -1,10 +1,21 @@
 'use client'
 
-import { useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
 import { FaGoogle } from 'react-icons/fa6'
 import { toast } from 'sonner'
+
+import {
+	useGetAuthSsoAccountsQuery,
+	usePostAuthSsoByProviderLinkMutation
+} from '@/generated/api'
+
+import {
+	SSO_PROVIDERS,
+	type SsoProvider,
+	isSsoProvider
+} from '@/constants/sso-providers'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { useAppConfig } from '@/lib/config/use-app-config'
 
 import { Heading } from '../../shared/heading'
 import { Button } from '../../ui/button'
@@ -13,73 +24,37 @@ import { Skeleton } from '../../ui/skeleton'
 
 import { ConnectionError } from './connection-error'
 import { UnlinkProvider } from './unlink-provider'
-import { TelegramAuthRequest } from '@/src/api/generated'
-import {
-	useFetchSsoStatus,
-	useGetAvailableSsoProviders,
-	useSsoConnect,
-	useTelegramConnect
-} from '@/src/api/hooks'
-import { ROUTES, SSO_PROVIDERS } from '@/src/constants'
-
-function base64DecodeUnicode(str: string) {
-	try {
-		return decodeURIComponent(
-			atob(str.replace(/-/g, '+').replace(/_/g, '/'))
-				.split('')
-				.map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-				.join('')
-		)
-	} catch {
-		return null
-	}
-}
 
 export function Connections() {
-	const router = useRouter()
+	const { data: config, isLoading: isLoadingConfig } = useAppConfig()
+	const { data: accounts, isLoading: isLoadingAccounts } =
+		useGetAuthSsoAccountsQuery()
 
-	const queryClient = useQueryClient()
+	const providers = config?.features.auth.providers.filter(isSsoProvider)
+	const linkedProviders = new Set(
+		accounts?.accounts
+			.filter(account => account.linked)
+			.map(account => account.slug)
+	)
 
-	const { data: availableProviders, isLoading: isLoadingProviders } =
-		useGetAvailableSsoProviders()
-	const { data: ssoStatus, isLoading: isLoadingStatus } = useFetchSsoStatus()
+	const { mutate, isPending } = usePostAuthSsoByProviderLinkMutation()
 
-	const { mutate, isPending } = useSsoConnect({
-		onSuccess(data) {
-			router.push(data.url as any)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при подключении'
-			)
-		}
-	})
-
-	const { mutate: connectTelegram } = useTelegramConnect({
-		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: ['sso status'] })
-			router.push(ROUTES.ACCOUNT.CONNECTIONS)
-		},
-		onError() {
-			toast.error('Ошибка при привязке Telegram')
-		}
-	})
-
-	useEffect(() => {
-		const hashString = window.location.hash.replace('#tgAuthResult=', '')
-		if (!hashString) return
-
-		const decoded = base64DecodeUnicode(hashString)
-		if (!decoded) return
-
-		try {
-			const user: TelegramAuthRequest = JSON.parse(decoded)
-			connectTelegram(user)
-			window.history.replaceState(null, '', ROUTES.ACCOUNT.CONNECTIONS)
-		} catch {
-			router.push(ROUTES.ACCOUNT.CONNECTIONS)
-		}
-	}, [connectTelegram])
+	/** The provider returns to `/auth/callback/:provider`, which finishes the link. */
+	function link(provider: SsoProvider) {
+		mutate(
+			{ provider },
+			{
+				onSuccess(data) {
+					window.location.assign(data.url)
+				},
+				onError(error) {
+					toast.error(
+						getErrorMessage(error, 'Ошибка при подключении')
+					)
+				}
+			}
+		)
+	}
 
 	return (
 		<>
@@ -90,20 +65,15 @@ export function Connections() {
 						description='Подключите и управляйте своими аккаунтами на сторонних сервисах, таких как Google и GitHub'
 					/>
 					<div className='mt-2 space-y-5'>
-						{isLoadingProviders || isLoadingStatus
+						{isLoadingConfig || isLoadingAccounts
 							? Array.from({ length: 4 }).map((_, index) => (
 									<ConnectionsSkeleton key={index} />
 								))
-							: availableProviders?.map((provider, index) => {
-									const meta =
-										SSO_PROVIDERS[
-											provider as keyof typeof SSO_PROVIDERS
-										]
+							: providers?.map((provider, index) => {
+									const meta = SSO_PROVIDERS[provider]
 
-									if (!meta) return null
-
-									// @ts-ignore
-									const isConnected = ssoStatus?.[provider]
+									const isConnected =
+										linkedProviders.has(provider)
 
 									return (
 										<Card
@@ -136,9 +106,7 @@ export function Connections() {
 												) : (
 													<Button
 														onClick={() =>
-															mutate({
-																provider
-															})
+															link(provider)
 														}
 														variant='outline'
 														isLoading={isPending}

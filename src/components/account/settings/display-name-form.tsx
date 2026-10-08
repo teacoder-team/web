@@ -1,8 +1,18 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import {
+	getGetUsersMeQueryQueryKey,
+	usePatchUsersMeMutation
+} from '@/generated/api'
+import type { UserResponse } from '@/generated/model'
+
+import { getErrorMessage } from '@/lib/api/errors'
 
 import { Button } from '../../ui/button'
 import {
@@ -16,9 +26,6 @@ import {
 } from '../../ui/form'
 import { Input } from '../../ui/input'
 
-import type { AccountResponse } from '@/src/api/generated'
-import { patchUser } from '@/src/api/requests'
-
 const displayNameSchema = z.object({
 	displayName: z.string({ message: 'Имя обязательно' })
 })
@@ -26,20 +33,23 @@ const displayNameSchema = z.object({
 export type DisplayName = z.infer<typeof displayNameSchema>
 
 interface DisplayNameFormProps {
-	user: AccountResponse | undefined
+	user: UserResponse | undefined
 }
 
 export function DisplayNameForm({ user }: DisplayNameFormProps) {
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['patch user'],
-		mutationFn: (data: DisplayName) => patchUser(data),
-		onSuccess() {
-			toast.success('Профиль обновлён')
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при обновлении профиля'
-			)
+	const queryClient = useQueryClient()
+
+	const { mutate, isPending } = usePatchUsersMeMutation({
+		mutation: {
+			onSuccess(data) {
+				queryClient.setQueryData(getGetUsersMeQueryQueryKey(), data)
+				toast.success('Профиль обновлён')
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при обновлении профиля')
+				)
+			}
 		}
 	})
 
@@ -52,8 +62,8 @@ export function DisplayNameForm({ user }: DisplayNameFormProps) {
 
 	const { isDirty } = form.formState
 
-	async function onSubmit(data: DisplayName) {
-		await mutateAsync(data)
+	function onSubmit(data: DisplayName) {
+		mutate({ data })
 	}
 
 	return (

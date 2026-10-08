@@ -1,30 +1,36 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-export default async function proxy(request: NextRequest) {
-	const { cookies, url } = request
+import { SESSION_MARKER } from '@/lib/auth/marker'
 
-	const token = cookies.get('token')?.value
+/**
+ * UX redirects only. The marker is a hint - the real check is the refresh on the
+ * client, which drops the marker if the session is gone.
+ */
+export default function proxy(request: NextRequest) {
+	const { pathname, search } = request.nextUrl
 
-	const isAuthPage = url.includes('/auth')
-	const isVerifyPage = url.includes('/auth/verify')
+	const hasSession = request.cookies.has(SESSION_MARKER)
 
-	if (isVerifyPage) {
-		if (!token) {
-			return NextResponse.redirect(new URL('/auth/login', url))
-		}
+	// Providers return here after linking from settings, when the user is signed in.
+	if (pathname.startsWith('/auth/callback/')) {
 		return NextResponse.next()
 	}
 
-	if (isAuthPage) {
-		if (token) {
-			return NextResponse.redirect(new URL('/account', url))
-		}
-		return NextResponse.next()
+	if (pathname.startsWith('/auth')) {
+		return hasSession
+			? NextResponse.redirect(new URL('/account', request.url))
+			: NextResponse.next()
 	}
 
-	if (!token) {
-		return NextResponse.redirect(new URL('/auth/login', url))
+	if (!hasSession) {
+		const login = new URL('/auth/login', request.url)
+
+		login.searchParams.set('redirectTo', `${pathname}${search}`)
+
+		return NextResponse.redirect(login)
 	}
+
+	return NextResponse.next()
 }
 
 export const config = {

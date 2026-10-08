@@ -6,9 +6,9 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 
-import { Button } from '../ui/button'
+import { ROUTES } from '@/constants/routes'
 
-import { ROUTES } from '@/src/constants'
+import { Button } from '../ui/button'
 
 export function Hero() {
 	return (

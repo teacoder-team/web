@@ -1,14 +1,23 @@
+'use client'
+
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+	getGetAuthSsoAccountsQueryQueryKey,
+	useDeleteAuthSsoAccountsByProviderMutation
+} from '@/generated/api'
+
+import type { SsoProvider } from '@/constants/sso-providers'
+
+import { getErrorMessage } from '@/lib/api/errors'
+
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'
 
-import { useUnlinkAccount } from '@/src/api/hooks'
-
 interface UnlinkProviderProps {
-	provider: string
+	provider: SsoProvider
 }
 
 export function UnlinkProvider({ provider }: UnlinkProviderProps) {
@@ -16,17 +25,17 @@ export function UnlinkProvider({ provider }: UnlinkProviderProps) {
 
 	const queryClient = useQueryClient()
 
-	const { mutate, isPending } = useUnlinkAccount({
-		onSuccess() {
-			queryClient.invalidateQueries({
-				queryKey: ['sso status']
-			})
-			setIsOpen(false)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при отключении'
-			)
+	const { mutate, isPending } = useDeleteAuthSsoAccountsByProviderMutation({
+		mutation: {
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: getGetAuthSsoAccountsQueryQueryKey()
+				})
+				setIsOpen(false)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при отключении'))
+			}
 		}
 	})
 

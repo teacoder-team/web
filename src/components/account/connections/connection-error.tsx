@@ -5,6 +5,8 @@ import type { Route } from 'next'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+import { env } from '@/lib/config/env'
+
 import { Button } from '../../ui/button'
 import {
 	Card,
@@ -34,8 +36,7 @@ export function ConnectionError() {
 				title: 'Аккаунт уже привязан',
 				description:
 					'Этот аккаунт уже привязан к другому пользователю.',
-				details:
-					'Пожалуйста, используйте другой аккаунт или свяжитесь с поддержкой по адресу support@teacoder.ru, чтобы решить эту проблему.'
+				details: `Пожалуйста, используйте другой аккаунт или свяжитесь с поддержкой по адресу ${env.SUPPORT_EMAIL}, чтобы решить эту проблему.`
 			})
 			setIsVisible(true)
 		} else if (error === 'email-taken') {
@@ -45,6 +46,14 @@ export function ConnectionError() {
 					'Указанная почта уже используется другим аккаунтом.',
 				details:
 					'Попробуйте использовать другой адрес электронной почты или восстановить доступ к старому аккаунту.'
+			})
+			setIsVisible(true)
+		} else if (error === 'another-linked') {
+			setErrorInfo({
+				title: 'Сервис уже привязан',
+				description:
+					'К вашему профилю уже привязан другой аккаунт этого сервиса.',
+				details: `Отвяжите текущий аккаунт, а затем привяжите новый. Если возникли сложности, напишите в поддержку по адресу ${env.SUPPORT_EMAIL}.`
 			})
 			setIsVisible(true)
 		} else if (error === 'access_denied') {
@@ -67,7 +76,7 @@ export function ConnectionError() {
 		params.delete('error')
 
 		router.replace(
-			`${window.location.pathname}?${params.toString()}` as any as Route,
+			`${window.location.pathname}?${params.toString()}` as Route,
 			{
 				scroll: false
 			}

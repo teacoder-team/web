@@ -1,52 +1,61 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { CircleCheckBig, CircleX } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
-import { Button } from '../ui/button'
+import {
+	getGetProgressByCourseIdQueryQueryKey,
+	usePutProgressMutation
+} from '@/generated/api'
+import type { LessonResponse } from '@/generated/model'
 
-import type { LessonResponse } from '@/src/api/generated'
-import { createProgress } from '@/src/api/requests'
-import { cn } from '@/src/lib/utils'
+import { ROUTES } from '@/constants/routes'
+
+import { useCourseProgress } from '@/hooks/use-course-progress'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { cn } from '@/lib/utils'
+
+import { Button } from '../ui/button'
 
 interface LessonCompleteButtonProps {
 	lesson: LessonResponse
-	completedLessons: string[]
 }
 
-export function LessonCompleteButton({
-	lesson,
-	completedLessons
-}: LessonCompleteButtonProps) {
-	const { push, refresh } = useRouter()
+export function LessonCompleteButton({ lesson }: LessonCompleteButtonProps) {
+	const router = useRouter()
+	const queryClient = useQueryClient()
+
+	const { completedLessons, isLoading: isProgressLoading } =
+		useCourseProgress(lesson.courseId)
 
 	const isCompleted = completedLessons.includes(lesson.id)
 
-	const { mutate, isPending } = useMutation({
-		mutationKey: ['create progress course'],
-		mutationFn: () =>
-			createProgress({
-				isCompleted: !isCompleted,
-				lessonId: lesson.id
-			}),
-		onSuccess(data) {
-			refresh()
+	const { mutate: update, isPending } = usePutProgressMutation({
+		mutation: {
+			onSuccess(data) {
+				queryClient.invalidateQueries({
+					queryKey: getGetProgressByCourseIdQueryQueryKey(
+						lesson.courseId
+					)
+				})
 
-			if (data.nextLesson && data.isCompleted)
-				push(`/lesson/${data.nextLesson}`)
-
-			if (!data.nextLesson && data.isCompleted) {
+				if (data.nextLessonId && data.isCompleted) {
+					router.push(ROUTES.COURSES.LESSON(data.nextLessonId))
+				}
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при обновлении прогресса')
+				)
 			}
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ??
-					'Ошибка при обновлении прогресса'
-			)
 		}
 	})
+
+	const mutate = () =>
+		update({ data: { lessonId: lesson.id, isCompleted: !isCompleted } })
 
 	const Icon = isCompleted ? CircleX : CircleCheckBig
 
@@ -74,7 +83,7 @@ export function LessonCompleteButton({
 						!isCompleted &&
 							'bg-emerald-600 !text-white hover:bg-emerald-600/90'
 					)}
-					isLoading={isPending}
+					isLoading={isPending || isProgressLoading}
 				>
 					{isPending ? (
 						'Загрузка...'

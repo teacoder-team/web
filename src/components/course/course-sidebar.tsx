@@ -1,14 +1,19 @@
 import Link from 'next/link'
 
+import type {
+	CourseLessonListResponseItem,
+	CourseResponse
+} from '@/generated/model'
+
+import { ROUTES } from '@/constants/routes'
+
 import { Button } from '../ui/button'
 
 import { CourseActions } from './course-actions'
-import type { CourseResponse, LessonResponse } from '@/src/api/generated'
-import { ROUTES } from '@/src/constants'
 
 interface CourseSidebarProps {
 	course: CourseResponse
-	lessons: LessonResponse[]
+	lessons: CourseLessonListResponseItem[]
 	completedLessons: string[]
 }
 

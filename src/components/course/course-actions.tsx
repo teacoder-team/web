@@ -1,16 +1,20 @@
-import { useMutation } from '@tanstack/react-query'
+'use client'
+
 import { DownloadCloud } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FaYoutube } from 'react-icons/fa'
 import { toast } from 'sonner'
 
-import { Button } from '../ui/button'
+import { usePostCoursesBySlugMaterialsLinkMutation } from '@/generated/api'
+import type { CourseResponse } from '@/generated/model'
 
-import type { CourseResponse } from '@/src/api/generated'
-import { generateDownloadLink, resolveDownloadToken } from '@/src/api/requests'
-import { APP_CONFIG, ROUTES } from '@/src/constants'
-import { useAuth, useCurrent } from '@/src/hooks'
+import { ROUTES } from '@/constants/routes'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { useSession } from '@/lib/auth/auth-provider'
+
+import { Button } from '../ui/button'
 
 interface CourseActionsProps {
 	course: CourseResponse
@@ -18,27 +22,32 @@ interface CourseActionsProps {
 
 export function CourseActions({ course }: CourseActionsProps) {
 	const router = useRouter()
-	const { isAuthorized } = useAuth()
-	const { user } = useCurrent()
-
-	const { mutateAsync: generate, isPending: isGenerating } = useMutation({
-		mutationFn: (courseId: string) => generateDownloadLink(courseId),
-		onError() {
-			toast.error('Не удалось сгенерировать ссылку')
+	const { isAuthorized, isLoading } = useSession()
+	const { mutate, isPending } = usePostCoursesBySlugMaterialsLinkMutation({
+		mutation: {
+			onSuccess: ({ url }) => {
+				window.location.assign(url)
+			},
+			onError: error => {
+				toast.error(
+					getErrorMessage(error, 'Не удалось сгенерировать ссылку')
+				)
+			}
 		}
 	})
 
-	const handleDownload = async () => {
-		if (!isAuthorized || !user?.isPremium)
-			return router.push(ROUTES.PREMIUM)
-
-		try {
-			const { url } = await generate(course.id)
-
-			window.open(url)
-		} catch (err) {
-			console.error(err)
+	const handleDownload = () => {
+		if (isPending || isLoading || !course.hasMaterials) {
+			return
 		}
+
+		if (!isAuthorized) {
+			return router.push(
+				ROUTES.AUTH.LOGIN(ROUTES.COURSES.SINGLE(course.slug))
+			)
+		}
+
+		mutate({ slug: course.slug })
 	}
 
 	return (
@@ -54,14 +63,18 @@ export function CourseActions({ course }: CourseActionsProps) {
 					variant='primary'
 					className='w-full'
 					onClick={handleDownload}
-					isLoading={isGenerating}
+					disabled={!course.hasMaterials || isLoading || isPending}
 				>
 					<DownloadCloud />
-					Скачать код
+					{!course.hasMaterials
+						? 'Исходный код пока недоступен'
+						: isPending
+							? 'Готовим ссылку…'
+							: 'Скачать код'}
 				</Button>
 				{course.youtubeUrl && (
 					<Button variant='outline' className='w-full' asChild>
-						<Link href={course.youtubeUrl as any} target='_blank'>
+						<Link href={course.youtubeUrl} target='_blank'>
 							<FaYoutube />
 							Смотреть на YouTube
 						</Link>

@@ -1,16 +1,20 @@
+import type { SessionListResponseItem } from '@/generated/model'
+
+import { formatDate, getBrowserIcon } from '@/lib/utils'
+
 import { Card, CardContent } from '../../ui/card'
 
 import { RevokeSession } from './remove-session'
-import { SessionResponse } from '@/src/api/generated'
-import { formatDate, getBrowserIcon } from '@/src/lib/utils'
 
 interface SessionItemProps {
-	session: SessionResponse
-	isCurrentSession?: boolean
+	session: SessionListResponseItem
 }
 
-export function SessionItem({ session, isCurrentSession }: SessionItemProps) {
-	const Icon = getBrowserIcon(session.browser)
+export function SessionItem({ session }: SessionItemProps) {
+	const Icon = getBrowserIcon(session.friendlyName ?? '')
+
+	const isCurrentSession = session.current
+	const location = [session.city, session.country].filter(Boolean).join(', ')
 
 	return (
 		<Card className='shadow-none'>
@@ -21,7 +25,7 @@ export function SessionItem({ session, isCurrentSession }: SessionItemProps) {
 					</div>
 					<div>
 						<h2 className='font-semibold'>
-							{session.browser}, {session.os}
+							{session.friendlyName ?? 'Неизвестное устройство'}
 						</h2>
 						<p className='text-sm text-muted-foreground'>
 							{isCurrentSession && (
@@ -36,7 +40,7 @@ export function SessionItem({ session, isCurrentSession }: SessionItemProps) {
 									<span className='ml-2 mr-1'>•</span>
 								</span>
 							)}
-							{session.city}, {session.country}
+							{location}
 							{!isCurrentSession && (
 								<> • {formatDate(session.createdAt)}</>
 							)}

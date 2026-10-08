@@ -3,14 +3,19 @@
 import { Loader2 } from 'lucide-react'
 import { Fragment } from 'react'
 
+import { useGetSessionsQuery } from '@/generated/api'
+
 import { Heading } from '../../shared/heading'
 
 import { RemoveAllSessions } from './remove-all-sessions'
 import { SessionItem } from './session-item'
-import { useGetSessions } from '@/src/api/hooks'
 
 export function Sessions() {
-	const { data, isLoading } = useGetSessions()
+	const { data, isLoading } = useGetSessionsQuery()
+
+	// The API sorts by last activity; the current device goes first, as before.
+	const sessions =
+		data && [...data].sort((a, b) => Number(b.current) - Number(a.current))
 
 	return (
 		<div className='w-full'>
@@ -29,11 +34,10 @@ export function Sessions() {
 							<RemoveAllSessions />
 						</div>
 						<div className='mt-2 space-y-5'>
-							{data?.map((session, index) => (
+							{sessions?.map(session => (
 								<SessionItem
-									key={index}
+									key={session.id}
 									session={session}
-									isCurrentSession={index === 0}
 								/>
 							))}
 						</div>

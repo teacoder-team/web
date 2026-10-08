@@ -1,25 +1,25 @@
-import { useQuery } from '@tanstack/react-query'
+'use client'
+
 import Link from 'next/link'
 
-import { CourseProgress } from '../../shared/course-progress'
+import { useGetUsersMeProgressQuery } from '@/generated/api'
 
-import { getMeProgress } from '@/src/api/requests'
-import { Button } from '@/src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle
-} from '@/src/components/ui/card'
-import { Separator } from '@/src/components/ui/separator'
-import { ROUTES } from '@/src/constants'
+} from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+
+import { ROUTES } from '@/constants/routes'
+
+import { CourseProgress } from '../../shared/course-progress'
 
 export function CoursesTab() {
-	const { data, isLoading } = useQuery({
-		queryKey: ['get me progress'],
-		queryFn: () => getMeProgress()
-	})
+	const { data } = useGetUsersMeProgressQuery()
 
 	return (
 		<Card>
@@ -57,11 +57,13 @@ export function CoursesTab() {
 							<div className='flex justify-between text-sm text-muted-foreground'>
 								<span>
 									Последний доступ:{' '}
-									{new Date(
-										course.lastAccessed
-									).toLocaleDateString()}
+									{course.lastActivityAt
+										? new Date(
+												course.lastActivityAt
+											).toLocaleDateString()
+										: '—'}
 								</span>
-								{course.lastLesson && (
+								{course.nextLesson && (
 									<Button
 										variant='link'
 										size='sm'
@@ -70,7 +72,7 @@ export function CoursesTab() {
 									>
 										<Link
 											href={ROUTES.COURSES.LESSON(
-												course.lastLesson?.id
+												course.nextLesson.id
 											)}
 										>
 											Продолжить обучение
