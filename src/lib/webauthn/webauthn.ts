@@ -11,9 +11,6 @@ import type {
 	WebAuthnRegisterPayloadResponse
 } from '@/generated/model'
 
-// The API documents its options only as "an object" - they are the JSON
-// produced by @simplewebauthn/server and go to the browser untouched.
-
 export async function authenticateWithKey(
 	options: WebAuthnOptionsResponse
 ): Promise<WebAuthnLoginPayloadResponse> {

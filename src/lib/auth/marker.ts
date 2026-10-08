@@ -1,8 +1,3 @@
-/**
- * Non-secret "probably signed in" flag on the site's own domain. The real session
- * lives in the API's httpOnly refresh cookie, which neither `proxy.ts` nor the
- * server components can see - they use this marker for redirects and first paint only.
- */
 export const SESSION_MARKER = 'tc_session'
 
 const MAX_AGE = 60 * 60 * 24 * 30

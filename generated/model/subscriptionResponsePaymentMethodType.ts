@@ -48,5 +48,6 @@ export const SubscriptionResponsePaymentMethodType = {
   CRYPTO_BOT: 'CRYPTO_BOT',
   HELEKET: 'HELEKET',
   INTERNATIONAL_CARD: 'INTERNATIONAL_CARD',
+  YANDEX_SPLIT: 'YANDEX_SPLIT',
   TELEGRAM_STARS: 'TELEGRAM_STARS',
 } as const;

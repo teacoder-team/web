@@ -48,7 +48,7 @@ export interface CreatePaymentResponse {
   provider: CreatePaymentResponseProvider;
   /** Выбранный способ оплаты. */
   method: CreatePaymentResponseMethod;
-  /** Сумма к оплате. */
+  /** Сумма к оплате. У премиум-подписки зависит от способа: картой зарубежного банка дороже - актуальные цены отдаёт `GET /` в `features.premium.prices`. */
   amount: number;
   /** Валюта суммы. */
   currency: string;

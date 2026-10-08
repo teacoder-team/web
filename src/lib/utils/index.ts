@@ -1,5 +1,6 @@
 export * from './focus-ring'
 export * from './format-date'
+export * from './format-price'
 export * from './get-browser-icon'
 export * from './get-lesson-label'
 export * from './get-media-source'

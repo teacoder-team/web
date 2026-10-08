@@ -32,8 +32,11 @@ import { ROUTES } from '@/constants/routes'
 
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
+import { useAppConfig } from '@/lib/config/use-app-config'
+import { formatPrice, monthsTranslator } from '@/lib/utils'
 
 import { Input } from '../ui/input'
+import { Skeleton } from '../ui/skeleton'
 
 import { FAQSection } from './faq'
 import { PaymentMethods } from './payment-methods'
@@ -53,6 +56,9 @@ export function Premium() {
 	const router = useRouter()
 
 	const { isAuthorized, user, isLoading } = useSession()
+	const { data: config } = useAppConfig()
+
+	const premium = config?.features.premium
 
 	const form = useForm<PaymentFormValues>({
 		resolver: zodResolver(paymentSchema),
@@ -128,12 +134,24 @@ export function Premium() {
 
 						<CardContent className='flex flex-col items-center gap-6'>
 							<div className='text-center'>
-								<span className='text-5xl font-extrabold text-foreground'>
-									449&#8381;
-								</span>
-								<span className='ml-1 text-lg text-neutral-500 dark:text-neutral-400'>
-									/ месяц
-								</span>
+								{premium ? (
+									<>
+										<span className='text-5xl font-extrabold text-foreground'>
+											{formatPrice(
+												premium.prices.standard,
+												premium.currency
+											)}
+										</span>
+										<span className='ml-1 text-lg text-neutral-500 dark:text-neutral-400'>
+											/{' '}
+											{premium.months === 1
+												? 'месяц'
+												: `${premium.months} ${monthsTranslator(premium.months)}`}
+										</span>
+									</>
+								) : (
+									<Skeleton className='mx-auto h-12 w-48 rounded-lg' />
+								)}
 							</div>
 							<p className='text-center text-neutral-600 dark:text-neutral-300'>
 								Полный доступ к исходному коду всех проектов.
@@ -180,12 +198,18 @@ export function Premium() {
 						>
 							<PaymentMethods control={form.control} />
 
-							{method === 'INTERNATIONAL_CARD' && (
+							{method === 'INTERNATIONAL_CARD' && premium && (
 								<p className='mt-4 text-xs text-muted-foreground'>
 									Из-за высокой комиссии международных
 									платёжных систем итоговая стоимость
 									составляет{' '}
-									<span className='font-semibold'>499₽</span>.
+									<span className='font-semibold'>
+										{formatPrice(
+											premium.prices.international,
+											premium.currency
+										)}
+									</span>
+									.
 								</p>
 							)}
 

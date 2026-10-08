@@ -36,6 +36,7 @@ import type { RootResponseFeaturesAuth } from './rootResponseFeaturesAuth';
 import type { RootResponseFeaturesCaptcha } from './rootResponseFeaturesCaptcha';
 import type { RootResponseFeaturesOrion } from './rootResponseFeaturesOrion';
 import type { RootResponseFeaturesPaymentsItem } from './rootResponseFeaturesPaymentsItem';
+import type { RootResponseFeaturesPremium } from './rootResponseFeaturesPremium';
 
 /**
  * Возможности, включённые на этом сервере.
@@ -45,6 +46,8 @@ export type RootResponseFeatures = {
   auth: RootResponseFeaturesAuth;
   /** Способы оплаты, которые работают прямо сейчас. */
   payments: RootResponseFeaturesPaymentsItem[];
+  /** Премиум-подписка: период и цены. */
+  premium: RootResponseFeaturesPremium;
   /** Капча. */
   captcha: RootResponseFeaturesCaptcha;
   /** Файловое хранилище (аватары, обложки, вложения). */

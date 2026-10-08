@@ -113,6 +113,8 @@ export * from './rootResponseFeaturesCaptchaProvider';
 export * from './rootResponseFeaturesOrion';
 export * from './rootResponseFeaturesPaymentsItem';
 export * from './rootResponseFeaturesPaymentsItemId';
+export * from './rootResponseFeaturesPremium';
+export * from './rootResponseFeaturesPremiumPrices';
 export * from './sessionListResponse';
 export * from './sessionListResponseItem';
 export * from './signInResponse';

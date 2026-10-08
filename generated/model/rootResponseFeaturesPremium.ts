@@ -32,22 +32,18 @@
  * `POST /billing/create` принимает заголовок `Idempotency-Key` (например, UUID): повтор с тем же ключом и теми же параметрами вернёт тот же платёж, с другими параметрами - ошибку 422. Подробности - в описании метода.
  * OpenAPI spec version: 1.0.0
  */
+import type { RootResponseFeaturesPremiumPrices } from './rootResponseFeaturesPremiumPrices';
 
 /**
- * Выбранный способ оплаты.
+ * Премиум-подписка: период и цены.
  */
-export type CreatePaymentResponseMethod = typeof CreatePaymentResponseMethod[keyof typeof CreatePaymentResponseMethod];
-
-
-export const CreatePaymentResponseMethod = {
-  BANK_CARD: 'BANK_CARD',
-  SBP: 'SBP',
-  T_PAY: 'T_PAY',
-  SBER_PAY: 'SBER_PAY',
-  YOOMONEY: 'YOOMONEY',
-  CRYPTO_BOT: 'CRYPTO_BOT',
-  HELEKET: 'HELEKET',
-  INTERNATIONAL_CARD: 'INTERNATIONAL_CARD',
-  YANDEX_SPLIT: 'YANDEX_SPLIT',
-  TELEGRAM_STARS: 'TELEGRAM_STARS',
-} as const;
+export type RootResponseFeaturesPremium = {
+  /** Длительность одного периода подписки в месяцах. */
+  months: number;
+  /** Валюта цен. */
+  currency: string;
+  /** Цены за один период. Какая применится - решает выбранный способ оплаты. */
+  prices: RootResponseFeaturesPremiumPrices;
+  /** Цена в звёздах Telegram, если способ `TELEGRAM_STARS` включён. */
+  stars: number;
+};
