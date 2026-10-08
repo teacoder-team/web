@@ -2,7 +2,7 @@ export const env = {
 	NODE_ENV: process.env.NODE_ENV || 'production',
 
 	APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://teacoder.ru',
-	API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://rest-api.teacoder.ru',
+	API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.teacoder.ru',
 
 	SUPPORT_EMAIL:
 		process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'support@teacoder.ru',
