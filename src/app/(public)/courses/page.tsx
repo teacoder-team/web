@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 
-import { getCourses } from '@/src/api/requests'
-import { CourseCard } from '@/src/components/course/course-card'
+import { getCoursesQuery } from '@/generated/api'
+
+import { CourseCard } from '@/components/course/course-card'
 
 export const metadata: Metadata = {
 	title: 'Курсы',
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 export default async function CoursesPage() {
-	const courses = await getCourses()
+	const courses = await getCoursesQuery()
 
 	return (
 		<main className='mx-auto my-20 max-w-7xl'>
@@ -24,8 +25,8 @@ export default async function CoursesPage() {
 				</p>
 			</div>
 			<div className='my-20 grid gap-8 px-5 sm:grid-cols-2 md:grid-cols-2 md:px-0 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4'>
-				{courses.map((course, index) => (
-					<CourseCard key={index} course={course} />
+				{courses.map(course => (
+					<CourseCard key={course.id} course={course} />
 				))}
 			</div>
 		</main>

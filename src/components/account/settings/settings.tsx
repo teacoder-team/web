@@ -2,21 +2,22 @@
 
 import { Fragment } from 'react'
 
+import { useGetMfaQuery } from '@/generated/api'
+
+import { useSession } from '@/lib/auth/auth-provider'
+
 import { Heading } from '../../shared/heading'
 
 import { AccountActions } from './account-actions'
 import { AccountForm } from './account-form'
 import { Preferences } from './preferences'
 import { ProfileForm } from './profile-form'
-import { Subscription } from './subscription'
 import { TwoStepAuthForm } from './two-step-auth-form'
-import { useFetchMfaStatus } from '@/src/api/hooks'
-import { useCurrent } from '@/src/hooks'
 
 export function Settings() {
-	const { user } = useCurrent()
+	const { user } = useSession()
 
-	const { data: status } = useFetchMfaStatus()
+	const { data: status } = useGetMfaQuery()
 
 	return (
 		<div className='w-full'>
@@ -30,7 +31,6 @@ export function Settings() {
 						<ProfileForm user={user} />
 						<AccountForm user={user} />
 						<TwoStepAuthForm status={status} />
-						<Subscription user={user} />
 						<Preferences />
 						<AccountActions />
 					</div>

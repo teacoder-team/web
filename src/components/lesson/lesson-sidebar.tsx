@@ -10,27 +10,29 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
+import type {
+	CourseLessonListResponseItem,
+	LessonResponseCourse
+} from '@/generated/model'
+
+import { ROUTES } from '@/constants/routes'
+
+import { useCourseProgress } from '@/hooks/use-course-progress'
+
+import { cn } from '@/lib/utils'
+
 import { CourseProgress } from '../shared/course-progress'
 import { buttonVariants } from '../ui/button'
 import { ScrollArea } from '../ui/scroll-area'
 
-import type { CourseResponse, LessonResponse } from '@/src/api/generated'
-import { ROUTES } from '@/src/constants'
-import { cn } from '@/src/lib/utils'
-
 interface LessonSidebarProps {
-	course: CourseResponse
-	lessons: LessonResponse[]
-	completedLessons: string[]
-	progressCount: number
+	course: LessonResponseCourse
+	lessons: CourseLessonListResponseItem[]
 }
 
-export function LessonSidebar({
-	course,
-	lessons,
-	completedLessons,
-	progressCount
-}: LessonSidebarProps) {
+export function LessonSidebar({ course, lessons }: LessonSidebarProps) {
+	const { completedLessons, percentage } = useCourseProgress(course.id)
+
 	const pathname = usePathname()
 
 	return (
@@ -55,7 +57,7 @@ export function LessonSidebar({
 							{course.title}
 						</h1>
 						<CourseProgress
-							progress={progressCount}
+							progress={percentage}
 							variant='success'
 							isShowPercentage
 							label='Прогресс'

@@ -8,7 +8,9 @@ export function attachAnalyticsTriggers() {
 
 		if (eventName) {
 			const dataAttr = target.getAttribute('data-analytics-data')
-			const data = dataAttr ? JSON.parse(dataAttr) : undefined
+			const data: Record<string, unknown> | undefined = dataAttr
+				? JSON.parse(dataAttr)
+				: undefined
 
 			track(eventName, data)
 		}

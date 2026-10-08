@@ -1,16 +1,19 @@
-import { APP_CONFIG } from '../../constants/app'
-
+/**
+ * Course covers are stored as Orion file ids, avatars as full links.
+ * `storageUrl` is `features.orion.url` from `GET /`.
+ */
 export function getMediaSource(
-	path: string,
-	tag: 'users' | 'courses' | 'attachments'
+	path: string | null | undefined,
+	tag: 'users' | 'courses' | 'attachments',
+	storageUrl: string | undefined
 ) {
 	if (!path) {
 		return ''
 	}
 
-	if (path.startsWith('https://')) {
+	if (path.startsWith('https://') || !storageUrl) {
 		return path
 	}
 
-	return `${APP_CONFIG.storageUrl}/${tag}/${path}`
+	return `${storageUrl}/${tag}/${path}`
 }

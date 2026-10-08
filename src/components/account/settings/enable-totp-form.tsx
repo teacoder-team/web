@@ -1,12 +1,21 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { Check, Copy, Loader2, TriangleAlert } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import {
+	getGetMfaQueryQueryKey,
+	usePostMfaTotpSetupMutation,
+	usePostMfaTotpVerifyMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { downloadRecoveryCodes } from '@/lib/utils'
 
 import { Alert, AlertDescription, AlertTitle } from '../../ui/alert'
 import { Badge } from '../../ui/badge'
@@ -31,11 +40,7 @@ import {
 } from '../../ui/form'
 import { Input } from '../../ui/input'
 
-import {
-	fetchRecovery,
-	totpEnable,
-	totpGenerateSecret
-} from '@/src/api/requests'
+import { RecoveryCodesList } from './recovery-codes-list'
 
 const enableTotpSchema = z.object({
 	pin: z
@@ -43,8 +48,7 @@ const enableTotpSchema = z.object({
 		.min(6, {
 			message: 'PIN-код должен содержать минимум 6 символов'
 		})
-		.max(6, { message: 'PIN-код должен содержать не более 6 символов' }),
-	secret: z.string()
+		.max(6, { message: 'PIN-код должен содержать не более 6 символов' })
 })
 
 export type EnableTotp = z.infer<typeof enableTotpSchema>
@@ -52,50 +56,47 @@ export type EnableTotp = z.infer<typeof enableTotpSchema>
 export function EnableTotpForm() {
 	const [isOpen, setIsOpen] = useState(false)
 	const [step, setStep] = useState(1)
+	const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null)
 
 	const [isCopied, setIsCopied] = useState(false)
 
 	const queryClient = useQueryClient()
 
 	const {
-		mutate,
+		mutate: setup,
 		data: totp,
 		isPending: isLoadingGenerate
-	} = useMutation({
-		mutationKey: ['totp generate secret'],
-		mutationFn: () => totpGenerateSecret()
+	} = usePostMfaTotpSetupMutation({
+		mutation: {
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при подключении приложения')
+				)
+			}
+		}
 	})
 
-	const {
-		data,
-		isLoading: isLoadingRecovery,
-		refetch
-	} = useQuery({
-		queryKey: ['fetch recovery codes'],
-		queryFn: () => fetchRecovery(),
-		enabled: step === 2
-	})
-
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['totp enable'],
-		mutationFn: (data: EnableTotp) => totpEnable(data),
-		onSuccess() {
-			refetch()
-			queryClient.invalidateQueries({ queryKey: ['mfa status'] })
-			setStep(2)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при верификации кода'
-			)
+	const { mutate, isPending } = usePostMfaTotpVerifyMutation({
+		mutation: {
+			onSuccess(data) {
+				setRecoveryCodes(data.codes)
+				queryClient.invalidateQueries({
+					queryKey: getGetMfaQueryQueryKey()
+				})
+				setStep(2)
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при верификации кода')
+				)
+			}
 		}
 	})
 
 	const form = useForm<EnableTotp>({
 		resolver: zodResolver(enableTotpSchema),
 		defaultValues: {
-			pin: '',
-			secret: ''
+			pin: ''
 		}
 	})
 
@@ -109,55 +110,32 @@ export function EnableTotpForm() {
 		}, 2000)
 	}
 
+	function onCopyCodes() {
+		if (!recoveryCodes) return
+
+		navigator.clipboard.writeText(recoveryCodes.join('\n'))
+		toast.success('Коды скопированы')
+	}
+
 	const Icon = isCopied ? Check : Copy
 
 	useEffect(() => {
 		if (isOpen) {
-			mutate()
+			setup()
 		}
-	}, [mutate, isOpen])
+	}, [setup, isOpen])
 
-	function splitArrayIntoColumns(arr: string[]) {
-		if (!arr || arr.length === 0) return [[], [], []]
-
-		const mid = Math.ceil(arr.length / 3)
-		const first = arr.slice(0, mid)
-		const second = arr.slice(mid, mid * 2)
-		const third = arr.slice(mid * 2)
-
-		return [first, second, third]
+	function onSubmit(data: EnableTotp) {
+		mutate({ data: { code: data.pin } })
 	}
-
-	function handleDownload() {
-		const recoveryCodesText = data?.join('\n')
-
-		const blob = new Blob([recoveryCodesText!], { type: 'text/plain' })
-		const fileURL = window.URL.createObjectURL(blob)
-		const link = document.createElement('a')
-
-		link.href = fileURL
-		link.setAttribute('download', 'teacoder_recovery_codes.txt')
-
-		document.body.appendChild(link)
-		link.click()
-
-		setTimeout(() => window.URL.revokeObjectURL(fileURL), 0)
-	}
-
-	async function onSubmit(data: EnableTotp) {
-		mutateAsync({
-			pin: data.pin,
-			secret: totp?.secret ?? ''
-		})
-	}
-
-	const recoveryCodes = data ? splitArrayIntoColumns(data) : [[], [], []]
 
 	return (
 		<Dialog
 			open={isOpen}
 			onOpenChange={state => {
 				form.reset()
+				setStep(1)
+				setRecoveryCodes(null)
 				setIsOpen(state)
 			}}
 		>
@@ -281,80 +259,48 @@ export function EnableTotpForm() {
 					)
 				)}
 
-				{isLoadingRecovery ? (
-					<div className='flex items-center justify-center py-6'>
-						<Loader2 className='size-10 animate-spin text-muted-foreground' />
-					</div>
-				) : (
-					step === 2 && (
-						<div className='flex flex-col space-y-5 px-7'>
-							<Alert variant='warning'>
-								<TriangleAlert className='size-5 dark:text-yellow-500' />
-								<AlertTitle className='ml-1.5'>
-									Пожалуйста, храните их в безопасном месте.
-								</AlertTitle>
-								<AlertDescription className='ml-1.5'>
-									Они — последний способ восстановления
-									доступа к учетной записи.
-								</AlertDescription>
-							</Alert>
-							<div className='mt-4 flex justify-center gap-16 rounded-lg bg-accent p-3'>
-								<div className='flex flex-col'>
-									{recoveryCodes[0].map((code, index) => (
-										<p
-											key={index}
-											className='text-[17px] font-medium'
-										>
-											{code}
-										</p>
-									))}
-								</div>
-								<div className='flex flex-col'>
-									{recoveryCodes[1].map((code, index) => (
-										<p
-											key={index}
-											className='text-[17px] font-medium'
-										>
-											{code}
-										</p>
-									))}
-								</div>
-								<div className='flex flex-col'>
-									{recoveryCodes[2].map((code, index) => (
-										<p
-											key={index}
-											className='text-[17px] font-medium'
-										>
-											{code}
-										</p>
-									))}
-								</div>
+				{step === 2 && recoveryCodes && (
+					<div className='flex flex-col space-y-5 px-7'>
+						<Alert variant='warning'>
+							<TriangleAlert className='size-5 dark:text-yellow-500' />
+							<AlertTitle className='ml-1.5'>
+								Пожалуйста, храните их в безопасном месте.
+							</AlertTitle>
+							<AlertDescription className='ml-1.5'>
+								Они — последний способ восстановления доступа к
+								учетной записи.
+							</AlertDescription>
+						</Alert>
+						<RecoveryCodesList
+							codes={recoveryCodes}
+							className='mt-4 flex justify-center gap-16 rounded-lg bg-accent p-3'
+						/>
+						<DialogFooter className='flex gap-x-2 pb-7 sm:justify-between'>
+							<DialogClose asChild>
+								<Button variant='outline' className='h-9'>
+									Закрыть
+								</Button>
+							</DialogClose>
+							<div className='flex items-center gap-2'>
+								<Button
+									variant='outline'
+									className='h-9'
+									onClick={onCopyCodes}
+								>
+									Копировать
+								</Button>
+								<Button
+									variant='primary'
+									className='h-9'
+									onClick={() =>
+										downloadRecoveryCodes(recoveryCodes)
+									}
+								>
+									Скачать
+								</Button>
 							</div>
-							<DialogFooter className='flex gap-x-2 pb-7 sm:justify-between'>
-								<DialogClose asChild>
-									<Button variant='outline' className='h-9'>
-										Закрыть
-									</Button>
-								</DialogClose>
-								<div className='flex items-center gap-2'>
-									<Button
-										variant='outline'
-										className='h-9'
-										disabled={isPending}
-									>
-										Копировать
-									</Button>
-									<Button
-										variant='primary'
-										className='h-9'
-										onClick={handleDownload}
-									>
-										Скачать
-									</Button>
-								</div>
-							</DialogFooter>
-						</div>
-					)
+						</DialogFooter>
+					</div>
 				)}
 			</DialogContent>
 		</Dialog>

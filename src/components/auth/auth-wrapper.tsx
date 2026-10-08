@@ -13,6 +13,7 @@ interface AuthWrapperProps {
 	bottomLinkText?: string
 	bottomLinkHref?: Route
 	isShowSocial?: boolean
+	isShowPasskey?: boolean
 }
 
 export function AuthWrapper({
@@ -22,7 +23,8 @@ export function AuthWrapper({
 	bottomText,
 	bottomLinkText,
 	bottomLinkHref,
-	isShowSocial
+	isShowSocial,
+	isShowPasskey
 }: AuthWrapperProps) {
 	return (
 		<div className='container relative flex min-h-svh w-full flex-col items-center justify-center lg:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
@@ -36,7 +38,9 @@ export function AuthWrapper({
 							</p>
 						)}
 					</div>
-					{isShowSocial && <AuthSocial />}
+					{isShowSocial && (
+						<AuthSocial isShowPasskey={isShowPasskey} />
+					)}
 					<div className='p-0'>{children}</div>
 					{/* <p className='text-xs text-muted-foreground'>
 						Нажимая продолжить, вы соглашаетесь с нашим{' '}

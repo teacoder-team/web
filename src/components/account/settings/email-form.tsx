@@ -1,10 +1,21 @@
+'use client'
+
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Check, CheckCircle, Mail, MoreHorizontal, Pencil } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { CheckCircle, Mail, MoreHorizontal, Pencil } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
+
+import {
+	getGetUsersMeQueryQueryKey,
+	usePostUsersMeEmailChangeMutation,
+	usePostUsersMeEmailConfirmMutation
+} from '@/generated/api'
+import type { UserResponse } from '@/generated/model'
+
+import { getErrorMessage } from '@/lib/api/errors'
 
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -15,8 +26,7 @@ import {
 	DialogDescription,
 	DialogFooter,
 	DialogHeader,
-	DialogTitle,
-	DialogTrigger
+	DialogTitle
 } from '../../ui/dialog'
 import {
 	DropdownMenu,
@@ -35,8 +45,7 @@ import {
 } from '../../ui/form'
 import { Input } from '../../ui/input'
 
-import type { AccountResponse } from '@/src/api/generated'
-import { changeEmail, sendEmailVerification } from '@/src/api/requests'
+import { ConfirmCodeStep } from './confirm-code-step'
 
 const emailSchema = z.object({
 	email: z
@@ -48,43 +57,15 @@ const emailSchema = z.object({
 export type Email = z.infer<typeof emailSchema>
 
 interface EmailFormProps {
-	user: AccountResponse | undefined
+	user: UserResponse | undefined
 }
 
 export function EmailForm({ user }: EmailFormProps) {
 	const [isOpen, setIsOpen] = useState(false)
+	/** Where the confirmation code went - the dialog shows the code step. */
+	const [pendingEmail, setPendingEmail] = useState<string | null>(null)
 
 	const queryClient = useQueryClient()
-
-	const { mutate: send } = useMutation({
-		mutationKey: ['send email verification'],
-		mutationFn: () => sendEmailVerification(),
-		onSuccess() {
-			toast.success(
-				'Ссылка c подтверждением была отправлена на выш почтовый адрес'
-			)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при отправке письма'
-			)
-		}
-	})
-
-	const { mutateAsync, isPending } = useMutation({
-		mutationKey: ['change email'],
-		mutationFn: (data: Email) => changeEmail(data),
-		onSuccess() {
-			form.reset()
-			setIsOpen(false)
-			queryClient.invalidateQueries({ queryKey: ['get me'] })
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при смене почты'
-			)
-		}
-	})
 
 	const form = useForm<Email>({
 		resolver: zodResolver(emailSchema),
@@ -93,8 +74,44 @@ export function EmailForm({ user }: EmailFormProps) {
 		}
 	})
 
-	async function onSubmit(data: Email) {
-		await mutateAsync(data)
+	const { mutate: change, isPending } = usePostUsersMeEmailChangeMutation({
+		mutation: {
+			onSuccess(_, { data }) {
+				form.reset()
+				setPendingEmail(data.newEmail)
+				setIsOpen(true)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при смене почты'))
+			}
+		}
+	})
+
+	const { mutate: confirm, isPending: isConfirming } =
+		usePostUsersMeEmailConfirmMutation({
+			mutation: {
+				onSuccess() {
+					setPendingEmail(null)
+					setIsOpen(false)
+					queryClient.invalidateQueries({
+						queryKey: getGetUsersMeQueryQueryKey()
+					})
+				},
+				onError(error) {
+					toast.error(
+						getErrorMessage(error, 'Ошибка при смене почты')
+					)
+				}
+			}
+		})
+
+	/** Confirming the current address is a "change" to the same one. */
+	function requestChange(newEmail: string) {
+		change({ data: { newEmail } })
+	}
+
+	function onSubmit(data: Email) {
+		requestChange(data.email)
 	}
 
 	return (
@@ -107,7 +124,7 @@ export function EmailForm({ user }: EmailFormProps) {
 					<div className='mb-1 flex items-center gap-2'>
 						<h2 className='font-semibold'>Почта</h2>
 						{user?.email ? (
-							user.isEmailVerified ? (
+							user.emailVerifiedAt ? (
 								<Badge variant='success'>Подтверждена</Badge>
 							) : (
 								<Badge variant='error'>Не подтверждена</Badge>
@@ -147,8 +164,13 @@ export function EmailForm({ user }: EmailFormProps) {
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align='end' side='top'>
 							<DropdownMenuGroup>
-								{!user.isEmailVerified && (
-									<DropdownMenuItem onClick={() => send()}>
+								{!user.emailVerifiedAt && (
+									<DropdownMenuItem
+										onClick={() =>
+											user.email &&
+											requestChange(user.email)
+										}
+									>
 										<CheckCircle />
 										Подтвердить
 									</DropdownMenuItem>
@@ -172,54 +194,69 @@ export function EmailForm({ user }: EmailFormProps) {
 					open={isOpen}
 					onOpenChange={state => {
 						form.reset()
+						setPendingEmail(null)
 						setIsOpen(state)
 					}}
 				>
 					<DialogContent>
-						<DialogHeader>
-							<DialogTitle>Обновление почты</DialogTitle>
-							<DialogDescription>
-								Введите новый почтовый адрес.
-							</DialogDescription>
-						</DialogHeader>
-						<Form {...form}>
-							<form
-								onSubmit={form.handleSubmit(onSubmit)}
-								className='grid gap-4'
-							>
-								<FormField
-									control={form.control}
-									name='email'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Почта</FormLabel>
-											<FormControl>
-												<Input
-													placeholder={user?.email}
-													disabled={isPending}
-													{...field}
-												/>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<DialogFooter>
-									<DialogClose asChild>
-										<Button variant='outline'>
-											Отмена
-										</Button>
-									</DialogClose>
-									<Button
-										type='submit'
-										variant='primary'
-										isLoading={isPending}
+						{pendingEmail ? (
+							<ConfirmCodeStep
+								title='Обновление почты'
+								description={`Мы отправили 6-значный код на ${pendingEmail}.`}
+								isLoading={isConfirming}
+								onSubmit={code => confirm({ data: { code } })}
+							/>
+						) : (
+							<>
+								<DialogHeader>
+									<DialogTitle>Обновление почты</DialogTitle>
+									<DialogDescription>
+										Введите новый почтовый адрес.
+									</DialogDescription>
+								</DialogHeader>
+								<Form {...form}>
+									<form
+										onSubmit={form.handleSubmit(onSubmit)}
+										className='grid gap-4'
 									>
-										Обновить
-									</Button>
-								</DialogFooter>
-							</form>
-						</Form>
+										<FormField
+											control={form.control}
+											name='email'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>Почта</FormLabel>
+													<FormControl>
+														<Input
+															placeholder={
+																user?.email ??
+																undefined
+															}
+															disabled={isPending}
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+										<DialogFooter>
+											<DialogClose asChild>
+												<Button variant='outline'>
+													Отмена
+												</Button>
+											</DialogClose>
+											<Button
+												type='submit'
+												variant='primary'
+												isLoading={isPending}
+											>
+												Обновить
+											</Button>
+										</DialogFooter>
+									</form>
+								</Form>
+							</>
+						)}
 					</DialogContent>
 				</Dialog>
 			</div>

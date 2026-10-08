@@ -1,10 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+'use client'
+
 import { ChevronRightIcon, GemIcon, TrophyIcon, UsersIcon } from 'lucide-react'
 
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import { useGetUsersLeadersQuery } from '@/generated/api'
 
-import { getLeaders } from '@/src/api/requests'
-import { Button } from '@/src/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
@@ -12,8 +12,13 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle
-} from '@/src/components/ui/card'
-import { cn, getMediaSource } from '@/src/lib/utils'
+} from '@/components/ui/card'
+
+import { useMediaSource } from '@/hooks/use-media-source'
+
+import { cn } from '@/lib/utils'
+
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 
 interface LeaderboardProps {
 	limit?: number
@@ -26,10 +31,8 @@ export function Leaderboard({
 	showButton,
 	onViewAll
 }: LeaderboardProps) {
-	const { data, isLoading } = useQuery({
-		queryKey: ['get leaders'],
-		queryFn: () => getLeaders()
-	})
+	const { data } = useGetUsersLeadersQuery()
+	const getMediaSource = useMediaSource()
 
 	const users = limit ? data?.slice(0, limit) : data
 
@@ -46,7 +49,7 @@ export function Leaderboard({
 			<CardContent>
 				<div className='space-y-4'>
 					{users?.map((user, index) => {
-						const position = index + 1
+						const position = user.rank
 
 						return (
 							<div

@@ -2,6 +2,9 @@
 
 import Link from 'next/link'
 
+import { useAppConfig } from '@/lib/config/use-app-config'
+import { formatPrice } from '@/lib/utils'
+
 import {
 	Accordion,
 	AccordionContent,
@@ -9,7 +12,7 @@ import {
 	AccordionTrigger
 } from '../ui/accordion'
 
-const faqs = [
+const getFaqs = (internationalPrice: string | null) => [
 	{
 		question: 'Как можно оплатить подписку?',
 		answer: 'Оплата возможна при помощи банковских карт, СБП, T-Pay или криптовалюты.'
@@ -23,8 +26,14 @@ const faqs = [
 					доступна. Вы можете оформить подписку из любой страны -
 					зарубежные карты принимаются без ограничений. Из-за высокой
 					комиссии международных платёжных систем стоимость подписки
-					при оплате иностранной картой составляет{' '}
-					<strong>499 рублей</strong>.
+					при оплате иностранной картой выше
+					{internationalPrice ? (
+						<>
+							{' '}
+							и составляет <strong>{internationalPrice}</strong>
+						</>
+					) : null}
+					.
 				</p>
 			</>
 		)
@@ -73,6 +82,15 @@ const faqs = [
 ]
 
 export function FAQSection() {
+	const { data: config } = useAppConfig()
+
+	const premium = config?.features.premium
+	const faqs = getFaqs(
+		premium
+			? formatPrice(premium.prices.international, premium.currency)
+			: null
+	)
+
 	return (
 		<section className='mx-auto mt-20 max-w-3xl px-4'>
 			<h2 className='mb-8 text-center text-3xl font-bold text-foreground'>

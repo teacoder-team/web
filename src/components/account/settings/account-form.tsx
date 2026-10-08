@@ -1,11 +1,12 @@
+import type { UserResponse } from '@/generated/model'
+
 import { Card, CardContent } from '../../ui/card'
 
 import { EmailForm } from './email-form'
 import { PasswordForm } from './password-form'
-import type { AccountResponse } from '@/src/api/generated'
 
 interface AccountFormProps {
-	user: AccountResponse | undefined
+	user: UserResponse | undefined
 }
 
 export function AccountForm({ user }: AccountFormProps) {
@@ -16,7 +17,7 @@ export function AccountForm({ user }: AccountFormProps) {
 				<CardContent className='p-4'>
 					<div className='space-y-8'>
 						<EmailForm user={user} />
-						<PasswordForm />
+						<PasswordForm user={user} />
 					</div>
 				</CardContent>
 			</Card>

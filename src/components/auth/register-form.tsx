@@ -1,14 +1,19 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Captcha } from '../shared/captcha'
-import { EllipsisLoader } from '../shared/ellipsis-loader'
+import { usePostAuthRegisterMutation } from '@/generated/api'
+
+import { ROUTES } from '@/constants/routes'
+
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useCaptchaRequired } from '@/lib/captcha/captcha'
+
 import { Button } from '../ui/button'
 import {
 	Form,
@@ -21,12 +26,8 @@ import {
 import { Input } from '../ui/input'
 
 import { AuthWrapper } from './auth-wrapper'
-import { useRegister } from '@/src/api/hooks'
-import { instance } from '@/src/api/instance'
-import { ROUTES } from '@/src/constants'
-import { useFingerprint } from '@/src/hooks'
-import { analytics } from '@/src/lib/analytics'
-import { cookies } from '@/src/lib/cookie'
+import { CaptchaField } from './captcha-field'
+import { VerifyEmailStep } from './verify-email-step'
 
 const registerSchema = z.object({
 	name: z.string().min(1, { message: 'Имя обязательно' }),
@@ -44,27 +45,10 @@ const registerSchema = z.object({
 export type Register = z.infer<typeof registerSchema>
 
 export function RegisterForm() {
-	const { push } = useRouter()
-	const { data: fingerprint, error } = useFingerprint()
+	const [pendingEmail, setPendingEmail] = useState<string | null>(null)
+	const [captchaKey, setCaptchaKey] = useState(0)
 
-	const { mutateAsync, isPending } = useRegister({
-		onSuccess(data) {
-			analytics.auth.register.success()
-
-			cookies.set('token', data.token, { expires: 30 })
-
-			instance.defaults.headers['X-Session-Token'] = data.token
-
-			push(ROUTES.ACCOUNT.ROOT)
-		},
-		onError(error: any) {
-			const message =
-				error.response?.data?.message ?? 'Ошибка при регистрации'
-			analytics.auth.register.fail(message)
-
-			toast.error(message)
-		}
-	})
+	const isCaptchaRequired = useCaptchaRequired()
 
 	const form = useForm<Register>({
 		resolver: zodResolver(registerSchema),
@@ -76,34 +60,53 @@ export function RegisterForm() {
 		}
 	})
 
+	// A captcha token is single-use: every attempt needs a fresh widget.
+	function resetCaptcha() {
+		form.setValue('captcha', '')
+		setCaptchaKey(key => key + 1)
+	}
+
+	const { mutate, isPending } = usePostAuthRegisterMutation({
+		mutation: {
+			onSuccess(_, { data }) {
+				resetCaptcha()
+				setPendingEmail(data.email)
+			},
+			onError(error) {
+				const message = getErrorMessage(error, 'Ошибка при регистрации')
+				analytics.auth.register.fail(message)
+
+				toast.error(message)
+
+				resetCaptcha()
+			}
+		}
+	})
+
 	useEffect(() => {
 		analytics.auth.register.view()
 	}, [])
 
-	useEffect(() => {
-		if (form.formState.isSubmitSuccessful && form.getValues('captcha')) {
-			form.reset()
-		}
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
-
-	async function onSubmit(values: Register) {
+	function onSubmit({ name, email, password, captcha }: Register) {
 		analytics.auth.register.submit()
 
-		if (!values.captcha) {
+		if (isCaptchaRequired && !captcha) {
 			toast.warning('Пройдите капчу!')
 			return
 		}
 
-		const payload: any = {
-			...values
-		}
+		mutate({
+			data: { name, email, password, captchaToken: captcha || undefined }
+		})
+	}
 
-		if (fingerprint && !error) {
-			payload.visitorId = fingerprint.visitorId
-			payload.requestId = fingerprint.requestId
-		}
-
-		await mutateAsync(payload)
+	if (pendingEmail) {
+		return (
+			<VerifyEmailStep
+				email={pendingEmail}
+				onBack={() => setPendingEmail(null)}
+			/>
+		)
 	}
 
 	return (
@@ -182,21 +185,11 @@ export function RegisterForm() {
 								</FormItem>
 							)}
 						/>
-						<FormField
+						<CaptchaField
 							control={form.control}
 							name='captcha'
-							render={({ field }) => (
-								<FormItem className='flex flex-col items-center justify-center'>
-									<FormControl>
-										<Captcha
-											onVerify={token =>
-												form.setValue('captcha', token)
-											}
-											{...field}
-										/>
-									</FormControl>
-								</FormItem>
-							)}
+							resetKey={captchaKey}
+							className='flex flex-col items-center justify-center'
 						/>
 						<Button
 							type='submit'

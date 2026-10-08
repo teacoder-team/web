@@ -1,92 +1,142 @@
 'use client'
 
-import { useMutation } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+
+import { usePostAuthSsoByProviderStartMutation } from '@/generated/api'
+
+import {
+	SSO_PROVIDERS,
+	type SsoProvider,
+	isSsoProvider
+} from '@/constants/sso-providers'
+
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useAppConfig } from '@/lib/config/use-app-config'
+import { cn } from '@/lib/utils'
 
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
 
-import { useGetAvailableSsoProviders } from '@/src/api/hooks'
-import { getAuthUrl } from '@/src/api/requests'
-import { SSO_PROVIDERS } from '@/src/constants'
-import { useFingerprint } from '@/src/hooks'
-import { analytics } from '@/src/lib/analytics'
+import { PasskeyLoginButton } from './passkey-login-button'
 
-export function AuthSocial() {
-	const router = useRouter()
+const ICON_ROW_COLUMNS: Record<number, string> = {
+	1: 'grid-cols-1',
+	2: 'grid-cols-2',
+	3: 'grid-cols-3',
+	4: 'grid-cols-4'
+}
 
-	const { data, isLoading } = useGetAvailableSsoProviders()
-	const { data: fingerprint, error: fpError } = useFingerprint()
+interface AuthSocialProps {
+	isShowPasskey?: boolean
+}
 
-	const { mutate, isPending } = useMutation({
-		mutationKey: ['oauth login'],
-		mutationFn: (provider: string) => {
-			analytics.auth.social.redirect(provider)
+export function AuthSocial({ isShowPasskey }: AuthSocialProps) {
+	const { data: config, isLoading } = useAppConfig()
 
-			const payload =
-				fingerprint && !fpError
-					? {
-							visitorId: fingerprint.visitorId,
-							requestId: fingerprint.requestId
-						}
-					: { visitorId: '', requestId: '' }
+	const providers =
+		config?.features.auth.providers.filter(isSsoProvider) ?? []
 
-			return getAuthUrl(provider, payload)
-		},
-		onSuccess(data, variables) {
-			analytics.auth.social.success(variables)
+	const featured = providers.slice(0, 2)
+	const others = providers.slice(2)
 
-			router.push(data.url as any)
-		},
-		onError(error: any, variables) {
-			analytics.auth.social.fail(variables, error.message)
+	const { mutate, isPending } = usePostAuthSsoByProviderStartMutation()
 
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при создании URL'
-			)
-		}
-	})
+	function signInWith(provider: SsoProvider) {
+		analytics.auth.social.click(provider)
+		analytics.auth.social.redirect(provider)
+
+		mutate(
+			{ provider },
+			{
+				onSuccess(data) {
+					analytics.auth.social.success(provider)
+					window.location.assign(data.url)
+				},
+				onError(error) {
+					analytics.auth.social.fail(provider, error.message)
+					toast.error(
+						getErrorMessage(error, 'Ошибка при создании URL')
+					)
+				}
+			}
+		)
+	}
+
+	function renderButton(provider: SsoProvider, withName: boolean) {
+		const meta = SSO_PROVIDERS[provider]
+
+		return (
+			<Button
+				key={provider}
+				onClick={() => signInWith(meta.id)}
+				variant='outline'
+				className='[&_svg]:size-[21px]'
+				disabled={isPending}
+			>
+				<meta.icon
+					style={{
+						color: meta.color
+					}}
+				/>
+				{withName && meta.name}
+			</Button>
+		)
+	}
 
 	return (
 		<div className='flex flex-col gap-4'>
-			<div className='grid w-full grid-cols-4 gap-4'>
-				{isLoading
-					? Array.from({ length: 4 }).map((_, i) => (
+			{isLoading ? (
+				<>
+					<div className='grid w-full grid-cols-2 gap-4'>
+						{Array.from({ length: 2 }).map((_, i) => (
 							<Skeleton
 								key={i}
 								className='h-10 w-full rounded-lg'
 							/>
-						))
-					: data?.map((provider, index) => {
-							const meta =
-								SSO_PROVIDERS[
-									provider as keyof typeof SSO_PROVIDERS
-								]
+						))}
+					</div>
 
-							if (!meta) return null
+					<div className='grid w-full grid-cols-3 gap-4'>
+						{Array.from({ length: 3 }).map((_, i) => (
+							<Skeleton
+								key={i}
+								className='h-10 w-full rounded-lg'
+							/>
+						))}
+					</div>
+				</>
+			) : (
+				<>
+					{featured.length > 0 && (
+						<div
+							className={cn(
+								'grid w-full gap-4',
+								ICON_ROW_COLUMNS[featured.length]
+							)}
+						>
+							{featured.map(provider =>
+								renderButton(provider, true)
+							)}
+						</div>
+					)}
 
-							return (
-								<Button
-									key={index}
-									onClick={() => {
-										analytics.auth.social.click(meta.id)
-										mutate(meta.id)
-									}}
-									variant='outline'
-									className='[&_svg]:size-[21px]'
-									disabled={isPending}
-								>
-									<meta.icon
-										style={{
-											color: meta.color
-										}}
-									/>
-								</Button>
-							)
-						})}
-			</div>
-			{/* <PasskeyLoginButton /> */}
+					{others.length > 0 && (
+						<div
+							className={cn(
+								'grid w-full gap-4',
+								ICON_ROW_COLUMNS[Math.min(others.length, 4)]
+							)}
+						>
+							{others.map(provider =>
+								renderButton(provider, false)
+							)}
+						</div>
+					)}
+				</>
+			)}
+
+			{isShowPasskey && <PasskeyLoginButton />}
 		</div>
 	)
 }

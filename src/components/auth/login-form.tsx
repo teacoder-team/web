@@ -1,15 +1,21 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import type { Route } from 'next'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Captcha } from '../shared/captcha'
+import { usePostAuthLoginMutation } from '@/generated/api'
+
+import { ROUTES } from '@/constants/routes'
+
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
+import { useSignInResult } from '@/lib/auth/use-sign-in'
+import { useCaptchaRequired } from '@/lib/captcha/captcha'
+
 import { Button } from '../ui/button'
 import {
 	Form,
@@ -22,13 +28,8 @@ import {
 import { Input } from '../ui/input'
 
 import { AuthWrapper } from './auth-wrapper'
-import { MfaForm } from './mfa-form'
-import { useLogin } from '@/src/api/hooks'
-import { instance } from '@/src/api/instance'
-import { ROUTES } from '@/src/constants'
-import { useFingerprint } from '@/src/hooks'
-import { analytics } from '@/src/lib/analytics'
-import { cookies } from '@/src/lib/cookie'
+import { CaptchaField } from './captcha-field'
+import { MfaForm } from './mfa/mfa-form'
 
 const loginSchema = z.object({
 	email: z
@@ -44,45 +45,10 @@ const loginSchema = z.object({
 export type Login = z.infer<typeof loginSchema>
 
 export function LoginForm() {
-	const [methods, setMethods] = useState<string[]>([])
-	const [ticket, setTicket] = useState<string | null>(null)
-	const [userId, setUserId] = useState<string | null>(null)
+	const [captchaKey, setCaptchaKey] = useState(0)
 
-	const router = useRouter()
-	const searchParams = useSearchParams()
-
-	const { data: fingerprint, error } = useFingerprint()
-
-	const { mutateAsync, isPending } = useLogin({
-		onSuccess(data) {
-			if ('ticket' in data && typeof data.ticket === 'string') {
-				analytics.auth.login.mfaRequested(data.allowedMethods)
-
-				setTicket(data.ticket)
-				setMethods(data.allowedMethods)
-				setUserId(data.userId)
-			}
-
-			if ('token' in data && typeof data.token === 'string') {
-				analytics.auth.login.success()
-
-				cookies.set('token', data.token, { expires: 30 })
-
-				instance.defaults.headers['X-Session-Token'] = data.token
-
-				const redirectTo =
-					searchParams.get('redirectTo') || ROUTES.ACCOUNT.ROOT
-
-				router.push(redirectTo as Route)
-			}
-		},
-		onError(error: any) {
-			const message = error.response?.data?.message ?? 'Ошибка при входе'
-			analytics.auth.login.fail(message)
-
-			toast.error(message)
-		}
-	})
+	const isCaptchaRequired = useCaptchaRequired()
+	const { mfa, handleSignIn, resetMfa } = useSignInResult()
 
 	const form = useForm<Login>({
 		resolver: zodResolver(loginSchema),
@@ -93,46 +59,49 @@ export function LoginForm() {
 		}
 	})
 
+	const { mutate, isPending } = usePostAuthLoginMutation({
+		mutation: {
+			onSuccess(data) {
+				if (data.mfaRequired) {
+					analytics.auth.login.mfaRequested(data.mfaMethods)
+				} else {
+					analytics.auth.login.success()
+				}
+
+				form.reset()
+				handleSignIn(data)
+			},
+			onError(error) {
+				const message = getErrorMessage(error, 'Ошибка при входе')
+				analytics.auth.login.fail(message)
+
+				toast.error(message)
+
+				form.setValue('captcha', '')
+				setCaptchaKey(key => key + 1)
+			}
+		}
+	})
+
 	useEffect(() => {
 		analytics.auth.login.view()
 	}, [])
 
-	useEffect(() => {
-		if (form.formState.isSubmitSuccessful && form.getValues('captcha')) {
-			form.reset()
-		}
-	}, [form, form.reset, form.formState.isSubmitSuccessful])
-
-	async function onSubmit(values: Login) {
+	function onSubmit({ email, password, captcha }: Login) {
 		analytics.auth.login.submit()
 
-		if (!values.captcha) {
+		if (isCaptchaRequired && !captcha) {
 			toast.warning('Пройдите капчу!')
 			return
 		}
 
-		const payload: any = {
-			...values
-		}
-
-		if (fingerprint && !error) {
-			payload.visitorId = fingerprint.visitorId
-			payload.requestId = fingerprint.requestId
-		}
-
-		await mutateAsync(payload)
+		mutate({
+			data: { email, password, captchaToken: captcha || undefined }
+		})
 	}
 
-	return methods.length ? (
-		<MfaForm
-			ticket={ticket ?? ''}
-			methods={methods}
-			userId={userId ?? ''}
-			onBack={() => {
-				setTicket(null)
-				setMethods([])
-			}}
-		/>
+	return mfa ? (
+		<MfaForm ticket={mfa} onBack={resetMfa} />
 	) : (
 		<AuthWrapper
 			heading='Войти в аккаунт'
@@ -141,6 +110,7 @@ export function LoginForm() {
 			bottomLinkText='Регистрация'
 			bottomLinkHref={ROUTES.AUTH.REGISTER}
 			isShowSocial
+			isShowPasskey
 		>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
@@ -196,21 +166,11 @@ export function LoginForm() {
 								</FormItem>
 							)}
 						/>
-						<FormField
+						<CaptchaField
 							control={form.control}
 							name='captcha'
-							render={({ field }) => (
-								<FormItem className='flex w-full flex-col items-center justify-center'>
-									<FormControl>
-										<Captcha
-											onVerify={token =>
-												form.setValue('captcha', token)
-											}
-											{...field}
-										/>
-									</FormControl>
-								</FormItem>
-							)}
+							resetKey={captchaKey}
+							className='flex w-full flex-col items-center justify-center'
 						/>
 						<Button
 							type='submit'

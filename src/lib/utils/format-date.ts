@@ -11,3 +11,21 @@ export function formatDate(date: string | Date): string {
 
 	return `${day} ${month} в ${time}`
 }
+
+/** "2 ноября 2026" - without the "г." suffix, so it reads inside a sentence. */
+export function formatFullDate(date: string | Date): string {
+	return new Intl.DateTimeFormat('ru-RU', {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric'
+	})
+		.format(new Date(date))
+		.replace(/\s*г\.$/, '')
+}
+
+/** Calendar days left; 0 once the date has passed. */
+export function daysUntil(date: string | Date): number {
+	const diff = new Date(date).getTime() - Date.now()
+
+	return Math.max(0, Math.ceil(diff / 86_400_000))
+}

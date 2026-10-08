@@ -2,18 +2,14 @@
 
 import { useState } from 'react'
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
 import { Heading } from '../../shared/heading'
 
 import { CoursesList } from './courses-list'
 import { CoursesTab } from './courses-tab'
 import { Leaderboard } from './leaderboard'
 import { UserStats } from './user-stats'
-import {
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger
-} from '@/src/components/ui/tabs'
 
 export function Progress() {
 	const [activeTab, setActiveTab] = useState('overview')

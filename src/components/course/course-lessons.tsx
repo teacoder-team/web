@@ -1,13 +1,17 @@
+'use client'
+
 import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
-import type { LessonResponse } from '@/src/api/generated'
-import { ROUTES } from '@/src/constants'
-import { useAuth } from '@/src/hooks'
-import { lessonsTranslator } from '@/src/lib/utils'
+import type { CourseLessonListResponseItem } from '@/generated/model'
+
+import { ROUTES } from '@/constants/routes'
+
+import { useSession } from '@/lib/auth/auth-provider'
+import { lessonsTranslator } from '@/lib/utils'
 
 interface CourseLessonsProps {
-	lessons: LessonResponse[]
+	lessons: CourseLessonListResponseItem[]
 	completedLessons: string[]
 }
 
@@ -15,7 +19,7 @@ export function CourseLessons({
 	lessons = [],
 	completedLessons = []
 }: CourseLessonsProps) {
-	const { isAuthorized } = useAuth()
+	const { isAuthorized } = useSession()
 
 	const totalLessons = lessons?.length ?? 0
 	const completedCount = completedLessons?.length ?? 0

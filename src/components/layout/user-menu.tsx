@@ -2,8 +2,13 @@
 
 import { ChartArea, LogOut, Settings } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { toast } from 'sonner'
+
+import { ROUTES } from '@/constants/routes'
+
+import { useMediaSource } from '@/hooks/use-media-source'
+
+import { useSession } from '@/lib/auth/auth-provider'
+import { useSignOut } from '@/lib/auth/use-sign-out'
 
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
@@ -17,30 +22,11 @@ import {
 	DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 
-import { useLogout } from '@/src/api/hooks'
-import { instance } from '@/src/api/instance'
-import { ROUTES } from '@/src/constants'
-import { useCurrent } from '@/src/hooks/useCurrent'
-import { cookies } from '@/src/lib/cookie'
-import { getMediaSource } from '@/src/lib/utils'
-
 export function UserMenu() {
-	const router = useRouter()
+	const { user } = useSession()
+	const getMediaSource = useMediaSource()
 
-	const { user } = useCurrent()
-
-	const { mutate } = useLogout({
-		onSuccess() {
-			cookies.remove('token')
-
-			delete instance.defaults.headers['X-Session-Token']
-
-			router.push(ROUTES.AUTH.LOGIN())
-		},
-		onError(error: any) {
-			toast.error(error.response?.data?.message ?? 'Ошибка при выходе')
-		}
-	})
+	const { mutate } = useSignOut()
 
 	return (
 		<DropdownMenu>
@@ -51,7 +37,7 @@ export function UserMenu() {
 				>
 					<Avatar>
 						<AvatarImage
-							src={getMediaSource(user?.avatar ?? '', 'users')}
+							src={getMediaSource(user?.avatar, 'users')}
 							alt='Аватарка'
 						/>
 						<AvatarFallback>

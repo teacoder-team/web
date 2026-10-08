@@ -1,9 +1,18 @@
 'use client'
 
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { Download, RotateCcw, TriangleAlert } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+import {
+	getGetMfaQueryQueryKey,
+	useGetMfaRecoveryCodesQuery,
+	usePostMfaRecoveryCodesMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { downloadRecoveryCodes } from '@/lib/utils'
 
 import { Alert, AlertDescription, AlertTitle } from '../../ui/alert'
 import { Button } from '../../ui/button'
@@ -15,67 +24,69 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '../../ui/dialog'
+import { Input } from '../../ui/input'
 import { Separator } from '../../ui/separator'
 
-import { fetchRecovery, regenerateRecovery } from '@/src/api/requests'
+import { RecoveryCodesList } from './recovery-codes-list'
 
-export function RecoveryCodesModal() {
+interface RecoveryCodesModalProps {
+	/** Codes that were just issued (first security key) - opens the dialog with them. */
+	issuedCodes?: string[] | null
+	onClose?: () => void
+}
+
+export function RecoveryCodesModal({
+	issuedCodes,
+	onClose
+}: RecoveryCodesModalProps) {
 	const [isOpen, setIsOpen] = useState(false)
+	const [regeneratedCodes, setRegeneratedCodes] = useState<string[] | null>(
+		null
+	)
+	const [code, setCode] = useState('')
 
-	const { data, refetch } = useQuery({
-		queryKey: ['fetch recovery codes'],
-		queryFn: () => fetchRecovery(),
-		enabled: isOpen
+	const queryClient = useQueryClient()
+
+	const codes = issuedCodes ?? regeneratedCodes
+
+	const { data: status } = useGetMfaRecoveryCodesQuery({
+		query: { enabled: isOpen && !codes }
 	})
 
-	const { mutate: regenerate, isPending } = useMutation({
-		mutationKey: ['regenerate recovery codes'],
-		mutationFn: () => regenerateRecovery(),
-		onSuccess() {
-			refetch()
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ??
-					'Ошибка при генерации новых кодов'
-			)
+	const { mutate: regenerate, isPending } = usePostMfaRecoveryCodesMutation({
+		mutation: {
+			onSuccess(data) {
+				setCode('')
+				setRegeneratedCodes(data.codes)
+				queryClient.invalidateQueries({
+					queryKey: getGetMfaQueryQueryKey()
+				})
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при генерации новых кодов')
+				)
+			}
 		}
 	})
 
-	function splitArrayIntoColumns(arr: string[]) {
-		if (!arr || arr.length === 0) return [[], [], []]
+	function handleOpenChange(open: boolean) {
+		setIsOpen(open)
 
-		const mid = Math.ceil(arr.length / 3)
-		const first = arr.slice(0, mid)
-		const second = arr.slice(mid, mid * 2)
-		const third = arr.slice(mid * 2)
-
-		return [first, second, third]
+		if (!open) {
+			setCode('')
+			setRegeneratedCodes(null)
+			onClose?.()
+		}
 	}
-
-	function handleDownload() {
-		const recoveryCodesText = data?.join('\n')
-
-		const blob = new Blob([recoveryCodesText!], { type: 'text/plain' })
-		const fileURL = window.URL.createObjectURL(blob)
-		const link = document.createElement('a')
-
-		link.href = fileURL
-		link.setAttribute('download', 'teacoder_recovery_codes.txt')
-
-		document.body.appendChild(link)
-		link.click()
-
-		setTimeout(() => window.URL.revokeObjectURL(fileURL), 0)
-	}
-
-	const recoveryCodes = data ? splitArrayIntoColumns(data) : [[], [], []]
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
-				<Button variant='outline'>Просмотреть</Button>
-			</DialogTrigger>
+		<Dialog open={isOpen || !!issuedCodes} onOpenChange={handleOpenChange}>
+			{issuedCodes === undefined && (
+				<DialogTrigger asChild>
+					<Button variant='outline'>Просмотреть</Button>
+				</DialogTrigger>
+			)}
 			<DialogContent className='w-[500px]'>
 				<DialogTitle>Коды восстановления</DialogTitle>
 				<DialogDescription>
@@ -93,44 +104,52 @@ export function RecoveryCodesModal() {
 						записи.
 					</AlertDescription>
 				</Alert>
-				<div className='flex justify-center gap-10'>
-					<div className='flex flex-col'>
-						{recoveryCodes[0].map((code, index) => (
-							<p key={index} className='text-[17px] font-medium'>
-								{code}
-							</p>
-						))}
+				{codes ? (
+					<RecoveryCodesList
+						codes={codes}
+						className='flex justify-center gap-10'
+					/>
+				) : (
+					<div className='space-y-3'>
+						<p className='text-sm text-muted-foreground'>
+							{status
+								? `Осталось ${status.remaining} из ${status.total} кодов. `
+								: ''}
+							Коды показываются только один раз. Чтобы получить
+							новые, введите код из приложения или резервный код и
+							нажмите «Сбросить».
+						</p>
+						<Input
+							placeholder='Код из приложения или резервный код'
+							value={code}
+							onChange={e => setCode(e.target.value)}
+							className='font-mono'
+							autoComplete='one-time-code'
+							disabled={isPending}
+						/>
 					</div>
-					<div className='flex flex-col'>
-						{recoveryCodes[1].map((code, index) => (
-							<p key={index} className='text-[17px] font-medium'>
-								{code}
-							</p>
-						))}
-					</div>
-					<div className='flex flex-col'>
-						{recoveryCodes[2].map((code, index) => (
-							<p key={index} className='text-[17px] font-medium'>
-								{code}
-							</p>
-						))}
-					</div>
-				</div>
+				)}
 				<Separator />
 				<DialogFooter>
-					<Button
-						variant='outline'
-						className='h-9'
-						onClick={() => regenerate()}
-						disabled={isPending}
-					>
-						<RotateCcw className='size-3' />
-						Сбросить
-					</Button>
+					{!issuedCodes && (
+						<Button
+							variant='outline'
+							className='h-9'
+							onClick={() =>
+								regenerate({ data: { code: code.trim() } })
+							}
+							disabled={!!codes || code.trim().length < 6}
+							isLoading={isPending}
+						>
+							<RotateCcw className='size-3' />
+							Сбросить
+						</Button>
+					)}
 					<Button
 						variant='primary'
 						className='h-9'
-						onClick={handleDownload}
+						onClick={() => codes && downloadRecoveryCodes(codes)}
+						disabled={!codes}
 					>
 						<Download className='size-3' />
 						Скачать

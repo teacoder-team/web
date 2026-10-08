@@ -1,11 +1,12 @@
+import type { UserResponse } from '@/generated/model'
+
 import { Card, CardContent } from '../../ui/card'
 
 import { AvatarForm } from './avatar-form'
 import { DisplayNameForm } from './display-name-form'
-import type { AccountResponse } from '@/src/api/generated'
 
 interface ProfileForm {
-	user: AccountResponse | undefined
+	user: UserResponse | undefined
 }
 
 export function ProfileForm({ user }: ProfileForm) {

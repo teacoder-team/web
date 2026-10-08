@@ -1,6 +1,6 @@
-import { Progress } from '../ui/progress'
+import { cn } from '@/lib/utils'
 
-import { cn } from '@/src/lib/utils'
+import { Progress } from '../ui/progress'
 
 interface CourseProgressProps {
 	progress: number

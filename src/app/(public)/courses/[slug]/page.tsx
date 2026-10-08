@@ -1,22 +1,12 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
 
-import { getCourse, getCourseLessons, getCourses } from '@/src/api/requests'
-import { CourseDetails } from '@/src/components/course/course-details'
-import { getMediaSource } from '@/src/lib/utils'
-import { CourseProvider } from '@/src/providers/course-provider'
+import { getCoursesBySlugLessonsQuery } from '@/generated/api'
 
-export async function generateStaticParams() {
-	const courses = await getCourses()
+import { CourseDetails } from '@/components/course/course-details'
 
-	const paths = courses.map(course => {
-		return {
-			params: { slug: course.slug }
-		}
-	})
-
-	return paths
-}
+import { getAppConfig } from '@/lib/config/app-config'
+import { getCourse } from '@/lib/courses/get-course'
+import { getMediaSource } from '@/lib/utils'
 
 export async function generateMetadata({
 	params
@@ -25,9 +15,16 @@ export async function generateMetadata({
 }): Promise<Metadata> {
 	const { slug } = await params
 
-	const course = await getCourse(slug).catch(error => {
-		notFound()
-	})
+	const [course, config] = await Promise.all([
+		getCourse(slug),
+		getAppConfig()
+	])
+
+	const thumbnail = getMediaSource(
+		course.thumbnail,
+		'courses',
+		config?.features.orion.url
+	)
 
 	return {
 		title: course.title,
@@ -35,7 +32,7 @@ export async function generateMetadata({
 		openGraph: {
 			images: [
 				{
-					url: getMediaSource(course.thumbnail ?? '', 'courses'),
+					url: thumbnail,
 					alt: course.title
 				}
 			]
@@ -45,7 +42,7 @@ export async function generateMetadata({
 			description: course.shortDescription ?? '',
 			images: [
 				{
-					url: getMediaSource(course.thumbnail ?? '', 'courses'),
+					url: thumbnail,
 					alt: course.title
 				}
 			]
@@ -60,15 +57,10 @@ export default async function CoursePage({
 }) {
 	const { slug } = await params
 
-	const course = await getCourse(slug).catch(error => {
-		notFound()
-	})
+	const [course, lessons] = await Promise.all([
+		getCourse(slug),
+		getCoursesBySlugLessonsQuery(slug)
+	])
 
-	const lessons = await getCourseLessons(course.id)
-
-	return (
-		<CourseProvider id={course.id}>
-			<CourseDetails course={course} lessons={lessons} />
-		</CourseProvider>
-	)
+	return <CourseDetails course={course} lessons={lessons} />
 }

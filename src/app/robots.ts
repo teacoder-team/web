@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-import { APP_CONFIG } from '../constants'
+import { env } from '@/lib/config/env'
 
 export default function robots(): MetadataRoute.Robots {
 	return {
@@ -18,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
 				'*?*=*=*'
 			]
 		},
-		host: APP_CONFIG.baseUrl,
-		sitemap: `${APP_CONFIG.baseUrl}/sitemap.xml`
+		host: env.APP_URL,
+		sitemap: `${env.APP_URL}/sitemap.xml`
 	}
 }

@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react'
 
-import { Header } from '@/src/components/layout/header'
-import { UserNavigation } from '@/src/components/layout/user-navigation'
-import { AccountProvider } from '@/src/providers'
+import { AccountGuard } from '@/components/account/account-guard'
+import { Header } from '@/components/layout/header'
+import { UserNavigation } from '@/components/layout/user-navigation'
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
 	return (
-		<AccountProvider>
+		<AccountGuard>
 			<Header />
 			<main className='flex w-full flex-col items-center'>
 				<div className='mx-auto w-full max-w-7xl'>
@@ -18,6 +18,6 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
 					</div>
 				</div>
 			</main>
-		</AccountProvider>
+		</AccountGuard>
 	)
 }

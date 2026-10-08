@@ -1,48 +1,57 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChangeEvent, useState } from 'react'
+'use client'
+
+import { useQueryClient } from '@tanstack/react-query'
+import { type ChangeEvent, useState } from 'react'
 import { toast } from 'sonner'
+
+import {
+	getGetUsersMeQueryQueryKey,
+	usePostUsersMeAvatarMutation
+} from '@/generated/api'
+import type { UserResponse } from '@/generated/model'
+
+import { useMediaSource } from '@/hooks/use-media-source'
+
+import { getErrorMessage } from '@/lib/api/errors'
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
 import { Input } from '../../ui/input'
 
-import type { AccountResponse } from '@/src/api/generated'
-import { changeAvatar } from '@/src/api/requests'
-import { getMediaSource } from '@/src/lib/utils'
-
 interface AvatarFormProps {
-	user: AccountResponse | undefined
+	user: UserResponse | undefined
 }
 
 export function AvatarForm({ user }: AvatarFormProps) {
+	const getMediaSource = useMediaSource()
+
 	const [preview, setPreview] = useState<string | null>(
 		user?.avatar ? getMediaSource(user.avatar, 'users') : null
 	)
 
 	const queryClient = useQueryClient()
 
-	const { mutate } = useMutation({
-		mutationKey: ['change user avatar'],
-		mutationFn: (data: FormData) => changeAvatar(data),
-		onSuccess: data => {
-			setPreview(getMediaSource(data.file_id, 'users'))
-			queryClient.invalidateQueries({ queryKey: ['get me'] })
-			toast.success('Аватар успешно обновлён')
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при обновлении аватара'
-			)
+	const { mutate } = usePostUsersMeAvatarMutation({
+		mutation: {
+			onSuccess(data) {
+				setPreview(data.avatar)
+				queryClient.invalidateQueries({
+					queryKey: getGetUsersMeQueryQueryKey()
+				})
+				toast.success('Аватар успешно обновлён')
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при обновлении аватара')
+				)
+			}
 		}
 	})
 
-	async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+	function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
 		const file = event.target.files?.[0]
 
 		if (file) {
-			const formData = new FormData()
-			formData.append('file', file)
-
-			mutate(formData)
+			mutate({ data: { file } })
 		} else {
 			toast.error('Пожалуйста, выберите файл')
 		}

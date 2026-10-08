@@ -1,41 +1,39 @@
 'use client'
 
-import { startAuthentication } from '@simplewebauthn/browser'
 import { useMutation } from '@tanstack/react-query'
 import { KeyRound } from 'lucide-react'
-import { useState } from 'react'
 import { toast } from 'sonner'
+
+import {
+	postAuthWebauthnLoginOptionsMutation,
+	postAuthWebauthnLoginVerifyMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { useCompleteSignIn } from '@/lib/auth/use-sign-in'
+import {
+	authenticateWithKey,
+	isWebAuthnCancelled
+} from '@/lib/webauthn/webauthn'
 
 import { Button } from '../ui/button'
 
+/** Passwordless sign-in: the key's user verification is the second factor. */
 export function PasskeyLoginButton() {
-	const [isLoading, setIsLoading] = useState(false)
+	const completeSignIn = useCompleteSignIn()
 
 	const { mutate, isPending } = useMutation({
 		mutationFn: async () => {
-			setIsLoading(true)
+			const options = await postAuthWebauthnLoginOptionsMutation({})
+			const response = await authenticateWithKey(options)
 
-			// const options = await generateLoginOptions()
-
-			// options.challenge = Uint8Array.from(atob(options.challenge), c =>
-			// 	c.charCodeAt(0)
-			// )
-
-			// const authenticationResponse = await startAuthentication(options)
-
-			// console.log('PASSKEY AUTH DATA: ', authenticationResponse)
-
-			// const login = await passkeyLogin({
-			// 	credential: authenticationResponse
-			// })
-
-			// console.log('SUCCESS LOGIN: ', login)
+			return postAuthWebauthnLoginVerifyMutation({ response })
 		},
-		onError() {
-			toast.error('Ошибка входа по ключу')
-		},
-		onSettled() {
-			setIsLoading(false)
+		onSuccess: completeSignIn,
+		onError(error) {
+			if (!isWebAuthnCancelled(error)) {
+				toast.error(getErrorMessage(error, 'Ошибка входа по ключу'))
+			}
 		}
 	})
 
@@ -44,7 +42,7 @@ export function PasskeyLoginButton() {
 			onClick={() => mutate()}
 			variant='outline'
 			className='[&_svg]:size-5'
-			isLoading={isLoading || isPending}
+			isLoading={isPending}
 		>
 			<KeyRound />
 			Вход по ключу доступа

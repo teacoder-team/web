@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import {
 	Calendar,
 	KeyRound,
@@ -9,6 +9,17 @@ import {
 	Trash
 } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
+
+import {
+	getGetAuthWebauthnCredentialsQueryQueryKey,
+	getGetMfaQueryQueryKey,
+	useDeleteAuthWebauthnCredentialsByIdMutation,
+	useGetAuthWebauthnCredentialsQuery
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { formatDate } from '@/lib/utils'
 
 import { Button } from '../../ui/button'
 import { Card } from '../../ui/card'
@@ -28,9 +39,6 @@ import {
 	DropdownMenuTrigger
 } from '../../ui/dropdown-menu'
 
-import { deletePasskey, fetchPasskeys } from '@/src/api/requests'
-import { formatDate } from '@/src/lib/utils'
-
 export function PasskeyModal() {
 	const [isOpen, setIsOpen] = useState(false)
 
@@ -38,20 +46,25 @@ export function PasskeyModal() {
 
 	const queryClient = useQueryClient()
 
-	const { data, isLoading } = useQuery({
-		queryKey: ['fetch passkeys'],
-		queryFn: () => fetchPasskeys(),
-		enabled: isOpen
+	const { data, isLoading } = useGetAuthWebauthnCredentialsQuery({
+		query: { enabled: isOpen }
 	})
 
-	const { mutate, isPending } = useMutation({
-		mutationKey: ['delete passkey'],
-		mutationFn: (id: string) => deletePasskey(id),
-		onSuccess: () => {
-			setIsOpen(false)
-			queryClient.invalidateQueries({ queryKey: ['mfa status'] })
-			queryClient.invalidateQueries({ queryKey: ['fetch passkeys'] })
-			setDeletePasskeyId(null)
+	const { mutate, isPending } = useDeleteAuthWebauthnCredentialsByIdMutation({
+		mutation: {
+			onSuccess() {
+				setIsOpen(false)
+				queryClient.invalidateQueries({
+					queryKey: getGetMfaQueryQueryKey()
+				})
+				queryClient.invalidateQueries({
+					queryKey: getGetAuthWebauthnCredentialsQueryQueryKey()
+				})
+				setDeletePasskeyId(null)
+			},
+			onError(error) {
+				toast.error(getErrorMessage(error, 'Ошибка при удалении ключа'))
+			}
 		}
 	})
 
@@ -76,7 +89,7 @@ export function PasskeyModal() {
 						</div>
 					) : (
 						<div className='my-2'>
-							{data?.length && (
+							{!!data?.length && (
 								<div className='grid max-h-[300px] gap-3 overflow-y-auto pr-1'>
 									{data?.map((passkey, index) => (
 										<Card
@@ -90,7 +103,7 @@ export function PasskeyModal() {
 													</div>
 													<div>
 														<h4 className='text-sm font-medium'>
-															{passkey.deviceName}
+															{passkey.name}
 														</h4>
 														<div className='mt-2 space-y-1'>
 															<div className='flex items-center text-xs text-muted-foreground'>
@@ -107,9 +120,11 @@ export function PasskeyModal() {
 																<span>
 																	Последнее
 																	использование:{' '}
-																	{formatDate(
-																		passkey.lastUsedAt
-																	)}
+																	{passkey.lastUsedAt
+																		? formatDate(
+																				passkey.lastUsedAt
+																			)
+																		: 'ещё не использовался'}
 																</span>
 															</div>
 														</div>
@@ -176,7 +191,8 @@ export function PasskeyModal() {
 						<Button
 							variant='destructive'
 							onClick={() =>
-								deletePasskeyId && mutate(deletePasskeyId)
+								deletePasskeyId &&
+								mutate({ id: deletePasskeyId })
 							}
 							isLoading={isPending}
 						>

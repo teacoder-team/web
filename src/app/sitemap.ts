@@ -1,19 +1,27 @@
 import type { MetadataRoute } from 'next'
 
-import { getCourses } from '../api/requests'
-import { APP_CONFIG } from '../constants'
+import { getCoursesQuery } from '@/generated/api'
+
+import { ROUTES } from '@/constants/routes'
+
+import { env } from '@/lib/config/env'
+
+// Built per request: the build must not depend on the API being reachable.
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const courses: MetadataRoute.Sitemap = (await getCourses()).map(course => ({
-		url: `${APP_CONFIG.baseUrl}/${course.slug}`,
-		lastModified: new Date(),
-		changeFrequency: 'monthly',
-		priority: 0.9
-	}))
+	const courses: MetadataRoute.Sitemap = (await getCoursesQuery()).map(
+		course => ({
+			url: `${env.APP_URL}${ROUTES.COURSES.SINGLE(course.slug)}`,
+			lastModified: new Date(),
+			changeFrequency: 'monthly',
+			priority: 0.9
+		})
+	)
 
 	return [
 		{
-			url: APP_CONFIG.baseUrl,
+			url: env.APP_URL,
 			lastModified: new Date(),
 			changeFrequency: 'yearly',
 			priority: 1

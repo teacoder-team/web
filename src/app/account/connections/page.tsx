@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { Connections } from '@/src/components/account/connections/connections'
+import { Connections } from '@/components/account/connections/connections'
 
 export const metadata: Metadata = {
 	title: 'Сторонние сервисы'

@@ -1,32 +1,24 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, AlertCircleIcon, CodeIcon } from 'lucide-react'
+import { CodeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { Input } from '../ui/input'
+import { usePostBillingCreateMutation } from '@/generated/api'
+import { RootResponseFeaturesPaymentsItemId } from '@/generated/model'
 
-import { FAQSection } from './faq'
-import { PaymentMethods } from './payment-methods'
-import { InitPaymentRequestMethod } from '@/src/api/generated'
-import { useGetMe, useInitPayment } from '@/src/api/hooks'
-import { Button } from '@/src/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader
-} from '@/src/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle
-} from '@/src/components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
 	Form,
 	FormControl,
@@ -34,17 +26,25 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage
-} from '@/src/components/ui/form'
-import { ROUTES } from '@/src/constants'
-import { useAuth } from '@/src/hooks'
+} from '@/components/ui/form'
+
+import { ROUTES } from '@/constants/routes'
+
+import { getErrorMessage } from '@/lib/api/errors'
+import { useSession } from '@/lib/auth/auth-provider'
+import { useAppConfig } from '@/lib/config/use-app-config'
+import { formatPrice, monthsTranslator } from '@/lib/utils'
+
+import { Input } from '../ui/input'
+import { Skeleton } from '../ui/skeleton'
+
+import { FAQSection } from './faq'
+import { PaymentMethods } from './payment-methods'
 
 export const paymentSchema = z.object({
-	method: z.enum(
-		Object.values(InitPaymentRequestMethod) as [string, ...string[]],
-		{
-			required_error: 'Выберите метод оплаты'
-		}
-	),
+	method: z.nativeEnum(RootResponseFeaturesPaymentsItemId, {
+		required_error: 'Выберите метод оплаты'
+	}),
 	email: z.string().email('Введите корректный email').optional()
 })
 
@@ -52,57 +52,43 @@ export type PaymentFormValues = z.infer<typeof paymentSchema>
 
 export function Premium() {
 	const [isOpen, setIsOpen] = useState(false)
-	const { isAuthorized } = useAuth()
 
 	const router = useRouter()
 
-	const { mutate, isPending } = useInitPayment({
-		onSuccess(data) {
-			setIsOpen(false)
-			router.push(data.url)
-		},
-		onError(error: any) {
-			if (error.response?.status === 409) {
-				form.setError('email', {
-					type: 'manual',
-					message: 'Этот email уже используется'
-				})
-				return
-			}
+	const { isAuthorized, user, isLoading } = useSession()
+	const { data: config } = useAppConfig()
 
-			if (error.response?.status === 400) {
-				form.setError('email', {
-					type: 'manual',
-					message: 'Для проведения платежа необходимо указать почту'
-				})
-				return
-			}
-
-			form.setError('method', {
-				type: 'manual',
-				message: 'Не удалось создать платеж. Попробуйте позже.'
-			})
-		}
-	})
-
-	const { data: user, isLoading } = useGetMe({
-		enabled: isAuthorized
-	})
+	const premium = config?.features.premium
 
 	const form = useForm<PaymentFormValues>({
 		resolver: zodResolver(paymentSchema),
 		defaultValues: {
-			method: InitPaymentRequestMethod.BANK_CARD
+			method: RootResponseFeaturesPaymentsItemId.BANK_CARD
+		}
+	})
+
+	const { mutate, isPending } = usePostBillingCreateMutation({
+		mutation: {
+			onSuccess(data) {
+				setIsOpen(false)
+				window.location.assign(data.url)
+			},
+			onError(error) {
+				form.setError('method', {
+					type: 'manual',
+					message: getErrorMessage(
+						error,
+						'Не удалось создать платеж. Попробуйте позже.'
+					)
+				})
+			}
 		}
 	})
 
 	const method = form.watch('method')
 
-	const onSubmit = (data: PaymentFormValues) => {
-		mutate({
-			method: data.method as InitPaymentRequestMethod,
-			email: data.email
-		})
+	const onSubmit = ({ method, email }: PaymentFormValues) => {
+		mutate({ data: { method, email: user?.email ? undefined : email } })
 	}
 
 	return (
@@ -148,12 +134,24 @@ export function Premium() {
 
 						<CardContent className='flex flex-col items-center gap-6'>
 							<div className='text-center'>
-								<span className='text-5xl font-extrabold text-foreground'>
-									449&#8381;
-								</span>
-								<span className='ml-1 text-lg text-neutral-500 dark:text-neutral-400'>
-									/ месяц
-								</span>
+								{premium ? (
+									<>
+										<span className='text-5xl font-extrabold text-foreground'>
+											{formatPrice(
+												premium.prices.standard,
+												premium.currency
+											)}
+										</span>
+										<span className='ml-1 text-lg text-neutral-500 dark:text-neutral-400'>
+											/{' '}
+											{premium.months === 1
+												? 'месяц'
+												: `${premium.months} ${monthsTranslator(premium.months)}`}
+										</span>
+									</>
+								) : (
+									<Skeleton className='mx-auto h-12 w-48 rounded-lg' />
+								)}
 							</div>
 							<p className='text-center text-neutral-600 dark:text-neutral-300'>
 								Полный доступ к исходному коду всех проектов.
@@ -200,13 +198,18 @@ export function Premium() {
 						>
 							<PaymentMethods control={form.control} />
 
-							{method ===
-								InitPaymentRequestMethod.INTERNATIONAL_CARD && (
+							{method === 'INTERNATIONAL_CARD' && premium && (
 								<p className='mt-4 text-xs text-muted-foreground'>
 									Из-за высокой комиссии международных
 									платёжных систем итоговая стоимость
 									составляет{' '}
-									<span className='font-semibold'>499₽</span>.
+									<span className='font-semibold'>
+										{formatPrice(
+											premium.prices.international,
+											premium.currency
+										)}
+									</span>
+									.
 								</p>
 							)}
 

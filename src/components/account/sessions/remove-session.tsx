@@ -1,11 +1,18 @@
+'use client'
+
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import {
+	getGetSessionsQueryQueryKey,
+	useDeleteSessionsByIdMutation
+} from '@/generated/api'
+
+import { getErrorMessage } from '@/lib/api/errors'
+
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'
-
-import { useRevokeSession } from '@/src/api/hooks'
 
 interface RevokeSessionProps {
 	id: string
@@ -16,15 +23,19 @@ export function RevokeSession({ id }: RevokeSessionProps) {
 
 	const queryClient = useQueryClient()
 
-	const { mutate, isPending } = useRevokeSession({
-		onSuccess() {
-			queryClient.invalidateQueries({ queryKey: ['get sessions'] })
-			setIsOpen(false)
-		},
-		onError(error: any) {
-			toast.error(
-				error.response?.data?.message ?? 'Ошибка при удалении сессии'
-			)
+	const { mutate, isPending } = useDeleteSessionsByIdMutation({
+		mutation: {
+			onSuccess() {
+				queryClient.invalidateQueries({
+					queryKey: getGetSessionsQueryQueryKey()
+				})
+				setIsOpen(false)
+			},
+			onError(error) {
+				toast.error(
+					getErrorMessage(error, 'Ошибка при удалении сессии')
+				)
+			}
 		}
 	})
 

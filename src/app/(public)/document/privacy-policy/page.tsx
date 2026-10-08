@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 
-import { ROUTES } from '@/src/constants'
+import { ROUTES } from '@/constants/routes'
 
 export const metadata: Metadata = {
 	title: 'Политика конфиденциальности'

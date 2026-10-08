@@ -1,0 +1,11 @@
+# Copied byte-for-byte from the previous frontend - never reformat
+src/components/ui
+src/components/icons
+src/styles
+tailwind.config.ts
+postcss.config.mjs
+public
+design
+
+# orval output
+generated
