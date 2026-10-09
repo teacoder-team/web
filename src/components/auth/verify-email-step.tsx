@@ -16,7 +16,7 @@ import { CaptchaField } from './captcha-field'
 interface VerifyEmailStepProps {
 	email: string
 	onBack: () => void
-	onResend: (captchaToken?: string) => Promise<number>
+	onResend: (captchaToken?: string) => Promise<number | null>
 	resendAfter?: number
 }
 
@@ -58,8 +58,12 @@ export function VerifyEmailStep({
 		setIsSending(true)
 
 		try {
-			setRemaining(await onResend(captchaToken || undefined))
-			toast.success('Письмо с подтверждением отправлено')
+			const resendAfter = await onResend(captchaToken || undefined)
+
+			if (resendAfter !== null) {
+				setRemaining(resendAfter)
+				toast.success('Письмо с подтверждением отправлено')
+			}
 		} catch {
 			return
 		} finally {

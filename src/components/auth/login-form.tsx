@@ -122,7 +122,7 @@ export function LoginForm() {
 					const { email, password } = form.getValues()
 					const result = await mutateAsync({ data: { email, password, captchaToken } })
 
-					return 'emailVerificationRequired' in result ? result.resendAfter : 0
+					return 'emailVerificationRequired' in result ? result.resendAfter : null
 				}}
 			/>
 		)
