@@ -43,6 +43,10 @@ const MESSAGES: Record<string, string> = {
 	'Invalid code': 'Неверный код',
 	'Verification code expired or registration not found':
 		'Код истёк. Зарегистрируйтесь заново, чтобы получить новый',
+	'Verification link expired or invalid':
+		'Ссылка подтверждения устарела или уже использована. Войдите, чтобы получить новую',
+	'Invalid email verification token':
+		'Ссылка подтверждения недействительна. Войдите, чтобы получить новую',
 	'Reset link expired or invalid':
 		'Ссылка для сброса пароля устарела или уже использована. Запросите новую',
 	'Reset link is invalid': 'Ссылка для сброса пароля недействительна',
@@ -110,7 +114,7 @@ const MESSAGES: Record<string, string> = {
 	'This lesson requires TeaCoder Premium or the course to be purchased':
 		'Этот урок доступен с подпиской TeaCoder Premium',
 	'Payment provider is unavailable, try again later':
-		'Платёжный сервис недоступен, попробуйте позже',
+		'Этот способ оплаты временно недоступен. Мы работаем над решением проблемы. Пожалуйста, выберите другой способ оплаты.',
 	'No active subscription to renew': 'У вас нет действующей подписки',
 	'Subscription never expires - there is nothing to renew':
 		'Ваша подписка бессрочная'
@@ -135,7 +139,7 @@ const PATTERNS: [RegExp, string][] = [
 	],
 	[
 		/^Payment method .+ is not available yet$/,
-		'Этот способ оплаты пока недоступен'
+		'Этот способ оплаты пока недоступен. Пожалуйста, выберите другой способ оплаты.'
 	],
 	[
 		/^An unpaid .+ invoice .+ is open until/,

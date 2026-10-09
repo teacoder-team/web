@@ -12,7 +12,7 @@ export default function proxy(request: NextRequest) {
 	const hasSession = request.cookies.has(SESSION_MARKER)
 
 	// Providers return here after linking from settings, when the user is signed in.
-	if (pathname.startsWith('/auth/callback/')) {
+	if (pathname.startsWith('/auth/callback/') || pathname.startsWith('/auth/verify/')) {
 		return NextResponse.next()
 	}
 

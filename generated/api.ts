@@ -73,6 +73,7 @@ import type {
   LeaderListResponse,
   LessonResponse,
   LoginPayload,
+  LoginResponse,
   MaterialsLinkResponse,
   MessageResponse,
   MfaChallengePayload,
@@ -325,7 +326,7 @@ export function useGetHealthQuery<TData = Awaited<ReturnType<typeof getHealthQue
 
 
 /**
- * Создаёт неподтверждённый аккаунт и отправляет на почту 6-значный код, действующий 15 минут. Повторный запрос для той же почты просто отправит новый код. Требует токен капчи, если она включена.
+ * Создаёт неподтверждённый аккаунт и отправляет ссылку `{APP_URL}/auth/verify/{token}`. Ссылка одноразовая и действует 30 минут; новая ссылка отменяет предыдущую. Повторная регистрация неподтверждённой почты отправляет письмо для существующего аккаунта, не меняя пароль. Письма отправляются не чаще раза в минуту. Требует токен капчи, если она включена.
  * @summary Регистрация
  */
 export const postAuthRegisterMutation = (
@@ -394,7 +395,7 @@ export const usePostAuthRegisterMutation = <TError = ErrorType<unknown>,
     }
 
 /**
- * Проверяет код из письма, активирует аккаунт и сразу выполняет вход: access-токен в теле, refresh-токен в httpOnly-cookie `tc_refresh`. На код даётся 5 попыток.
+ * Принимает только `{ token }` из ссылки в письме. Подтверждает привязанную к токену почту и активирует аккаунт. Без MFA сразу открывает сессию: access-токен в теле, refresh-токен в httpOnly-cookie `tc_refresh`. При включённой MFA возвращает билет второго шага без создания сессии. Ссылка действует 30 минут и срабатывает один раз; повторный, просроченный или заменённый токен вернёт 400. Фронтенд должен отправить токен POST-запросом после открытия страницы, сам переход по ссылке его не расходует.
  * @summary Подтверждение регистрации
  */
 export const postAuthVerifyMutation = (
@@ -403,7 +404,7 @@ export const postAuthVerifyMutation = (
 ) => {
 
 
-      return apiClient<AuthResponse>(
+      return apiClient<SignInResponse>(
       {url: `/auth/verify`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: verifyRegisterPayload, signal
@@ -463,7 +464,7 @@ export const usePostAuthVerifyMutation = <TError = ErrorType<unknown>,
     }
 
 /**
- * Проверяет пароль. Если двухфакторная защита выключена - открывает сессию: access-токен в теле, refresh-токен в httpOnly-cookie `tc_refresh`. Если включена - сессия не создаётся: в ответе `mfaRequired: true` и `mfaToken` для `POST /auth/mfa/challenge` и `POST /auth/mfa/confirm`. После 5 неудачных попыток вход блокируется на 15 минут для этой почты, этого IP и этого устройства (если передан `X-Fingerprint-Event`). Вход с устройства, которого аккаунт раньше не видел, присылает владельцу письмо. Требует токен капчи, если она включена.
+ * Проверяет пароль. Если почта не подтверждена, отправляет ссылку подтверждения и возвращает `emailVerificationRequired: true` с `resendAfter` в секундах; сессия и токены не создаются. Повторные письма ограничены одним в минуту, неверный пароль письмо не отправляет. При подтверждённой почте без MFA открывает сессию: access-токен в теле, refresh-токен в httpOnly-cookie `tc_refresh`. При включённой MFA возвращает `mfaRequired: true` и билет второго шага без сессии. После 5 неверных паролей вход блокируется на 15 минут для почты, IP и устройства. Вход с нового устройства присылает владельцу письмо. Требует токен капчи, если она включена.
  * @summary Вход по почте и паролю
  */
 export const postAuthLoginMutation = (
@@ -472,7 +473,7 @@ export const postAuthLoginMutation = (
 ) => {
 
 
-      return apiClient<SignInResponse>(
+      return apiClient<LoginResponse>(
       {url: `/auth/login`, method: 'POST',
       headers: {'Content-Type': 'application/json', },
       data: loginPayload, signal

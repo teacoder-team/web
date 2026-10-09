@@ -30,6 +30,7 @@ import { Input } from '../ui/input'
 import { AuthWrapper } from './auth-wrapper'
 import { CaptchaField } from './captcha-field'
 import { MfaForm } from './mfa/mfa-form'
+import { VerifyEmailStep } from './verify-email-step'
 
 const loginSchema = z.object({
 	email: z
@@ -46,6 +47,7 @@ export type Login = z.infer<typeof loginSchema>
 
 export function LoginForm() {
 	const [captchaKey, setCaptchaKey] = useState(0)
+	const [verification, setVerification] = useState<{ email: string; resendAfter: number } | null>(null)
 
 	const isCaptchaRequired = useCaptchaRequired()
 	const { mfa, handleSignIn, resetMfa } = useSignInResult()
@@ -59,9 +61,19 @@ export function LoginForm() {
 		}
 	})
 
-	const { mutate, isPending } = usePostAuthLoginMutation({
+	const { mutate, mutateAsync, isPending } = usePostAuthLoginMutation({
 		mutation: {
-			onSuccess(data) {
+			onSuccess(data, variables) {
+				form.setValue('captcha', '')
+				setCaptchaKey(key => key + 1)
+
+				if ('emailVerificationRequired' in data) {
+					setVerification({ email: variables.data.email, resendAfter: data.resendAfter })
+
+					return
+				}
+
+				setVerification(null)
 				if (data.mfaRequired) {
 					analytics.auth.login.mfaRequested(data.mfaMethods)
 				} else {
@@ -98,6 +110,22 @@ export function LoginForm() {
 		mutate({
 			data: { email, password, captchaToken: captcha || undefined }
 		})
+	}
+
+	if (verification) {
+		return (
+			<VerifyEmailStep
+				email={verification.email}
+				resendAfter={verification.resendAfter}
+				onBack={() => setVerification(null)}
+				onResend={async captchaToken => {
+					const { email, password } = form.getValues()
+					const result = await mutateAsync({ data: { email, password, captchaToken } })
+
+					return 'emailVerificationRequired' in result ? result.resendAfter : null
+				}}
+			/>
+		)
 	}
 
 	return mfa ? (

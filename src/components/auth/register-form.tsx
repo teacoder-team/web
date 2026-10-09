@@ -66,7 +66,7 @@ export function RegisterForm() {
 		setCaptchaKey(key => key + 1)
 	}
 
-	const { mutate, isPending } = usePostAuthRegisterMutation({
+	const { mutate, mutateAsync, isPending } = usePostAuthRegisterMutation({
 		mutation: {
 			onSuccess(_, { data }) {
 				resetCaptcha()
@@ -105,6 +105,12 @@ export function RegisterForm() {
 			<VerifyEmailStep
 				email={pendingEmail}
 				onBack={() => setPendingEmail(null)}
+					onResend={async captchaToken => {
+						const { name, email, password } = form.getValues()
+						await mutateAsync({ data: { name, email, password, captchaToken } })
+
+						return 60
+					}}
 			/>
 		)
 	}

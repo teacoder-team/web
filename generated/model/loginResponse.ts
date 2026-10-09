@@ -34,14 +34,42 @@
  */
 
 /**
- * Токен подтверждения почты и входа в аккаунт.
+ * Результат входа: сессия, запрос второго фактора или подтверждения почты.
  */
-export interface VerifyRegisterPayload {
+export type LoginResponse = {
+  /** Второй фактор не нужен. */
+  mfaRequired: false;
   /**
-     * Одноразовый токен из ссылки подтверждения почты. Действует 30 минут.
-     * @minLength 43
-     * @maxLength 43
-     * @pattern ^[A-Za-z0-9_-]{43}$
+     * Всегда `null`, если второй фактор не нужен.
+     * @nullable
      */
-  token: string;
-}
+  mfaToken: null;
+  /** Идентификатор пользователя. */
+  id: string;
+  /** Короткоживущий JWT. Храните в памяти (не в localStorage) и передавайте в заголовке `Authorization: Bearer <token>` - в cookie сервер его не кладёт. Когда истечёт, получите новый через `POST /auth/refresh`. */
+  accessToken: string;
+  linkedProvider: 'GOOGLE' | 'GITHUB' | 'DISCORD' | 'TELEGRAM' | 'YANDEX' | 'VK' | null;
+} | {
+  /** Включена двухфакторная защита - нужен второй шаг. */
+  mfaRequired: true;
+  /**
+     * Временный билет второго шага входа из ответа на вход. Действует 5 минут и срабатывает один раз.
+     * @minLength 1
+     * @maxLength 128
+     */
+  mfaToken: string;
+  /** Способы, которыми можно подтвердить вход. */
+  mfaMethods: ('WEBAUTHN' | 'TOTP' | 'RECOVERY_CODE')[];
+  /** Через сколько секунд `mfaToken` перестанет действовать. */
+  expiresIn: number;
+} | {
+  /** Нужно подтвердить почту по ссылке из письма; сессия ещё не создана. */
+  emailVerificationRequired: true;
+  /** Сообщение о необходимости проверить почту. */
+  message: string;
+  /**
+     * Через сколько секунд можно повторно запросить письмо через вход.
+     * @minimum 0
+     */
+  resendAfter: number;
+};
