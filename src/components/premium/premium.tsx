@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { CodeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -74,18 +75,18 @@ export function Premium() {
 				window.location.assign(data.url)
 			},
 			onError(error) {
-				form.setError('method', {
-					type: 'manual',
-					message: getErrorMessage(
-						error,
-						'Не удалось создать платеж. Попробуйте позже.'
-					)
-				})
+				const message = getErrorMessage(error, 'Не удалось создать платёж. Попробуйте ещё раз или выберите другой способ оплаты.')
+				form.setError('method', { type: 'manual', message })
+				toast.error(message, { duration: 8000 })
 			}
 		}
 	})
 
 	const method = form.watch('method')
+
+	useEffect(() => {
+		form.clearErrors('method')
+	}, [method, form])
 
 	const onSubmit = ({ method, email }: PaymentFormValues) => {
 		mutate({ data: { method, email: user?.email ? undefined : email } })

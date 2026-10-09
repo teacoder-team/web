@@ -72,6 +72,7 @@ export * from './lessonResponse';
 export * from './lessonResponseAccess';
 export * from './lessonResponseCourse';
 export * from './loginPayload';
+export * from './loginResponse';
 export * from './materialsLinkResponse';
 export * from './messageResponse';
 export * from './mfaChallengePayload';
