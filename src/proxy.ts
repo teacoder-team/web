@@ -2,17 +2,21 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 import { SESSION_MARKER } from '@/lib/auth/marker'
 
-/**
- * UX redirects only. The marker is a hint - the real check is the refresh on the
- * client, which drops the marker if the session is gone.
- */
 export default function proxy(request: NextRequest) {
 	const { pathname, search } = request.nextUrl
 
 	const hasSession = request.cookies.has(SESSION_MARKER)
 
-	// Providers return here after linking from settings, when the user is signed in.
-	if (pathname.startsWith('/auth/callback/') || pathname.startsWith('/auth/verify/')) {
+	if (
+		pathname.startsWith('/auth/callback/') ||
+		pathname.startsWith('/auth/verify/')
+	) {
+		return NextResponse.next()
+	}
+
+	// Robokassa returns here with a cross-site POST, which carries no Lax cookies.
+	// The route only forwards to /payment/:id, where the session is checked.
+	if (pathname === '/payment/success') {
 		return NextResponse.next()
 	}
 
@@ -34,5 +38,10 @@ export default function proxy(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/auth/:path*', '/account/:path*', '/lesson/:path*']
+	matcher: [
+		'/auth/:path*',
+		'/account/:path*',
+		'/lesson/:path*',
+		'/payment/:path*'
+	]
 }

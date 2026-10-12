@@ -87,6 +87,7 @@ import type {
   OAuthCallbackResponse,
   OAuthStartResponse,
   PaymentMethodsResponse,
+  PaymentResponse,
   PostAuthWebauthnLoginOptionsMutationBodyOne,
   PostAuthWebauthnLoginOptionsMutationBodyThree,
   PostAuthWebauthnLoginOptionsMutationBodyTwo,
@@ -3407,6 +3408,100 @@ export const usePostBillingCreateMutation = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getPostBillingCreateMutationMutationOptions(options), queryClient);
     }
+
+/**
+ * Статус платежа текущего пользователя и что он оплачивает. Подходит для опроса после возврата со страницы оплаты: провайдер подтверждает оплату вебхуком, и после этого статус становится `CAPTURED`, а доступ уже выдан. Неоплаченная ссылка через час переводится в `EXPIRED`. Чужой или несуществующий платёж - 404.
+ * @summary Платёж
+ */
+export const getBillingPaymentsByIdQuery = (
+    id: string,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<PaymentResponse>(
+      {url: `/billing/payments/${id}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetBillingPaymentsByIdQueryQueryKey = (id: string,) => {
+    return [
+    `/billing/payments/${id}`
+    ] as const;
+    }
+
+
+export const getGetBillingPaymentsByIdQueryQueryOptions = <TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBillingPaymentsByIdQueryQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>> = ({ signal }) => getBillingPaymentsByIdQuery(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBillingPaymentsByIdQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>>
+export type GetBillingPaymentsByIdQueryQueryError = ErrorType<unknown>
+
+
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Платёж
+ */
+
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBillingPaymentsByIdQueryQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Действует ли премиум, до какой даты оплачен и включено ли автопродление. Если подписки никогда не было - все флаги `false`.
