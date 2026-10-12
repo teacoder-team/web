@@ -45,7 +45,8 @@
 		--destructive-foreground: 0 0% 100%;
 
 		--border: 45 12% 85%;
-		--input: 45 10% 78%;
+		/* Fill of text fields */
+		--input: 220 14% 96%;
 		--ring: 221 83% 53%;
 
 		/* Always-dark surface (hero, art panels, footer) in both themes */
@@ -97,7 +98,7 @@
 		--destructive-foreground: 0 0% 100%;
 
 		--border: 240 4% 14%;
-		--input: 240 4% 20%;
+		--input: 240 4% 11.5%;
 		--ring: 205 95% 70%;
 
 		--inverse: 240 8% 5%;

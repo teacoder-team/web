@@ -80,6 +80,7 @@ export function Hero({ covers }: HeroProps) {
 				>
 					<Image
 						src='/images/art/sphere-halftone.png'
+						unoptimized
 						alt=''
 						width={960}
 						height={960}

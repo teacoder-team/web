@@ -47,7 +47,10 @@ export type Login = z.infer<typeof loginSchema>
 
 export function LoginForm() {
 	const [captchaKey, setCaptchaKey] = useState(0)
-	const [verification, setVerification] = useState<{ email: string; resendAfter: number } | null>(null)
+	const [verification, setVerification] = useState<{
+		email: string
+		resendAfter: number
+	} | null>(null)
 
 	const isCaptchaRequired = useCaptchaRequired()
 	const { mfa, handleSignIn, resetMfa } = useSignInResult()
@@ -68,7 +71,10 @@ export function LoginForm() {
 				setCaptchaKey(key => key + 1)
 
 				if ('emailVerificationRequired' in data) {
-					setVerification({ email: variables.data.email, resendAfter: data.resendAfter })
+					setVerification({
+						email: variables.data.email,
+						resendAfter: data.resendAfter
+					})
 
 					return
 				}
@@ -120,9 +126,13 @@ export function LoginForm() {
 				onBack={() => setVerification(null)}
 				onResend={async captchaToken => {
 					const { email, password } = form.getValues()
-					const result = await mutateAsync({ data: { email, password, captchaToken } })
+					const result = await mutateAsync({
+						data: { email, password, captchaToken }
+					})
 
-					return 'emailVerificationRequired' in result ? result.resendAfter : null
+					return 'emailVerificationRequired' in result
+						? result.resendAfter
+						: null
 				}}
 			/>
 		)
@@ -173,7 +183,7 @@ export function LoginForm() {
 										<FormLabel>Пароль</FormLabel>
 										<Link
 											href={ROUTES.AUTH.RECOVERY}
-											className='ml-auto inline-block text-sm underline'
+											className='ml-auto inline-block text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline'
 										>
 											Забыли пароль?
 										</Link>

@@ -13,19 +13,10 @@ import {
 import { analytics } from '@/lib/analytics'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useAppConfig } from '@/lib/config/use-app-config'
-import { cn } from '@/lib/utils'
 
 import { Button } from '../ui/button'
-import { Skeleton } from '../ui/skeleton'
 
 import { PasskeyLoginButton } from './passkey-login-button'
-
-const ICON_ROW_COLUMNS: Record<number, string> = {
-	1: 'grid-cols-1',
-	2: 'grid-cols-2',
-	3: 'grid-cols-3',
-	4: 'grid-cols-4'
-}
 
 interface AuthSocialProps {
 	isShowPasskey?: boolean
@@ -36,9 +27,6 @@ export function AuthSocial({ isShowPasskey }: AuthSocialProps) {
 
 	const providers =
 		config?.features.auth.providers.filter(isSsoProvider) ?? []
-
-	const featured = providers.slice(0, 2)
-	const others = providers.slice(2)
 
 	const { mutate, isPending } = usePostAuthSsoByProviderStartMutation()
 
@@ -63,78 +51,27 @@ export function AuthSocial({ isShowPasskey }: AuthSocialProps) {
 		)
 	}
 
-	function renderButton(provider: SsoProvider, withName: boolean) {
-		const meta = SSO_PROVIDERS[provider]
-
-		return (
-			<Button
-				key={provider}
-				onClick={() => signInWith(meta.id)}
-				variant='outline'
-				className='[&_svg]:size-[21px]'
-				disabled={isPending}
-			>
-				<meta.icon
-					style={{
-						color: meta.color
-					}}
-				/>
-				{withName && meta.name}
-			</Button>
-		)
-	}
+	// The wrapper shows its own skeleton while the config loads
+	if (isLoading) return null
 
 	return (
-		<div className='flex flex-col gap-4'>
-			{isLoading ? (
-				<>
-					<div className='grid w-full grid-cols-2 gap-4'>
-						{Array.from({ length: 2 }).map((_, i) => (
-							<Skeleton
-								key={i}
-								className='h-10 w-full rounded-lg'
-							/>
-						))}
-					</div>
+		<div className='flex flex-col gap-3'>
+			{providers.map(provider => {
+				const meta = SSO_PROVIDERS[provider]
 
-					<div className='grid w-full grid-cols-3 gap-4'>
-						{Array.from({ length: 3 }).map((_, i) => (
-							<Skeleton
-								key={i}
-								className='h-10 w-full rounded-lg'
-							/>
-						))}
-					</div>
-				</>
-			) : (
-				<>
-					{featured.length > 0 && (
-						<div
-							className={cn(
-								'grid w-full gap-4',
-								ICON_ROW_COLUMNS[featured.length]
-							)}
-						>
-							{featured.map(provider =>
-								renderButton(provider, true)
-							)}
-						</div>
-					)}
-
-					{others.length > 0 && (
-						<div
-							className={cn(
-								'grid w-full gap-4',
-								ICON_ROW_COLUMNS[Math.min(others.length, 4)]
-							)}
-						>
-							{others.map(provider =>
-								renderButton(provider, false)
-							)}
-						</div>
-					)}
-				</>
-			)}
+				return (
+					<Button
+						key={provider}
+						onClick={() => signInWith(meta.id)}
+						variant='outline'
+						className='h-[42px] w-full [&_svg]:size-5'
+						disabled={isPending}
+					>
+						<meta.icon style={{ color: meta.color }} />
+						Продолжить через {meta.name}
+					</Button>
+				)
+			})}
 
 			{isShowPasskey && <PasskeyLoginButton />}
 		</div>

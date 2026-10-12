@@ -24,7 +24,7 @@ const SelectValue = SelectPrimitives.Value
 SelectValue.displayName = 'SelectValue'
 
 const selectTriggerStyles = cva(
-	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-xl border border-input bg-card px-3.5 py-2 outline-none transition text-sm hover:border-foreground/25',
+	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-xl border border-border bg-input px-3.5 py-2 outline-none transition text-sm hover:border-foreground/25',
 	{
 		variants: {
 			disabled: {

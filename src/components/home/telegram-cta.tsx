@@ -46,6 +46,7 @@ export function TelegramCTA() {
 				>
 					<Image
 						src='/images/art/planet-wide.png'
+						unoptimized
 						alt=''
 						width={2400}
 						height={560}

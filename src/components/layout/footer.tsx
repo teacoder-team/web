@@ -39,7 +39,8 @@ const generalLinks: NavLink[] = [
 
 const documentsLinks: NavLink[] = [
 	{ title: 'Пользовательское соглашение', href: ROUTES.DOCUMENTS.TERMS },
-	{ title: 'Политика конфиденциальности', href: ROUTES.DOCUMENTS.PRIVACY }
+	{ title: 'Политика конфиденциальности', href: ROUTES.DOCUMENTS.PRIVACY },
+	{ title: 'Политика использования cookie', href: ROUTES.DOCUMENTS.COOKIES }
 ]
 
 const socialLinks: SocialLink[] = [
@@ -66,8 +67,6 @@ const socialLinks: SocialLink[] = [
 ]
 
 export function Footer() {
-	const { openSettings } = useConsent()
-
 	return (
 		<footer className='relative overflow-hidden bg-inverse text-inverse-foreground'>
 			<div className='page-container grid gap-12 pb-10 pt-16 sm:pt-20 lg:grid-cols-12 lg:gap-8'>
@@ -107,15 +106,6 @@ export function Footer() {
 						{documentsLinks.map((link, index) => (
 							<FooterLink key={index} {...link} />
 						))}
-						<li>
-							<button
-								type='button'
-								onClick={openSettings}
-								className='rounded-sm text-[15px] text-inverse-foreground/65 transition-colors hover:text-inverse-foreground'
-							>
-								Настройки cookie
-							</button>
-						</li>
 					</FooterColumn>
 				</div>
 			</div>

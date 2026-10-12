@@ -186,7 +186,7 @@ export function EnableTotpForm() {
 										<p className='mt-1 text-sm text-muted-foreground'>
 											Введите секретный ключ вручную:
 										</p>
-										<div className='mt-2 h-8 w-full rounded-lg border border-input bg-background px-3 py-1.5 text-[13px]'>
+										<div className='mt-2 h-8 w-full rounded-lg border border-border bg-input px-3 py-1.5 text-[13px]'>
 											{totp?.secret}
 										</div>
 										<Button

@@ -53,7 +53,7 @@ export function CookieDialog() {
 				Нужны для входа в аккаунт и его защиты. Аналитические включаются
 				только с вашего согласия.{' '}
 				<Link
-					href={ROUTES.DOCUMENTS.PRIVACY}
+					href={ROUTES.DOCUMENTS.COOKIES}
 					target='_blank'
 					className='text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground'
 				>
