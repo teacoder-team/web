@@ -33,13 +33,16 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { CreatePaymentPayloadMethod } from './createPaymentPayloadMethod';
+import type { CreatePaymentPayloadProvider } from './createPaymentPayloadProvider';
 
 /**
  * Что и как оплатить.
  */
 export interface CreatePaymentPayload {
-  /** Способ оплаты. От него зависит, через какого провайдера пройдёт платёж. */
+  /** Способ оплаты. CRYPTO — криптовалюта. Для Робокассы передайте BANK_CARD и provider: ROBOKASSA; фактический способ уточняется после оплаты. */
   method: CreatePaymentPayloadMethod;
+  /** Провайдер из списка способов оплаты. Без него для BANK_CARD используется YOOKASSA, для CRYPTO — HELEKET. Недоступные сочетания отклоняются. */
+  provider?: CreatePaymentPayloadProvider;
   /** Курс для покупки. Без него оплачивается премиум-подписка. */
   courseId?: string;
   /** Почта для чека. Нужна, только если у аккаунта нет своей почты. */

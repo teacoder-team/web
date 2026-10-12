@@ -33,7 +33,7 @@ The repository has a CodeGraph index (`.codegraph/`). Use it **before** grep or 
 
 - MCP tool `codegraph_explore` (pass this repository as `projectPath`): one call returns the source of the relevant symbols with line numbers, call paths and the blast radius (who depends on a symbol).
 - From the shell: `codegraph explore "<symbols or question>"`.
-- Before changing a shared component or utility (`Button`, `CourseCard`, `getMediaSource`, `formatPrice`…), check its blast radius so you don't break callers.
+- Before changing a shared component or utility (`Button`, `CourseCard`, `getMediaSource`, `formatPrice`...), check its blast radius so you don't break callers.
 - Indexing (`codegraph init`, upgrades) is the user's call, not the agent's.
 
 ## Structure
@@ -47,10 +47,10 @@ src/
     lesson/[id]/    lesson page
     payment/        payment result
   components/
-    ui/             primitives (button, card, badge, input, dialog, sheet…) - the design system base
+    ui/             primitives (button, card, badge, input, dialog, sheet...) - the design system base
     home/ course/ lesson/ premium/ account/ auth/ consent/ layout/ payment/
     motion/         Reveal and other animation wrappers
-    shared/         Logo, Heading, ConfirmDialog, Toaster…
+    shared/         Logo, Heading, ConfirmDialog, Toaster...
   constants/        routes.ts (all paths come from here), fonts.ts, seo.ts, payment and SSO icons
   hooks/            use-course-progress, use-media-source
   lib/
@@ -59,7 +59,7 @@ src/
     consent/        cookie consent (tc_consent)
     analytics/      analytics.* and Yandex Metrica (only with consent)
     captcha/ fingerprint/ webauthn/ courses/ config/
-    utils/          cn, formatPrice, formatDate, getLessonLabel, getMediaSource…
+    utils/          cn, formatPrice, formatDate, getLessonLabel, getMediaSource...
   assets/           self-hosted fonts, globals.css with tokens
 generated/          orval API client - DO NOT EDIT
 public/images/art/  generated artwork (see DESIGN.md)
@@ -101,7 +101,7 @@ Many older files are not prettier-formatted. `bun run format` rewrites all of `s
 ### Git
 
 - Work on a branch from `dev`. Commit and push only when the user asks.
-- Commit messages: Conventional Commits in English - `feat(ui): …`, `fix(auth): …`, `chore: …`, `docs(legal): …`.
+- Commit messages: Conventional Commits in English - `feat(ui): ...`, `fix(auth): ...`, `chore: ...`, `docs(legal): ...`.
 - Don't mix redesign, logic and `generated/` regeneration in one commit.
 - On Windows, `core.autocrlf=true` can make `git status` show files as modified while `git diff` is empty. Trust `git diff`.
 

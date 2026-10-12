@@ -1,4 +1,4 @@
-import type { Control } from 'react-hook-form'
+import { type Control, useController } from 'react-hook-form'
 
 import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
@@ -18,6 +18,7 @@ interface PaymentMethodsProps {
 
 export function PaymentMethods({ control }: PaymentMethodsProps) {
 	const { data: config, isLoading } = useAppConfig()
+	const { field: provider } = useController({ control, name: 'provider' })
 
 	const data = config?.features.payments
 
@@ -38,19 +39,30 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 				<FormItem>
 					<FormControl>
 						<RadioGroup
-							value={field.value}
-							onValueChange={field.onChange}
+							value={`${field.value}:${provider.value}`}
+							onValueChange={value => {
+								const option = data.find(
+									method => getOptionKey(method) === value
+								)
+								if (!option) return
+
+								field.onChange(option.id)
+								provider.onChange(option.provider)
+							}}
 							className='flex flex-col gap-4'
 						>
 							{/* `GET /` lists only the methods that work right now. */}
 							{data.map(method => {
 								const Icon = PAYMENT_METHOD_ICONS[method.id]
-								const isSelected = field.value === method.id
+								const key = getOptionKey(method)
+								const isSelected =
+									field.value === method.id &&
+									provider.value === method.provider
 
 								return (
 									<Label
-										key={method.id}
-										htmlFor={method.id}
+										key={key}
+										htmlFor={key}
 										className={cn(
 											'flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 transition-colors duration-200',
 											isSelected
@@ -85,8 +97,8 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 											</span>
 										</div>
 										<RadioGroupItem
-											value={method.id}
-											id={method.id}
+											value={key}
+											id={key}
 											className='sr-only'
 										/>
 									</Label>
@@ -98,6 +110,10 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 			)}
 		/>
 	)
+}
+
+function getOptionKey(method: { id: string; provider: string }) {
+	return `${method.id}:${method.provider}`
 }
 
 export function PaymentMethodSkeleton() {

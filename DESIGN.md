@@ -1,253 +1,247 @@
-# DESIGN.md - TeaCoder visual language
+# DESIGN.md — TeaCoder Design System
 
-Rules for agents and people who change the UI. The goal: every new page should look like part of one product. If a rule gets in the way, discuss it first instead of silently working around it.
+This document defines the visual language of TeaCoder. Follow it when creating or updating UI so that every page feels like part of the same product.
 
-The style draws on **fumadocs.dev** (dark grainy panels, bento grid, pill buttons) and **Claude Academy / anthropic.com** (calm warm background, serif course titles, minimal cards). We don't copy them; we keep their character: calm, dense, airy, one accent color.
+The design should feel **calm, modern, editorial, and technical**. Combine generous spacing, warm backgrounds, expressive typography, clean layouts, and subtle blue accents. Dark panels, grain textures, and halftone artwork add character without overwhelming the content.
 
----
+## 1. Core Principles
 
-## 1. Principles
-
-1. **One accent - blue.** Everything bright in the UI is blue or light blue. No purple, pink or "AI gradients".
-2. **Background and spacing instead of borders.** A surface is separated by a step in color or a thin `border-border` line, not by `shadow-2xl`.
-3. **Dark panels are the main expressive device.** Large blocks (hero, art, CTA) are dark `bg-inverse` with a grainy blue glow, in both themes.
-4. **Every pixel is true.** No made-up features, numbers, reviews, instructors or durations. Illustrative mockups use real data (course covers and titles) or abstractions (skeleton bars).
-5. **Restrained motion.** Animation emphasizes, it doesn't entertain. Every animation respects `prefers-reduced-motion`.
-
----
+- **One accent color.** Blue is the primary accent. Avoid purple, pink, rainbow gradients, and generic AI-style visuals.
+- **Clarity over decoration.** Every element should serve a purpose. Avoid unnecessary borders, shadows, gradients, and visual noise.
+- **Consistent surfaces.** Use background colors, spacing, and subtle borders to establish hierarchy instead of heavy shadows.
+- **Expressive but restrained.** Use dark panels, grain textures, and halftone artwork as distinctive visual elements, not as decoration everywhere.
+- **Content must be real.** Never invent features, statistics, testimonials, prices, course details, or other factual content.
+- **Design for both themes.** Light and dark modes should feel intentionally designed, not like simple color inversions.
+- **Motion with purpose.** Animation should improve feedback or guide attention, never distract from the content.
 
 ## 2. Color
 
-All colors are CSS variables in `src/assets/styles/globals.css` (HSL triplets without `hsl()`), exposed as Tailwind tokens in `tailwind.config.ts`. **Do not use hex values or `blue-600` / `neutral-*` in components** - tokens only.
+All UI colors must use the existing design tokens defined in the project's theme configuration. Do not introduce hardcoded colors or use arbitrary Tailwind color classes in components.
 
-| Token                                           | Light                           | Dark                         | Purpose                                           |
-| ----------------------------------------------- | ------------------------------- | ---------------------------- | ------------------------------------------------- |
-| `background`                                    | warm beige `45 25% 95%`         | near-black `240 6% 4%`       | page background                                   |
-| `foreground`                                    | `240 6% 8%`                     | `0 0% 93%`                   | body text                                         |
-| `card`                                          | lighter than background         | `240 4% 7.5%`                | cards, bento                                      |
-| `popover`                                       | white                           | `240 4% 9%`                  | menus, dialogs, cookie banner                     |
-| `secondary` / `muted` / `accent`                | one step darker than background | one step lighter             | secondary buttons, hover, fills                   |
-| `muted-foreground`                              | gray                            | gray                         | secondary text                                    |
-| `border`                                        | hairlines                       | hairlines                    | dividers, field borders                           |
-| `input`                                         | cool light gray                 | one step lighter than `card` | fill of text fields                               |
-| `primary`                                       | `#2563EB`-like                  | slightly lighter             | buttons, active states                            |
-| `brand`                                         | blue for text                   | light blue `205 95% 74%`     | accent words, icons, links on the page background |
-| `brand-soft`                                    | pale blue                       | dark blue                    | badge fill                                        |
-| `highlight`                                     | ice blue                        | same                         | accents **on dark panels** (`bg-inverse`)         |
-| `inverse` / `inverse-foreground`                | near-black / light              | same                         | always-dark panels and footer                     |
-| `success`, `warning`, `destructive` (+ `-soft`) | calm                            | calm                         | statuses, errors, toasts                          |
+| Token                               | Purpose                                    |
+| ----------------------------------- | ------------------------------------------ |
+| `background`                        | Main page background                       |
+| `foreground`                        | Primary text                               |
+| `card`                              | Cards and elevated surfaces                |
+| `popover`                           | Dialogs, menus, and floating surfaces      |
+| `primary`                           | Main actions and interactive states        |
+| `brand`                             | Blue accents, links, and highlighted text  |
+| `brand-soft`                        | Subtle blue backgrounds and badges         |
+| `highlight`                         | Accent color on dark panels                |
+| `inverse`                           | Consistently dark panels and sections      |
+| `inverse-foreground`                | Text and UI elements inside dark panels    |
+| `secondary`, `muted`, `accent`      | Secondary surfaces and interaction states  |
+| `muted-foreground`                  | Secondary text                             |
+| `border`, `input`, `ring`           | Borders, form fields, and focus indicators |
+| `success`, `warning`, `destructive` | Status messages and feedback               |
 
 Rules:
 
-- Accent text on the regular background: `text-brand`; on a dark panel: `text-highlight`.
-- Inside `bg-inverse`, use only `inverse-foreground` with opacity: `text-inverse-foreground/70`, `border-inverse-foreground/10`, `bg-inverse-foreground/[0.06]`.
-- Token opacity modifiers work: `bg-primary/90`, `border-foreground/20`.
-
----
+- Use `brand` for accents on regular page backgrounds and `highlight` inside dark panels.
+- Inside dark panels, use `inverse-foreground` and its opacity variants for text, borders, and subtle fills.
+- Use semantic status colors only for their intended meaning.
+- Preserve sufficient contrast in both themes.
+- Never add a new color when an existing token can serve the same purpose.
 
 ## 3. Typography
 
-Fonts are self-hosted (`src/constants/fonts.ts`, files in `src/assets/fonts/`). **Never add Google Fonts.** A new typeface means local woff2 files with Cyrillic support and the OFL license next to them.
+Typography combines a clean sans-serif foundation with an editorial serif accent.
 
-| Class          | Typeface                         | Where                                                                     |
-| -------------- | -------------------------------- | ------------------------------------------------------------------------- |
-| `font-display` | **Onest** (`--font-display`)     | all `h1–h4` by default, large section headings, the manifesto             |
-| `font-sans`    | **Geist** (`--font-geist-sans`)  | body text, UI, buttons                                                    |
-| `font-serif`   | **EB Garamond** (`--font-serif`) | editorial headings: course title on the card, "Популярные курсы", "Курсы" |
-| `font-mono`    | system mono                      | code, percentages, monospace labels                                       |
+- **Display font:** Onest for headings and prominent titles.
+- **Sans-serif font:** Geist for body text, interface elements, and buttons.
+- **Serif font:** EB Garamond for selected editorial headings, especially course titles and featured sections.
+- **Monospace:** System monospace for code and technical data.
 
-Heading scale (fluid, tracking and line height included):
+Use the existing locally hosted fonts. Do not load fonts from external services. Any new typeface must include local WOFF2 files with Cyrillic support and an appropriate license.
 
-| Class              | Size       | Where                                |
-| ------------------ | ---------- | ------------------------------------ |
-| `text-display-2xl` | 40 → 72 px | hero `h1` only                       |
-| `text-display-xl`  | 32 → 56 px | CTA heading, accent line, page title |
-| `text-display-lg`  | 28 → 44 px | section headings                     |
-| `text-display-md`  | 22 → 30 px | bento card headings                  |
+### Hierarchy
 
-Rules:
-
-- Onest headings are `font-medium` (500). No heavier.
-- Serif headings are `font-medium` with `tracking-[-0.01em]`…`[-0.02em]`. No serif italics.
-- Highlight the accent word in a heading with **color**, not style: `<span className='text-highlight'>TeaCoder</span>` on a dark panel, `text-brand` on the light background.
-- Card titles are one line: `truncate` plus `title={…}` for the full text.
-- Lead paragraphs: `text-lg leading-relaxed text-muted-foreground` (or `text-inverse-foreground/70` on a panel).
-- Text measure: `max-w-xl`…`max-w-2xl`.
-
----
-
-## 4. Grid, spacing, radii
-
-Containers (`globals.css`, `components` layer):
-
-- `.page-container` - max 1240 px, side gutters 16/24/32 px. Regular content.
-- `.frame-container` - max 1440 px, gutters 12/20/24 px. Wide dark panels (hero, CTA) and the header.
-
-Section rhythm: `py-24 sm:py-32` (or `pb-…` when a section follows directly). Bento gap: `gap-5`. Card padding: `p-7 sm:p-10` (bento), `p-5 sm:p-6` (course card).
-
-Radii (`--radius: 0.75rem`):
-
-| Class               | px  | Where                                 |
-| ------------------- | --- | ------------------------------------- |
-| `rounded-lg`        | 12  | inputs, small elements                |
-| `rounded-xl`        | 16  | nested windows, covers inside a panel |
-| `rounded-2xl`       | 20  | course cards, banner, popovers        |
-| `rounded-3xl`       | 28  | bento cards                           |
-| `rounded-[1.75rem]` | 28  | large hero/CTA panels                 |
-| `rounded-full`      | -   | **all buttons**, badges, icon circles |
-
-Grids: bento uses `grid gap-5 lg:grid-cols-2 [&>*]:min-w-0` (without `min-w-0`, marquees and `<pre>` blocks stretch the column on mobile). Courses: `grid gap-5 sm:grid-cols-2 lg:grid-cols-3`.
-
----
-
-## 5. Surfaces and patterns
-
-### Card (light surface)
-
-```tsx
-<article className='rounded-3xl border border-border bg-card p-7 sm:p-10'>
-```
-
-Hover on clickable cards: `hover:border-foreground/20` plus a slight cover zoom `group-hover:scale-[1.03]`. No lift-with-shadow.
-
-### Dark panel with art
-
-```tsx
-<div className='bg-inverse text-inverse-foreground relative isolate overflow-hidden rounded-[1.75rem]'>
-	<Image
-		src='/images/art/hero-grain.webp'
-		alt=''
-		fill
-		className='-z-20 object-cover'
-	/>
-	{/* decoration: -z-10, pointer-events-none, aria-hidden */}
-	{/* content */}
-</div>
-```
-
-### Blue panel
-
-`bg-primary` plus the `.grain` class (film grain via `::after`). Used for the course marquee in the bento.
-
-### UI mock window
-
-Inside a dark panel: `rounded-tl-2xl border-l border-t border-inverse-foreground/10 bg-inverse/80 backdrop-blur-xl`, pinned to the bottom-right and **cropped by the panel edge**. Contents are real data or skeleton bars `h-2 rounded-full bg-inverse-foreground/15`. Always `aria-hidden='true'`.
-
-### Course card (`src/components/course/course-card.tsx`)
-
-16:9 cover → serif title on one line → description `line-clamp-3` → footer row: meta joined with `·` on the left, access on the right ("Бесплатно" `text-success`, "По подписке" `text-brand`, price `tabular-nums`). Prices always go through `formatPrice(amount, currency)`; the currency comes from `GET /` (`features.premium.currency`).
-
-### Floating banner
-
-The cookie banner (`src/components/consent/cookie-dialog.tsx`) is the reference for non-modal notices: `fixed bottom-5 right-5 max-w-[400px] rounded-2xl bg-popover p-5 shadow-popover`; full width with 12 px margins on mobile.
-
----
-
-## 6. `ui` components
-
-Primitives live in `src/components/ui` (shadcn, reworked). Use them; don't hand-build buttons or fields.
-
-**Button** - always a pill. Variants:
-
-| Variant               | Where                                                 |
-| --------------------- | ----------------------------------------------------- |
-| `default` / `primary` | main action on the light background                   |
-| `outline`             | secondary action next to the main one                 |
-| `secondary`           | neutral action (e.g. "Только необходимые")            |
-| `ghost`               | header and menu actions, "Назад", "Отмена"            |
-| `highlight`           | main action **on a dark panel** (ice pill, dark text) |
-| `glass`               | secondary action on a dark panel                      |
-| `contrast`            | light button on `bg-primary`                          |
-| `ink`                 | dark button where blue is out of place                |
-| `destructive`         | deleting, signing out of all sessions                 |
-| `link`                | inline action link                                    |
-
-Sizes: `xs` 32, `sm` 36, `default` 40, `lg` 48, `xl` 56 (hero/CTA only), `icon` 40. A trailing arrow icon nudges right on hover automatically. `isLoading` renders a spinner - use it instead of custom loaders.
-
-**Badge** - `default` (blue), `neutral`, `outline`, `success`, `error`, `warning`, `solid`. For statuses ("Подтверждена", "Включено", "Активна") use `success` / `warning` / `error`.
-
-**Input / InputOTP / Select** - filled with the `input` token (`bg-input`): a cool light gray in light theme, a step lighter than the card in dark. `--input` is a fill color, not a border - borders use `border-border`. Focus: `border-primary` + `ring-4 ring-primary/15`. **Select** - `bg-card`, `rounded-xl`.
-
-**Dialog / AlertDialog / Sheet** - `bg-popover`, `rounded-3xl`, `shadow-popover`, title in `font-display`. Overlay `bg-foreground/40 backdrop-blur-[2px]`.
-
-**Skeleton** - `bg-foreground/[0.06]`. A skeleton mirrors the shape of the content it replaces (same radii and proportions).
-
-Shadows - tokens only: `shadow-card`, `shadow-card-hover`, `shadow-popover`.
-
----
-
-## 7. Imagery
-
-The art is generated procedurally (stochastic grain + Bayer 8×8 ordered halftone). Palette: deep blue `#1D4ED8`, brand `#2563EB`, sky `#38BDF8`, ice `#BAE6FD` on dark `#06090F`. Files are in `public/images/art/`:
-
-| File                  | What                                    | Where                               |
-| --------------------- | --------------------------------------- | ----------------------------------- |
-| `hero-grain.webp`     | grainy glow, top right                  | hero background                     |
-| `sphere-halftone.png` | halftone sphere (transparent PNG)       | hero, right side                    |
-| `panel-grain.webp`    | calm grain                              | "Отслеживание прогресса" bento card |
-| `cta-grain.webp`      | night sky, glow from below, stars       | Telegram CTA background             |
-| `planet-wide.png`     | halftone planet horizon                 | bottom of the Telegram CTA          |
-| `courses-banner.webp` | grainy navy with diagonal light streaks | banner on the courses page          |
+- **Hero headings:** Large, responsive, and visually dominant.
+- **Page headings:** Clear and prominent, with restrained line lengths.
+- **Section headings:** Consistent in size and spacing.
+- **Card headings:** Compact and easy to scan.
+- **Body text:** Comfortable to read, with relaxed line height.
+- **Secondary text:** Visually quieter but still accessible.
 
 Rules:
 
-- New banners follow the same style: dark base, blue tones, grain or square halftone. No stock photos, 3D renders, emoji or illustrations of people.
-- Decorative images: `alt=''`, `aria-hidden`, `pointer-events-none`. Backgrounds use `next/image` with `fill` and `object-cover`.
-- Grain as webp (quality ~82), halftone as transparent PNG. Keep each file under ~900 KB.
-- Render halftone PNGs with `unoptimized` on `next/image`, otherwise resampling blurs the square dots.
-- Course covers come from the API as file ids - build the URL with `getMediaSource()` / `useMediaSource()`.
+- Use medium weight (500) for Onest headings. Avoid unnecessarily bold typography.
+- Keep serif typography limited to editorial contexts.
+- Highlight words with color rather than italics or decorative effects.
+- Keep headings concise and prevent awkward wrapping.
+- Use truncation only when necessary, with a way to access the full text.
+- Limit paragraph width for readability.
+- Maintain a clear distinction between headings, body text, metadata, and secondary information.
 
----
+## 4. Layout and Spacing
 
-## 8. Icons
+Use the existing container utilities and spacing scale instead of introducing arbitrary values.
 
-`lucide-react` with the default stroke. Sizes: 16 px inside buttons (set by `Button`), 14 px in meta rows, 24 px in icon circles. Social brand icons come from `react-icons` (`FaTelegram`, `FaYoutube`, `FaGithub`). Icon circle: `flex size-8 items-center justify-center rounded-full bg-secondary` (on a dark panel: `border border-inverse-foreground/15 bg-inverse-foreground/[0.06]`).
+- **Regular content:** Centered, with a maximum width of approximately 1240 px.
+- **Wide sections:** Up to approximately 1440 px.
+- **Page gutters:** Responsive, with enough space on small screens.
+- **Section spacing:** Generous vertical spacing that separates major content groups.
+- **Card spacing:** Consistent internal padding and gaps.
+- **Bento layouts:** Balanced grids with clear visual hierarchy and consistent gaps.
 
----
+### Shape language
 
-## 9. Motion
+- Small controls: rounded corners.
+- Nested surfaces and media: medium rounded corners.
+- Cards: large rounded corners.
+- Hero panels and major banners: generous rounded corners.
+- Buttons, badges, and compact icon containers: pill or circular shapes.
 
-- Section entrance: `<Reveal>` from `src/components/motion/reveal.tsx` - once, on entering the viewport, 0.7 s, `ease [0.22, 1, 0.36, 1]`. Never re-animate on every scroll.
-- Hover and transitions: 150–300 ms, `ease-out`.
-- Small UI (banners, content swaps): CSS `animate-in fade-in-0 slide-in-from-bottom-*` from `tailwindcss-animate`. Keep framer-motion for staged effects (sphere parallax, manifesto word reveal, rising planet).
-- Marquee: `animate-marquee` with `--marquee-duration`, pause on hover, `motion-reduce:animate-none`, duplicated items `aria-hidden` and `tabIndex={-1}`.
-- Always check `useReducedMotion()` in framer animations and use `motion-reduce:` in CSS.
-- Don't: fly blocks in from the side, pulse things forever for decoration, run animations longer than 1.4 s.
-- Never put `backdrop-blur` over something that animates, and avoid large rotating layers: both forced a per-frame repaint and made the old auth screens lag. Decorative backdrops behind forms stay static.
+Prefer the existing radius scale. Do not mix unrelated corner styles on the same page.
 
----
+### Responsive behavior
 
-## 10. Copy
+Design mobile-first and adapt layouts naturally to larger screens.
 
-- UI text is Russian. Use informal «ты» on marketing pages, formal «вы» in legal text and system messages (cookie banner, errors).
-- Short bento headings end with a period ("Практика с кодом."); page and section headings don't.
-- Don't invent announcements, statistics or testimonials. A badge above a heading must be true ("Курсы по веб-разработке").
+- Avoid horizontal overflow.
+- Stack content when columns become too narrow.
+- Keep interactive elements accessible on touch devices.
+- Prevent images, code blocks, and long text from stretching their containers.
+- Preserve the content hierarchy across breakpoints.
 
----
+## 5. Surfaces and Components
 
-## 11. Dark theme and accessibility
+Use existing UI primitives and shared design patterns whenever possible. Extend them consistently rather than building one-off replacements.
 
-- Check every new screen in both light and dark themes. Dark is not an inversion: it has its own surfaces (`card`, `popover`) and accents (`brand` is lighter).
-- Text contrast: WCAG AA. Gray text is never lighter than `muted-foreground`.
-- Visible focus ring (`focus-visible:ring-2 ring-ring` is already in the primitives).
-- Hit targets of at least 40 px. Interactive elements are `button` / `a`, not `div`.
-- Responsive: 375 / 768 / 1280 / 1920 px, no horizontal scroll.
+### Cards
 
----
+Cards should rely on surface contrast, spacing, and subtle borders. Avoid excessive shadows and unnecessary nested containers.
 
-## 12. Pre-handoff checklist
+Clickable cards may use a subtle border change or a slight image zoom on hover. Avoid dramatic lifting effects.
 
-- [ ] Colors come from tokens only - no hex, no `blue-*` / `neutral-*`.
-- [ ] Headings in Onest `font-medium`; serif only in editorial places.
-- [ ] Buttons from `ui/button`, with the right variant per the table.
-- [ ] Spacing and radii from the scale.
-- [ ] Animations respect reduced motion and play once.
-- [ ] Both themes, widths 375 / 768 / 1280, no horizontal scroll.
-- [ ] States covered: loading (skeleton of the same shape), empty, error, `disabled`, `isLoading`.
-- [ ] No invented features and no new API requests.
+### Dark panels
 
----
+Dark panels are a key part of the visual identity. Use them for prominent sections, featured content, and calls to action.
 
-## Not yet redesigned
+- Use the inverse color tokens.
+- Add subtle blue lighting, grain, or halftone artwork when appropriate.
+- Keep decorative effects behind the content.
+- Maintain readable contrast.
+- Avoid stacking multiple competing effects.
 
-At the time of writing, the new style covers: the design system, header, footer, home page, course catalog and course card, the cookie banner and the auth screens (`AuthWrapper`: centered heading and form card over a static halftone backdrop; on sign-in/up the card first shows sign-in methods, the email form opens on demand). The subscription page is done too (hero, dark price panel + benefits card, PREMIUM course grid, FAQ). The course page is done (sticky aside with cover, access, CTA, progress and meta; program with collapsible sections). The lesson page is done (top bar with breadcrumb and progress, sticky program sidebar with collapsible sections or a flat list, player, prev/complete navigation; the sidebar moves into a Sheet below `lg`). The account area is done (sticky user card + section nav, `AccountHeader` / `SettingsSection` / `SettingsRow` from `components/account/account-ui.tsx` - reuse them for any settings-like screen). The 404, payment result and legal documents still use the old markup. When you redesign them, follow this file and update this list.
+### Buttons
+
+Buttons use pill-shaped corners and consistent sizing.
+
+- **Primary:** The main action.
+- **Outline:** A secondary action alongside the primary one.
+- **Secondary:** A neutral alternative.
+- **Ghost:** A low-emphasis action.
+- **Highlight:** The main action on a dark panel.
+- **Destructive:** An action that removes data or performs another destructive operation.
+- **Link:** An inline navigation or text action.
+
+Use the existing button variants and loading behavior. Every button should communicate its importance clearly. Do not give multiple competing actions the same visual prominence without a reason.
+
+### Forms and dialogs
+
+- Use consistent field heights, spacing, and corner radii.
+- Distinguish field backgrounds from borders.
+- Provide clear focus, disabled, validation, and error states.
+- Keep dialogs visually consistent with the rest of the interface.
+- Avoid unnecessary overlays, blur effects, and decorative layers.
+
+### Loading, empty, and error states
+
+Every data-driven screen should handle loading, empty, and error states.
+
+- Skeletons should match the shape and proportions of the content they replace.
+- Empty states should explain what is happening and, when appropriate, offer a next step.
+- Errors should be understandable and actionable.
+- Disabled and loading controls must communicate their state clearly.
+
+## 6. Imagery and Graphics
+
+The visual language uses dark backgrounds, blue light, film grain, and ordered halftone patterns.
+
+Preferred palette for decorative artwork:
+
+- Deep navy and near-black backgrounds.
+- Deep and medium blue lighting.
+- Sky blue and pale ice-blue highlights.
+
+Use the existing artwork where appropriate. New artwork should follow the same visual direction.
+
+Rules:
+
+- Prefer abstract textures and geometric compositions over generic stock imagery.
+- Avoid decorative 3D renders, emoji-based illustrations, and generic AI-generated visuals.
+- Keep artwork subordinate to the content.
+- Use decorative images without redundant alternative text.
+- Keep decorative assets reasonably small and optimized for the web.
+- Preserve the sharpness of halftone patterns when rendering transparent images.
+- Use the project's established media utilities for course covers and other API-provided images.
+- Never substitute invented course covers, statistics, or interface data for real content.
+
+## 7. Icons
+
+Use the project's existing icon libraries and conventions.
+
+- Prefer simple outline icons with consistent stroke weight.
+- Use consistent sizes for actions, metadata, and icon containers.
+- Use recognizable brand icons only where they add clarity.
+- Align icons with adjacent text.
+- Avoid mixing unrelated icon styles or using icons as decoration without a clear purpose.
+
+Icons must support the interface, not compete with its typography.
+
+## 8. Motion and Interaction
+
+Animation should be subtle, quick, and functional.
+
+- Use short transitions for hover, focus, and state changes.
+- Reveal sections only when it improves the reading experience.
+- Use continuous animation only when it communicates something meaningful.
+- Keep decorative motion restrained.
+- Avoid large moving layers and expensive effects that can degrade performance.
+- Do not animate every element on a page.
+
+Respect `prefers-reduced-motion` in CSS and JavaScript animations. Interactive feedback must remain understandable without animation.
+
+## 9. Copy and Content
+
+The interface language is Russian.
+
+- Use informal «ты» in marketing and educational content.
+- Use formal «вы» in legal text and system messages.
+- Keep interface labels concise and specific.
+- Write headings that communicate the value of a section rather than describing its appearance.
+- Avoid generic marketing phrases, exaggerated claims, and unnecessary exclamation marks.
+- Do not invent features, announcements, metrics, testimonials, or other claims.
+- Ensure badges, prices, availability labels, and other factual UI elements reflect actual application data.
+
+## 10. Accessibility and Quality
+
+Accessibility and usability are part of the design system, not optional finishing steps.
+
+- Support both light and dark themes.
+- Maintain WCAG AA contrast for normal text.
+- Keep focus indicators visible.
+- Use semantic interactive elements for actions and navigation.
+- Provide accessible names for icon-only controls.
+- Aim for touch targets of at least 40 px, preferably larger where practical.
+- Associate form fields with their labels and make validation errors understandable.
+- Respect reduced-motion preferences.
+- Test responsive layouts at 375, 768, 1280, and 1920 px.
+- Ensure the interface works with keyboard navigation.
+
+## 11. Before Finishing a UI Change
+
+- [ ] The page follows the existing visual language.
+- [ ] Colors come from design tokens.
+- [ ] Typography and spacing follow the established hierarchy.
+- [ ] Existing UI primitives are reused where possible.
+- [ ] Light and dark themes both work correctly.
+- [ ] Mobile and desktop layouts have been checked.
+- [ ] Loading, empty, error, and disabled states are handled where relevant.
+- [ ] Interactive elements have clear feedback and accessible focus states.
+- [ ] Animations respect reduced-motion preferences.
+- [ ] Images and other assets are optimized.
+- [ ] No fictional content, unnecessary API requests, or unrelated changes were introduced.
+
+**The goal is consistency, not rigidity.** Follow these rules by default. When a genuine product need calls for an exception, make it deliberate and keep the result consistent with the overall TeaCoder experience.
