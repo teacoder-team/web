@@ -234,4 +234,4 @@ Rules:
 
 ## Not yet redesigned
 
-At the time of writing, the new style covers: the design system, header, footer, home page, course catalog and course card, the cookie banner and the auth screens (`AuthWrapper`: centered heading and form card over a static halftone backdrop; on sign-in/up the card first shows sign-in methods, the email form opens on demand). The course page, lesson, subscription, account area, 404, payment result and legal documents still use the old markup. When you redesign them, follow this file and update this list.
+At the time of writing, the new style covers: the design system, header, footer, home page, course catalog and course card, the cookie banner and the auth screens (`AuthWrapper`: centered heading and form card over a static halftone backdrop; on sign-in/up the card first shows sign-in methods, the email form opens on demand). The subscription page is done too (hero, dark price panel + benefits card, PREMIUM course grid, FAQ). The course page, lesson, account area, 404, payment result and legal documents still use the old markup. When you redesign them, follow this file and update this list.
