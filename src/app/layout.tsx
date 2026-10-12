@@ -53,8 +53,8 @@ export const metadata: Metadata = {
 		images: [
 			{
 				url: new URL(env.APP_URL + '/opengraph.jpg'),
-				width: 1200,
-				height: 630,
+				width: 2400,
+				height: 1260,
 				alt: 'TeaCoder - образовательная платформа по веб-разработке'
 			}
 		],
@@ -67,8 +67,8 @@ export const metadata: Metadata = {
 		images: [
 			{
 				url: new URL(env.APP_URL + '/opengraph.jpg'),
-				width: 1200,
-				height: 630,
+				width: 2400,
+				height: 1260,
 				alt: 'TeaCoder - образовательная платформа по веб-разработке'
 			}
 		]
