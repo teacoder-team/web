@@ -31,48 +31,36 @@ export function Header() {
 	return (
 		<header
 			className={cn(
-				'sticky left-0 right-0 top-0 z-50 transition-all duration-300',
+				'sticky inset-x-0 top-0 z-50 border-b transition-[background-color,border-color] duration-300',
 				isScrolled
-					? 'bg-background/85 shadow-sm backdrop-blur-md'
-					: 'bg-background'
+					? 'border-border bg-background/80 backdrop-blur-xl'
+					: 'border-transparent bg-background'
 			)}
 		>
-			<div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-				<div className='relative flex h-16 w-full items-center justify-between'>
-					<div className='flex items-center'>
+			<div className='frame-container'>
+				<div className='flex h-16 items-center justify-between gap-6 px-1 sm:px-3'>
+					<div className='flex items-center gap-10'>
 						<Link
 							href={ROUTES.HOME}
-							className='mr-10 flex items-center gap-x-3 text-xl font-bold text-blue-600'
+							className='flex items-center gap-2.5 rounded-lg font-display text-lg font-semibold tracking-tight'
 						>
-							<Logo className='size-8' />
+							<Logo className='h-7 w-auto' />
 							TeaCoder
 						</Link>
-					</div>
-					<div className='absolute left-1/2 hidden -translate-x-1/2 items-center md:flex'>
 						<NavLinks />
 					</div>
-					<div className='flex items-center gap-4'>
-						<div className='hidden items-center space-x-3 md:flex'>
+					<div className='flex items-center gap-2'>
+						<div className='hidden items-center md:flex'>
 							{isAuthorized ? (
 								<UserMenu />
 							) : (
-								<div className='flex items-center gap-5'>
-									<Button
-										variant='outline'
-										size='sm'
-										className='rounded-full'
-										asChild
-									>
+								<div className='flex items-center gap-2'>
+									<Button variant='ghost' size='sm' asChild>
 										<Link href={ROUTES.AUTH.LOGIN()}>
 											Войти
 										</Link>
 									</Button>
-									<Button
-										variant='primary'
-										size='sm'
-										className='rounded-full'
-										asChild
-									>
+									<Button size='sm' asChild>
 										<Link href={ROUTES.AUTH.REGISTER}>
 											Регистрация
 										</Link>

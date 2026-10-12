@@ -37,7 +37,7 @@ function getState(subscription: SubscriptionResponse) {
 				: { variant: 'success' as const, label: 'Активна' },
 			description: expiresAt
 				? autoRenew
-					? `Следующее списание — ${formatFullDate(expiresAt)}. Доступ не прервётся.`
+					? `Следующее списание - ${formatFullDate(expiresAt)}. Доступ не прервётся.`
 					: `Автопродление выключено: доступ сохранится до ${formatFullDate(expiresAt)}, затем подписка закончится.`
 				: 'Премиум активен.'
 		}

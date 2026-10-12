@@ -8,7 +8,7 @@ import { QueryProvider } from '@/components/providers/query-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/shared/sonner'
 
-import { geist } from '@/constants/fonts'
+import { garamond, geist, onest } from '@/constants/fonts'
 import { SEO } from '@/constants/seo'
 
 import { YandexMetrikaScript } from '@/lib/analytics/script-providers'
@@ -85,7 +85,14 @@ export default async function RootLayout({
 
 	return (
 		<html lang='ru' suppressHydrationWarning>
-			<body className={cn('flex h-full w-full flex-col', geist.variable)}>
+			<body
+				className={cn(
+					'flex h-full w-full flex-col',
+					geist.variable,
+					onest.variable,
+					garamond.variable
+				)}
+			>
 				<QueryProvider>
 					<ConsentProvider
 						initialConsent={parseConsent(
@@ -107,12 +114,12 @@ export default async function RootLayout({
 										<Toaster
 											toastOptions={{
 												classNames: {
-													error: 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200 border-0',
+													error: 'bg-destructive-soft text-destructive border-0',
 													success:
-														'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 border-0',
+														'bg-success-soft text-success border-0',
 													warning:
-														'bg-yellow-100 text-yellow-800 dark:bg-yellow-950 dark:text-yellow-200 border-0',
-													info: 'bg-sky-100 text-sky-800 dark:bg-gray-800 dark:text-gray-200 border-0'
+														'bg-warning-soft text-warning border-0',
+													info: 'bg-brand-soft text-foreground border-0'
 												}
 											}}
 										/>

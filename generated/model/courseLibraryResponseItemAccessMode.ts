@@ -27,19 +27,20 @@
  *
  * ## Повторные запросы и оплата
  *
- * На один курс (или подписку) у пользователя всегда не больше одного открытого счёта - второй, который можно случайно оплатить, не создаётся. Повторное создание платежа тем же способом возвращает уже открытый счёт.
+ * Повторное создание платежа тем же способом возвращает его открытый счёт. Неоплаченный счёт другим способом не блокирует новый: пользователь может выбрать СБП, карту или криптовалюту, не дожидаясь истечения предыдущего счёта. Платёж в статусе PROCESSING по этому товару блокирует создание новых счетов до завершения обработки.
  *
  * `POST /billing/create` принимает заголовок `Idempotency-Key` (например, UUID): повтор с тем же ключом и теми же параметрами вернёт тот же платёж, с другими параметрами - ошибку 422. Подробности - в описании метода.
  * OpenAPI spec version: 1.0.0
  */
 
 /**
- * `FREE` - ознакомительный, открыт всем. `PREMIUM` - открывается вместе с курсом (см. `accessMode` курса). В бесплатном курсе открыты все уроки.
+ * Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме.
  */
-export type CourseLessonListResponseItemAccess = typeof CourseLessonListResponseItemAccess[keyof typeof CourseLessonListResponseItemAccess];
+export type CourseLibraryResponseItemAccessMode = typeof CourseLibraryResponseItemAccessMode[keyof typeof CourseLibraryResponseItemAccessMode];
 
 
-export const CourseLessonListResponseItemAccess = {
+export const CourseLibraryResponseItemAccessMode = {
   FREE: 'FREE',
   PREMIUM: 'PREMIUM',
+  PURCHASE: 'PURCHASE',
 } as const;

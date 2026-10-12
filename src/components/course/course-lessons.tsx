@@ -3,15 +3,17 @@
 import { CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
-import type { CourseLessonListResponseItem } from '@/generated/model'
-
 import { ROUTES } from '@/constants/routes'
 
 import { useSession } from '@/lib/auth/auth-provider'
+import {
+	type CourseProgramItem,
+	flattenCourseProgram
+} from '@/lib/course-program'
 import { lessonsTranslator } from '@/lib/utils'
 
 interface CourseLessonsProps {
-	lessons: CourseLessonListResponseItem[]
+	lessons: CourseProgramItem[]
 	completedLessons: string[]
 }
 
@@ -21,7 +23,8 @@ export function CourseLessons({
 }: CourseLessonsProps) {
 	const { isAuthorized } = useSession()
 
-	const totalLessons = lessons?.length ?? 0
+	const orderedLessons = flattenCourseProgram(lessons)
+	const totalLessons = orderedLessons.length
 	const completedCount = completedLessons?.length ?? 0
 
 	return (
@@ -36,7 +39,7 @@ export function CourseLessons({
 				)}
 			</div>
 			<ul className='mt-5 divide-y rounded-xl border'>
-				{lessons.map(lesson => {
+				{orderedLessons.map((lesson, index) => {
 					const isCompleted = completedLessons.includes(lesson.id)
 
 					return (
@@ -57,7 +60,7 @@ export function CourseLessons({
 											<CheckCircle className='size-5 text-emerald-500' />
 										) : (
 											<span className='text-xs'>
-												{lesson.position}
+												{index + 1}
 											</span>
 										)}
 									</div>
@@ -66,18 +69,6 @@ export function CourseLessons({
 										<h3 className='font-medium'>
 											{lesson.title}
 										</h3>
-										{lesson.description && (
-											<p
-												className='mt-1 overflow-hidden text-sm text-neutral-600 dark:text-neutral-300'
-												style={{
-													display: '-webkit-box',
-													WebkitBoxOrient: 'vertical',
-													WebkitLineClamp: 2
-												}}
-											>
-												{lesson.description}
-											</p>
-										)}
 									</div>
 								</div>
 							</Link>

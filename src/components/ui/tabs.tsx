@@ -30,9 +30,9 @@ interface TabsListProps
 }
 
 const variantStyles: Record<TabsListVariant, string> = {
-	line: cn('flex items-center justify-start border-b, border-gray-200'),
+	line: cn('flex items-center justify-start border-b border-border'),
 	solid: cn(
-		'inline-flex items-center justify-center rounded-md p-1 bg-gray-100'
+		'inline-flex items-center justify-center rounded-full p-1 bg-secondary'
 	)
 }
 
@@ -56,9 +56,9 @@ TabsList.displayName = 'TabsList'
 function getVariantStyles(tabVariant: TabsListVariant) {
 	switch (tabVariant) {
 		case 'line':
-			return '-mb-px items-center justify-center whitespace-nowrap border-b-2 border-muted-foreground px-3 pb-2 text-sm font-medium transition-all text-muted-foreground hover:text-muted-foreground/80 hover:border-muted-foreground/80 data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 data-[disabled]:pointer-events-none data-[disabled]:text-gray-300'
+			return '-mb-px items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 pb-2.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
 		case 'solid':
-			return 'inline-flex items-center justify-center whitespace-nowrap rounded px-3 py-1 text-sm font-medium ring-1 ring-inset transition-all text-muted-foreground hover:text-gray-700 ring-transparent data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow data-[disabled]:pointer-events-none data-[disabled]:text-gray-400 data-[disabled]:opacity-50'
+			return 'inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-card data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
 	}
 }
 

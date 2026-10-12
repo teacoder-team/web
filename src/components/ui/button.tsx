@@ -6,28 +6,38 @@ import { type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react'
 import { cn } from '@/src/lib/utils'
 
 const buttonVariants = cva(
-	'inline-flex items-center justify-center gap-2 whitespace-nowrap select-none rounded-lg transition-all will-change-transform active:hover:scale-[0.98] active:hover:transform text-sm font-medium ring-offset-background focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+	'inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-[background-color,color,border-color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&>svg:last-child:not(:first-child)]:transition-transform [&>svg:last-child:not(:first-child)]:duration-200 hover:[&>svg:last-child:not(:first-child)]:translate-x-0.5',
 	{
 		variants: {
 			variant: {
-				default:
-					'bg-primary text-primary-foreground hover:bg-primary/90',
+				default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+				// Kept as an alias of `default` for existing call sites
+				primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+				ink: 'bg-foreground text-background hover:bg-foreground/85',
+				// Ice-blue pill for dark grainy panels
+				highlight:
+					'bg-highlight text-inverse hover:bg-highlight/85',
+				// Translucent pill for dark panels
+				glass: 'border border-inverse-foreground/15 bg-inverse-foreground/[0.06] text-inverse-foreground backdrop-blur-md hover:bg-inverse-foreground/[0.12]',
+				// Light button for use on top of primary-filled blocks
+				contrast:
+					'bg-primary-foreground text-primary hover:bg-primary-foreground/90',
 				destructive:
-					'bg-gradient-to-t from-red-600 to-red-500 text-destructive-foreground hover:opacity-90',
+					'bg-destructive text-destructive-foreground hover:bg-destructive/90',
 				outline:
-					'border border-input bg-transparent hover:bg-accent hover:text-accent-foreground',
-				secondary: 'bg-white text-black hover:bg-white/90',
-				ghost: 'hover:bg-accent hover:text-accent-foreground',
-				link: 'text-primary underline-offset-4 hover:underline',
-				primary:
-					'bg-gradient-to-t from-blue-600 to-blue-500 text-primary-foreground hover:opacity-90'
+					'border border-border bg-transparent text-foreground hover:border-foreground/20 hover:bg-secondary',
+				secondary:
+					'bg-secondary text-secondary-foreground hover:bg-accent',
+				ghost: 'text-foreground hover:bg-secondary',
+				link: 'h-auto rounded-sm px-0 text-brand underline decoration-brand/30 underline-offset-4 hover:decoration-brand active:scale-100'
 			},
 			size: {
-				default: 'h-10 px-4 py-2',
-				sm: 'h-9 rounded-lg px-5 py-2',
-				xs: 'h-9 rounded-lg px-3 text-xs',
-				lg: 'h-11 rounded-lg px-8',
-				icon: 'h-10 w-10'
+				default: 'h-10 px-5',
+				sm: 'h-9 px-4',
+				xs: 'h-8 px-3 text-xs',
+				lg: 'h-12 px-6 text-[15px]',
+				xl: 'h-14 px-7 text-base',
+				icon: 'size-10'
 			}
 		},
 		defaultVariants: {
@@ -61,15 +71,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 		const Comp = asChild ? Slot : 'button'
 		return (
 			<Comp
-				className={cn(
-					buttonVariants({ variant, size, className }),
-					'flex gap-2'
-				)}
+				className={cn(buttonVariants({ variant, size, className }))}
 				ref={ref}
 				disabled={isLoading ?? props.disabled}
 				{...props}
 			>
-				{isLoading && <Loader2 className='size-5 animate-spin' />}
+				{isLoading && <Loader2 className='animate-spin' />}
 				<Slottable>{children}</Slottable>
 			</Comp>
 		)

@@ -267,7 +267,7 @@ export function EnableTotpForm() {
 								Пожалуйста, храните их в безопасном месте.
 							</AlertTitle>
 							<AlertDescription className='ml-1.5'>
-								Они — последний способ восстановления доступа к
+								Они - последний способ восстановления доступа к
 								учетной записи.
 							</AlertDescription>
 						</Alert>

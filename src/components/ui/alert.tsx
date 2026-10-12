@@ -4,15 +4,15 @@ import { type HTMLAttributes, forwardRef } from 'react'
 import { cn } from '@/src/lib/utils'
 
 const alertVariants = cva(
-	'relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7',
+	'relative w-full rounded-xl px-4 py-3.5 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7',
 	{
 		variants: {
 			variant: {
-				default: 'bg-background text-foreground',
+				default: 'bg-secondary text-foreground',
 				warning:
-					'border-yellow-600/30 bg-yellow-50 text-yellow-800 [&>svg]:text-yellow-800 dark:bg-yellow-400/10 dark:text-yellow-500 dark:border-yellow-400/20',
+					'bg-warning-soft text-warning [&>svg]:text-warning',
 				destructive:
-					'border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive'
+					'bg-destructive-soft text-destructive [&>svg]:text-destructive'
 			}
 		},
 		defaultVariants: {

@@ -125,7 +125,7 @@ export function PasswordForm({ user }: PasswordFormProps) {
 				<div className='flex w-full flex-col'>
 					<h2 className='mb-1 font-semibold'>Пароль</h2>
 					<p className='text-sm text-muted-foreground'>
-						Пароль — ключ к вашей учетной записи. Никому его не
+						Пароль - ключ к вашей учетной записи. Никому его не
 						сообщайте. При необходимости вы можете изменить его
 						здесь для повышения безопасности.
 					</p>

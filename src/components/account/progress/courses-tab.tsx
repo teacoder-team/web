@@ -61,7 +61,7 @@ export function CoursesTab() {
 										? new Date(
 												course.lastActivityAt
 											).toLocaleDateString()
-										: '—'}
+										: '-'}
 								</span>
 								{course.nextLesson && (
 									<Button

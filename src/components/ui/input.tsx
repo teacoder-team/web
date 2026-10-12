@@ -14,8 +14,8 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
 				<input
 					type={isPassword ? typeState : type}
 					className={cn(
-						'flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors duration-300 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus:border-blue-600 focus:ring-2 focus:ring-blue-200 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 focus:dark:ring-blue-700/30 md:text-sm',
-						isPassword && 'pr-10',
+						'flex h-11 w-full rounded-xl border border-input bg-card px-3.5 py-2 text-base transition-[border-color,box-shadow] duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground/80 hover:border-foreground/25 focus-visible:border-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/15 disabled:cursor-not-allowed disabled:opacity-50 aria-[invalid=true]:border-destructive aria-[invalid=true]:ring-destructive/15 sm:text-sm',
+						isPassword && 'pr-11',
 						className
 					)}
 					ref={ref}
@@ -24,14 +24,13 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
 				{isPassword && (
 					<div
 						className={cn(
-							'absolute bottom-0 right-0 flex h-full items-center justify-center px-3'
+							'absolute bottom-0 right-0 flex h-full items-center justify-center px-1.5'
 						)}
 					>
 						<button
 							className={cn(
-								'h-fit w-fit rounded-sm outline-none transition-all',
-								'text-gray-400 dark:text-gray-600',
-								'hover:text-gray-500 hover:dark:text-gray-500'
+								'flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors',
+								'hover:text-foreground'
 							)}
 							type='button'
 							onClick={() => {
@@ -44,8 +43,8 @@ const Input = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
 						>
 							<span className='sr-only'>
 								{typeState === 'password'
-									? 'Show password'
-									: 'Hide password'}
+									? 'Показать пароль'
+									: 'Скрыть пароль'}
 							</span>
 							{typeState === 'password' ? (
 								<Eye

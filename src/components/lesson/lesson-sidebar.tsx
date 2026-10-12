@@ -10,15 +10,13 @@ import {
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import type {
-	CourseLessonListResponseItem,
-	LessonResponseCourse
-} from '@/generated/model'
+import type { LessonResponseCourse } from '@/generated/model'
 
 import { ROUTES } from '@/constants/routes'
 
 import { useCourseProgress } from '@/hooks/use-course-progress'
 
+import type { ProgramLesson } from '@/lib/course-program'
 import { cn } from '@/lib/utils'
 
 import { CourseProgress } from '../shared/course-progress'
@@ -27,7 +25,7 @@ import { ScrollArea } from '../ui/scroll-area'
 
 interface LessonSidebarProps {
 	course: LessonResponseCourse
-	lessons: CourseLessonListResponseItem[]
+	lessons: ProgramLesson[]
 }
 
 export function LessonSidebar({ course, lessons }: LessonSidebarProps) {

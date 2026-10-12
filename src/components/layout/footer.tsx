@@ -3,7 +3,7 @@
 import { ExternalLink } from 'lucide-react'
 import { Route } from 'next'
 import Link from 'next/link'
-import { JSX } from 'react'
+import type { JSX, ReactNode } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { FaTelegram, FaYoutube } from 'react-icons/fa6'
 
@@ -11,6 +11,8 @@ import { ROUTES } from '@/constants/routes'
 
 import { env } from '@/lib/config/env'
 import { useConsent } from '@/lib/consent/consent-provider'
+
+import { Logo } from '../shared/logo'
 
 interface NavLink {
 	title: string
@@ -43,17 +45,17 @@ const documentsLinks: NavLink[] = [
 const socialLinks: SocialLink[] = [
 	{
 		href: 'https://youtube.com/@TeaCoder52',
-		icon: <FaYoutube className='size-6' />,
+		icon: <FaYoutube className='size-[18px]' />,
 		label: 'YouTube'
 	},
 	{
 		href: 'https://t.me/TeaCoder_official',
-		icon: <FaTelegram className='size-6' />,
+		icon: <FaTelegram className='size-[18px]' />,
 		label: 'Telegram'
 	},
 	{
 		href: 'https://github.com/teacoder-team',
-		icon: <FaGithub className='size-6' />,
+		icon: <FaGithub className='size-[18px]' />,
 		label: 'GitHub'
 	}
 	// {
@@ -67,67 +69,85 @@ export function Footer() {
 	const { openSettings } = useConsent()
 
 	return (
-		<footer className='border-t'>
-			<div className='relative mx-auto max-w-[1340px] px-4 py-8 lg:px-8'>
-				<div className='grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5'>
-					<div className='space-y-4 sm:col-span-2 md:col-span-2'>
-						<h2 className='text-2xl font-bold'>TeaCoder</h2>
-						<p className='text-sm text-muted-foreground'>
-							Образовательная платформа по веб-разработке.
-							<br /> В случае возникновения вопросов, обращайтесь
-							на почту{' '}
-							<Link
-								href={`mailto:${env.SUPPORT_EMAIL}`}
-								className='text-blue-500 hover:underline'
-							>
-								{env.SUPPORT_EMAIL}
-							</Link>
-							.
-						</p>
-					</div>
-					<div className='space-y-4'>
-						<h3 className='text-sm font-medium'>Общие ссылки</h3>
-						<ul className='space-y-3 text-sm'>
-							{generalLinks.map((link, index) => (
-								<FooterLink key={index} {...link} />
-							))}
-						</ul>
-					</div>
-
-					<div className='space-y-4'>
-						<h3 className='text-sm font-medium'>Документы</h3>
-						<ul className='space-y-3 text-sm'>
-							{documentsLinks.map((link, index) => (
-								<FooterLink key={index} {...link} />
-							))}
-							<li>
-								<button
-									type='button'
-									onClick={openSettings}
-									className='inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary'
-								>
-									Настройки cookie
-								</button>
-							</li>
-						</ul>
-					</div>
-
-					<div className='space-y-4'>
-						<h3 className='text-sm font-medium'>Соц. сети</h3>
-						<div className='flex space-x-4'>
-							{socialLinks.map((link, index) => (
-								<SocialLink key={index} {...link} />
-							))}
-						</div>
+		<footer className='relative overflow-hidden bg-inverse text-inverse-foreground'>
+			<div className='page-container grid gap-12 pb-10 pt-16 sm:pt-20 lg:grid-cols-12 lg:gap-8'>
+				<div className='lg:col-span-5'>
+					<Link
+						href={ROUTES.HOME}
+						className='inline-flex items-center gap-2.5 rounded-lg font-display text-xl font-semibold tracking-tight'
+					>
+						<Logo className='h-8 w-auto' />
+						TeaCoder
+					</Link>
+					<p className='mt-6 max-w-sm font-serif text-lg leading-snug text-inverse-foreground/70'>
+						Образовательная платформа по веб-разработке. В случае
+						возникновения вопросов, обращайтесь на почту{' '}
+						<Link
+							href={`mailto:${env.SUPPORT_EMAIL}`}
+							className='text-inverse-foreground underline decoration-inverse-foreground/30 underline-offset-4 transition-colors hover:decoration-inverse-foreground'
+						>
+							{env.SUPPORT_EMAIL}
+						</Link>
+						.
+					</p>
+					<div className='mt-8 flex gap-2'>
+						{socialLinks.map((link, index) => (
+							<SocialLink key={index} {...link} />
+						))}
 					</div>
 				</div>
+
+				<div className='grid gap-10 sm:grid-cols-2 lg:col-span-6 lg:col-start-7'>
+					<FooterColumn title='Общие ссылки'>
+						{generalLinks.map((link, index) => (
+							<FooterLink key={index} {...link} />
+						))}
+					</FooterColumn>
+					<FooterColumn title='Документы'>
+						{documentsLinks.map((link, index) => (
+							<FooterLink key={index} {...link} />
+						))}
+						<li>
+							<button
+								type='button'
+								onClick={openSettings}
+								className='rounded-sm text-[15px] text-inverse-foreground/65 transition-colors hover:text-inverse-foreground'
+							>
+								Настройки cookie
+							</button>
+						</li>
+					</FooterColumn>
+				</div>
 			</div>
-			<div className='mx-auto max-w-full border-t py-6'>
-				<p className='text-center text-sm text-muted-foreground'>
-					TeaCoder © {new Date().getFullYear()} Все права защищены.
-				</p>
+
+			<div className='page-container flex flex-col gap-2 border-t border-inverse-foreground/10 py-6 text-sm text-inverse-foreground/50 sm:flex-row sm:justify-between'>
+				<p>TeaCoder © {new Date().getFullYear()} Все права защищены.</p>
 			</div>
+
+			<p
+				aria-hidden='true'
+				className='pointer-events-none -mb-[0.22em] select-none text-center font-display text-[24vw] font-semibold leading-none tracking-[-0.06em] text-inverse-foreground/[0.05]'
+			>
+				TeaCoder
+			</p>
 		</footer>
+	)
+}
+
+function FooterColumn({
+	title,
+	children
+}: {
+	title: string
+	children: ReactNode
+}) {
+	return (
+		<div>
+			<h3 className='text-sm font-medium text-inverse-foreground'>
+				{title}
+			</h3>
+			<ul className='mt-5 space-y-3'>{children}</ul>
+		</div>
 	)
 }
 
@@ -136,7 +156,7 @@ function FooterLink({ title, href, isExternal }: NavLink) {
 		<li>
 			<Link
 				href={href}
-				className='inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary'
+				className='inline-flex items-center gap-2 rounded-sm text-[15px] text-inverse-foreground/65 transition-colors hover:text-inverse-foreground'
 				target={isExternal ? '_blank' : undefined}
 				referrerPolicy={isExternal ? 'no-referrer' : undefined}
 			>
@@ -151,7 +171,7 @@ function SocialLink({ href, icon, label }: SocialLink) {
 	return (
 		<Link
 			href={href as Route}
-			className='text-muted-foreground transition-colors hover:text-primary'
+			className='flex size-10 items-center justify-center rounded-full bg-inverse-foreground/[0.08] text-inverse-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground'
 			target='_blank'
 			referrerPolicy='no-referrer'
 		>
