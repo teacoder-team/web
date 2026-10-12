@@ -33,8 +33,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { RootResponseFeaturesPaymentsItemId } from './rootResponseFeaturesPaymentsItemId';
+import type { RootResponseFeaturesPaymentsItemProvider } from './rootResponseFeaturesPaymentsItemProvider';
 
 export type RootResponseFeaturesPaymentsItem = {
+  /** Провайдер для поля provider при создании платежа. Выбор определяется парой id и provider. */
+  provider: RootResponseFeaturesPaymentsItemProvider;
   /** Идентификатор способа - передаётся в `method` при создании платежа. */
   id: RootResponseFeaturesPaymentsItemId;
   /** Название для интерфейса. */

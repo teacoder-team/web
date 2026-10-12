@@ -44,7 +44,7 @@ export function LessonPlayer({ videoId }: LessonPlayerProps) {
 					{!isLoaded && (
 						<div className='absolute inset-0 flex flex-col items-center justify-center gap-3 text-inverse-foreground/60'>
 							<Loader2 className='size-6 animate-spin' />
-							<p className='text-sm'>Загрузка видео…</p>
+							<p className='text-sm'>Загрузка видео...</p>
 						</div>
 					)}
 					{isInView && (

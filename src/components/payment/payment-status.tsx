@@ -228,7 +228,7 @@ export function PaymentStatus({ id }: { id: string }) {
 				footer={
 					<p className='flex items-center justify-center gap-2 text-xs text-muted-foreground'>
 						<span className='size-1.5 animate-pulse rounded-full bg-primary' />
-						Проверяем статус платежа…
+						Проверяем статус платежа...
 					</p>
 				}
 			>

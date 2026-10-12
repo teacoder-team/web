@@ -83,7 +83,7 @@ export function AvatarForm({ user }: AvatarFormProps) {
 				)}
 			>
 				<Upload />
-				{isPending ? 'Загружаем…' : 'Загрузить'}
+				{isPending ? 'Загружаем...' : 'Загрузить'}
 				<Input
 					type='file'
 					accept='image/jpeg, image/png, image/webp, image/gif'

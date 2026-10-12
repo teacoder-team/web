@@ -1,6 +1,6 @@
 import { BitcoinIcon, CreditCardIcon, GlobeIcon, StarIcon } from 'lucide-react'
-import { FaYandex } from 'react-icons/fa'
 import type { ComponentType, SVGProps } from 'react'
+import { FaYandex } from 'react-icons/fa'
 
 import type { RootResponseFeaturesPaymentsItemId } from '@/generated/model'
 
@@ -22,8 +22,7 @@ export const PAYMENT_METHOD_ICONS: Record<
 	T_PAY: TBankIcon,
 	SBER_PAY: SberbankIcon,
 	YOOMONEY: YoomoneyIcon,
-	CRYPTO_BOT: BitcoinIcon,
-	HELEKET: BitcoinIcon,
+	CRYPTO: BitcoinIcon,
 	INTERNATIONAL_CARD: GlobeIcon,
 	YANDEX_SPLIT: FaYandex,
 	TELEGRAM_STARS: StarIcon

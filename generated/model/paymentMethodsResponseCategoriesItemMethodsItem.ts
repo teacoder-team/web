@@ -33,8 +33,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { PaymentMethodsResponseCategoriesItemMethodsItemId } from './paymentMethodsResponseCategoriesItemMethodsItemId';
+import type { PaymentMethodsResponseCategoriesItemMethodsItemProvider } from './paymentMethodsResponseCategoriesItemMethodsItemProvider';
 
 export type PaymentMethodsResponseCategoriesItemMethodsItem = {
+  /** Передаётся в provider при создании платежа. Выбор определяется парой id и provider. */
+  provider: PaymentMethodsResponseCategoriesItemMethodsItemProvider;
   /** Идентификатор способа - передаётся в `method` при создании платежа. */
   id: PaymentMethodsResponseCategoriesItemMethodsItemId;
   /** Название для интерфейса. */

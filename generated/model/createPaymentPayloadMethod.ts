@@ -34,7 +34,7 @@
  */
 
 /**
- * Способ оплаты. От него зависит, через какого провайдера пройдёт платёж.
+ * Способ оплаты. CRYPTO — криптовалюта. Для Робокассы передайте BANK_CARD и provider: ROBOKASSA; фактический способ уточняется после оплаты.
  */
 export type CreatePaymentPayloadMethod = typeof CreatePaymentPayloadMethod[keyof typeof CreatePaymentPayloadMethod];
 
@@ -45,8 +45,7 @@ export const CreatePaymentPayloadMethod = {
   T_PAY: 'T_PAY',
   SBER_PAY: 'SBER_PAY',
   YOOMONEY: 'YOOMONEY',
-  CRYPTO_BOT: 'CRYPTO_BOT',
-  HELEKET: 'HELEKET',
+  CRYPTO: 'CRYPTO',
   INTERNATIONAL_CARD: 'INTERNATIONAL_CARD',
   YANDEX_SPLIT: 'YANDEX_SPLIT',
   TELEGRAM_STARS: 'TELEGRAM_STARS',

@@ -32,7 +32,10 @@ export function EmailVerification({ token }: { token: string }) {
 				handleSignIn(result)
 			},
 			onError(error) {
-				const message = getErrorMessage(error, 'Не удалось подтвердить почту. Попробуйте войти, чтобы получить новую ссылку.')
+				const message = getErrorMessage(
+					error,
+					'Не удалось подтвердить почту. Попробуйте войти, чтобы получить новую ссылку.'
+				)
 				setErrorMessage(message)
 				toast.error(message)
 			}
@@ -48,7 +51,9 @@ export function EmailVerification({ token }: { token: string }) {
 		setErrorMessage(null)
 
 		if (!/^[A-Za-z0-9_-]{43}$/.test(token)) {
-			setErrorMessage('Ссылка подтверждения недействительна. Войдите, чтобы получить новую.')
+			setErrorMessage(
+				'Ссылка подтверждения недействительна. Войдите, чтобы получить новую.'
+			)
 
 			return
 		}
@@ -57,20 +62,36 @@ export function EmailVerification({ token }: { token: string }) {
 	}, [mutate, token])
 
 	if (mfa) {
-		return <MfaForm ticket={mfa} onBack={() => router.replace(ROUTES.AUTH.LOGIN())} />
+		return (
+			<MfaForm
+				ticket={mfa}
+				onBack={() => router.replace(ROUTES.AUTH.LOGIN())}
+			/>
+		)
 	}
 
 	return (
 		<AuthWrapper
-			heading={errorMessage ? 'Не удалось подтвердить почту' : 'Подтверждаем почту'}
-			description={errorMessage ?? 'Пожалуйста, подождите. После подтверждения вы войдёте в аккаунт.'}
+			heading={
+				errorMessage
+					? 'Не удалось подтвердить почту'
+					: 'Подтверждаем почту'
+			}
+			description={
+				errorMessage ??
+				'Пожалуйста, подождите. После подтверждения вы войдёте в аккаунт.'
+			}
 		>
 			{errorMessage ? (
 				<Button variant='primary' asChild className='w-full'>
-					<Link href={ROUTES.AUTH.LOGIN()}>Войти и получить новую ссылку</Link>
+					<Link href={ROUTES.AUTH.LOGIN()}>
+						Войти и получить новую ссылку
+					</Link>
 				</Button>
 			) : (
-				<p role='status' className='text-sm text-muted-foreground'>Проверяем ссылку…</p>
+				<p role='status' className='text-sm text-muted-foreground'>
+					Проверяем ссылку...
+				</p>
 			)}
 		</AuthWrapper>
 	)
