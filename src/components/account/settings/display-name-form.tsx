@@ -67,40 +67,36 @@ export function DisplayNameForm({ user }: DisplayNameFormProps) {
 	}
 
 	return (
-		<div>
+		<div className='p-5 sm:p-6'>
 			<Form {...form}>
-				<form
-					onSubmit={form.handleSubmit(onSubmit)}
-					className='grid gap-4'
-				>
+				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<FormField
 						control={form.control}
 						name='displayName'
 						render={({ field }) => (
 							<FormItem>
-								<FormLabel>Ваше имя</FormLabel>
-								<FormControl>
-									<div className='relative'>
+								<FormLabel>Имя</FormLabel>
+								<div className='flex flex-col gap-2 sm:flex-row'>
+									<FormControl>
 										<Input
 											placeholder='Tony Stark'
 											disabled={isPending}
 											{...field}
 										/>
-										{isDirty && (
-											<div className='absolute bottom-0 right-0 flex h-full items-center justify-center px-2'>
-												<Button
-													variant='primary'
-													className='h-6 rounded-lg px-3 text-xs'
-													isLoading={isPending}
-												>
-													Сохранить
-												</Button>
-											</div>
-										)}
-									</div>
-								</FormControl>
+									</FormControl>
+									{isDirty && (
+										<Button
+											type='submit'
+											size='lg'
+											className='shrink-0'
+											isLoading={isPending}
+										>
+											Сохранить
+										</Button>
+									)}
+								</div>
 								<FormDescription>
-									Измените ваше имя на любое, какое захотите.
+									Так вас увидят в рейтинге и на платформе.
 								</FormDescription>
 								<FormMessage />
 							</FormItem>

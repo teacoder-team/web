@@ -50,8 +50,8 @@ export function RevokeSession({ id }: RevokeSessionProps) {
 			open={isOpen}
 			onOpenChange={setIsOpen}
 		>
-			<Button variant='outline' size='sm'>
-				Выйти
+			<Button variant='ghost' size='sm'>
+				Завершить сеанс
 			</Button>
 		</ConfirmDialog>
 	)

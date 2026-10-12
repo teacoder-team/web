@@ -1,17 +1,17 @@
 'use client'
 
-import { Fragment } from 'react'
-
 import { useGetMfaQuery } from '@/generated/api'
 
 import { useSession } from '@/lib/auth/auth-provider'
 
-import { Heading } from '../../shared/heading'
+import { AccountHeader, SettingsSection } from '../account-ui'
 
 import { AccountActions } from './account-actions'
-import { AccountForm } from './account-form'
-import { Preferences } from './preferences'
-import { ProfileForm } from './profile-form'
+import { AppearanceForm } from './appearance'
+import { AvatarForm } from './avatar-form'
+import { DisplayNameForm } from './display-name-form'
+import { EmailForm } from './email-form'
+import { PasswordForm } from './password-form'
 import { TwoStepAuthForm } from './two-step-auth-form'
 
 export function Settings() {
@@ -20,22 +20,31 @@ export function Settings() {
 	const { data: status } = useGetMfaQuery()
 
 	return (
-		<div className='w-full'>
-			<div className='mx-auto flex h-full max-w-5xl flex-col gap-4'>
-				<Fragment>
-					<Heading
-						title='Настройки аккаунта'
-						description=' Управление настройками вашего аккаунта'
-					/>
-					<div className='mt-2 space-y-9'>
-						<ProfileForm user={user} />
-						<AccountForm user={user} />
-						<TwoStepAuthForm status={status} />
-						<Preferences />
-						<AccountActions />
-					</div>
-				</Fragment>
-			</div>
+		<div className='space-y-10'>
+			<AccountHeader
+				title='Настройки'
+				description='Профиль, вход в аккаунт, защита и внешний вид.'
+			/>
+			<SettingsSection title='Профиль'>
+				<AvatarForm user={user} />
+				<DisplayNameForm user={user} />
+			</SettingsSection>
+			<SettingsSection title='Вход в аккаунт'>
+				<EmailForm user={user} />
+				<PasswordForm user={user} />
+			</SettingsSection>
+			<SettingsSection
+				title='Защита'
+				description='Второй шаг при входе: код из приложения или ключ доступа.'
+			>
+				<TwoStepAuthForm status={status} />
+			</SettingsSection>
+			<SettingsSection title='Внешний вид'>
+				<AppearanceForm />
+			</SettingsSection>
+			<SettingsSection tone='danger'>
+				<AccountActions />
+			</SettingsSection>
 		</div>
 	)
 }

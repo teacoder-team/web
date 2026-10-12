@@ -1,121 +1,119 @@
 'use client'
 
-import { ChevronRightIcon, GemIcon, TrophyIcon, UsersIcon } from 'lucide-react'
+import { Gem } from 'lucide-react'
+import { useState } from 'react'
 
 import { useGetUsersLeadersQuery } from '@/generated/api'
 
-import { Button } from '@/components/ui/button'
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardFooter,
-	CardHeader,
-	CardTitle
-} from '@/components/ui/card'
-
 import { useMediaSource } from '@/hooks/use-media-source'
 
+import { useSession } from '@/lib/auth/auth-provider'
 import { cn } from '@/lib/utils'
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import { Button } from '../../ui/button'
+import { Skeleton } from '../../ui/skeleton'
+import { SettingsSection } from '../account-ui'
 
-interface LeaderboardProps {
-	limit?: number
-	showButton?: boolean
-	onViewAll?: () => void
+const PREVIEW_COUNT = 8
+
+const PODIUM: Record<number, string> = {
+	1: 'bg-warning-soft text-warning',
+	2: 'bg-secondary text-foreground',
+	3: 'bg-brand-soft text-brand'
 }
 
-export function Leaderboard({
-	limit,
-	showButton,
-	onViewAll
-}: LeaderboardProps) {
-	const { data } = useGetUsersLeadersQuery()
+export function Leaderboard() {
+	const [isExpanded, setIsExpanded] = useState(false)
+
+	const { user } = useSession()
+	const { data, isLoading } = useGetUsersLeadersQuery()
 	const getMediaSource = useMediaSource()
 
-	const users = limit ? data?.slice(0, limit) : data
+	const users = isExpanded ? data : data?.slice(0, PREVIEW_COUNT)
+	const canExpand = (data?.length ?? 0) > PREVIEW_COUNT
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className='flex items-center text-lg font-medium'>
-					<UsersIcon className='mr-2 size-5' /> Рейтинг пользователей
-				</CardTitle>
-				<CardDescription>
-					Пользователи с наибольшим количеством очков
-				</CardDescription>
-			</CardHeader>
-			<CardContent>
-				<div className='space-y-4'>
-					{users?.map((user, index) => {
-						const position = user.rank
+		<SettingsSection title='Рейтинг'>
+			{isLoading
+				? Array.from({ length: 5 }).map((_, index) => (
+						<div
+							key={index}
+							className='flex items-center gap-3 px-5 py-3.5'
+						>
+							<Skeleton className='size-7 rounded-full' />
+							<Skeleton className='size-9 rounded-full' />
+							<Skeleton className='h-4 flex-1' />
+						</div>
+					))
+				: users?.map(leader => {
+						const isMe = leader.id === user?.id
 
 						return (
 							<div
-								key={index}
-								className='flex items-center justify-between rounded-md p-2'
+								key={leader.id}
+								className={cn(
+									'flex items-center gap-3 px-5 py-3',
+									isMe && 'bg-brand-soft/50'
+								)}
 							>
-								<div className='flex items-center'>
-									<div className='w-8 text-center text-[15px] font-semibold'>
-										{position === 1 && (
-											<TrophyIcon className='mx-auto size-5 text-yellow-500' />
+								<span
+									className={cn(
+										'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-xs tabular-nums',
+										PODIUM[leader.rank] ??
+											'text-muted-foreground'
+									)}
+								>
+									{leader.rank}
+								</span>
+								<Avatar className='size-9'>
+									<AvatarImage
+										src={getMediaSource(
+											leader.avatar,
+											'users'
 										)}
-										{position === 2 && (
-											<TrophyIcon className='mx-auto size-5 text-gray-400' />
-										)}
-										{position === 3 && (
-											<TrophyIcon className='mx-auto size-5 text-amber-700' />
-										)}
-										{position > 3 && position}
-									</div>
-									<div className='ml-4 flex items-center gap-4'>
-										<Avatar>
-											<AvatarImage
-												src={getMediaSource(
-													user.avatar,
-													'users'
-												)}
-												alt={user.displayName}
-											/>
-											<AvatarFallback>
-												{user?.displayName.slice(0, 1)}
-											</AvatarFallback>
-										</Avatar>
-
-										<div className='flex items-center gap-2'>
-											<p className='font-medium'>
-												{user.displayName}
-											</p>
-											{user.isPremium && (
-												<span className='flex items-center gap-1 rounded-full bg-blue-100 px-2 py-[3px] text-xs font-medium text-blue-600'>
-													<GemIcon className='size-3 text-blue-500' />
-													Premium
-												</span>
-											)}
-										</div>
-									</div>
+										alt=''
+									/>
+									<AvatarFallback>
+										{leader.displayName.slice(0, 1)}
+									</AvatarFallback>
+								</Avatar>
+								<div className='flex min-w-0 flex-1 items-center gap-2'>
+									<span className='truncate text-sm font-medium'>
+										{leader.displayName}
+									</span>
+									{isMe && (
+										<span className='shrink-0 text-xs text-brand'>
+											вы
+										</span>
+									)}
+									{leader.isPremium && (
+										<Gem
+											aria-label='Premium'
+											className='size-3.5 shrink-0 text-brand'
+										/>
+									)}
 								</div>
-								<div className='font-medium'>
-									{user.points} очков
-								</div>
+								<span className='shrink-0 font-mono text-sm tabular-nums'>
+									{new Intl.NumberFormat('ru-RU').format(
+										leader.points
+									)}
+								</span>
 							</div>
 						)
 					})}
-				</div>
-			</CardContent>
-			{showButton && (
-				<CardFooter>
+
+			{canExpand && (
+				<div className='p-3'>
 					<Button
-						variant='outline'
+						variant='ghost'
 						className='w-full'
-						onClick={onViewAll}
+						onClick={() => setIsExpanded(value => !value)}
 					>
-						Посмотреть полный рейтинг{' '}
-						<ChevronRightIcon className='ml-2 size-4' />
+						{isExpanded ? 'Свернуть' : 'Показать весь рейтинг'}
 					</Button>
-				</CardFooter>
+				</div>
 			)}
-		</Card>
+		</SettingsSection>
 	)
 }
