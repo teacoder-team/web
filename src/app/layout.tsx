@@ -52,10 +52,10 @@ export const metadata: Metadata = {
 		locale: 'ru_RU',
 		images: [
 			{
-				url: new URL(env.APP_URL + '/opengraph.png'),
-				width: 512,
-				height: 512,
-				alt: SEO.name
+				url: new URL(env.APP_URL + '/opengraph.jpg'),
+				width: 1200,
+				height: 630,
+				alt: 'TeaCoder - образовательная платформа по веб-разработке'
 			}
 		],
 		url: env.APP_URL
@@ -66,10 +66,10 @@ export const metadata: Metadata = {
 		description: SEO.description,
 		images: [
 			{
-				url: new URL(env.APP_URL + '/opengraph.png'),
-				width: 512,
-				height: 512,
-				alt: SEO.name
+				url: new URL(env.APP_URL + '/opengraph.jpg'),
+				width: 1200,
+				height: 630,
+				alt: 'TeaCoder - образовательная платформа по веб-разработке'
 			}
 		]
 	},
