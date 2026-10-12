@@ -131,7 +131,7 @@ export function Hero({ covers }: HeroProps) {
 					</motion.div>
 				</div>
 
-				{covers.length > 0 && (
+				{/* {covers.length > 0 && (
 					<motion.div
 						className='ml-auto mt-4 w-full pl-6 sm:pl-12 lg:w-[76%] lg:pl-0'
 						initial={reduceMotion ? false : { opacity: 0, y: 60 }}
@@ -140,7 +140,7 @@ export function Hero({ covers }: HeroProps) {
 					>
 						<LessonPreview covers={covers} />
 					</motion.div>
-				)}
+				)} */}
 			</div>
 		</section>
 	)

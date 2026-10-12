@@ -172,6 +172,7 @@ The art is generated procedurally (stochastic grain + Bayer 8×8 ordered halfton
 | `panel-grain.webp` | calm grain | "Отслеживание прогресса" bento card |
 | `cta-grain.webp` | night sky, glow from below, stars | Telegram CTA background |
 | `planet-wide.png` | halftone planet horizon | bottom of the Telegram CTA |
+| `courses-banner.webp` | grainy navy with diagonal light streaks | banner on the courses page |
 
 Rules:
 - New banners follow the same style: dark base, blue tones, grain or square halftone. No stock photos, 3D renders, emoji or illustrations of people.
