@@ -57,7 +57,7 @@ export function CodeStep({
 				{children}
 
 				<Button variant='ghost' onClick={onBack} className='w-full'>
-					<ArrowLeftIcon className='mr-2 h-4 w-4' />
+					<ArrowLeftIcon />
 					{backText}
 				</Button>
 			</div>

@@ -3,107 +3,195 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+	/*
+	 * Light theme: warm paper background, ink foreground, one brand blue.
+	 * Surfaces differ from the background by a single step of lightness
+	 * instead of relying on 1px borders.
+	 */
+	:root {
+		--background: 45 25% 95%;
+		--foreground: 240 6% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+		--card: 45 33% 98.5%;
+		--card-foreground: 240 6% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 240 6% 8%;
 
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
+		--primary: 221 83% 53%;
+		--primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
+		/* Brand blue for text and icons on the page background */
+		--brand: 221 78% 48%;
+		--brand-soft: 219 90% 94%;
+		/* Light ice-blue used on dark, grainy panels */
+		--highlight: 199 95% 82%;
 
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+		--secondary: 45 16% 90%;
+		--secondary-foreground: 240 6% 10%;
 
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+		--muted: 45 16% 91%;
+		--muted-foreground: 240 4% 38%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+		--accent: 45 16% 90%;
+		--accent-foreground: 240 6% 8%;
 
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+		--success: 152 52% 30%;
+		--success-soft: 145 38% 91%;
+		--warning: 32 85% 36%;
+		--warning-soft: 42 80% 90%;
+		--destructive: 2 64% 48%;
+		--destructive-soft: 4 70% 94%;
+		--destructive-foreground: 0 0% 100%;
 
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+		--border: 45 12% 85%;
+		/* Fill of text fields */
+		--input: 220 14% 96%;
+		--ring: 221 83% 53%;
 
-    --radius: 0.5rem;
-  }
+		/* Always-dark surface (hero, art panels, footer) in both themes */
+		--inverse: 240 8% 5%;
+		--inverse-foreground: 0 0% 94%;
 
-  .dark {
-    --background: 0 0% 10%;
-    --foreground: 0 0% 98%;
+		--chart-1: 221 83% 53%;
+		--chart-2: 152 52% 36%;
+		--chart-3: 32 85% 48%;
+		--chart-4: 199 70% 48%;
+		--chart-5: 30 6% 55%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 98%;
+		--radius: 0.75rem;
+	}
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 98%;
+	/* Dark theme: near-black neutral, quiet hairlines, ice-blue accents */
+	.dark {
+		--background: 240 6% 4%;
+		--foreground: 0 0% 93%;
 
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 98%;
+		--card: 240 4% 7.5%;
+		--card-foreground: 0 0% 93%;
 
-    --secondary: 0 0% 15%;
-    --secondary-foreground: 0 0% 98%;
+		--popover: 240 4% 9%;
+		--popover-foreground: 0 0% 93%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 63.9%;
+		--primary: 221 83% 56%;
+		--primary-foreground: 0 0% 100%;
 
-    --accent: 0 0% 15%;
-    --accent-foreground: 0 0% 98%;
+		--brand: 205 95% 74%;
+		--brand-soft: 221 45% 16%;
+		--highlight: 199 95% 82%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+		--secondary: 240 4% 12%;
+		--secondary-foreground: 0 0% 93%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 0 0% 83.1%;
+		--muted: 240 4% 11%;
+		--muted-foreground: 240 4% 62%;
 
-    --chart-1: 0 0% 60%;
-    --chart-2: 0 0% 45%;
-    --chart-3: 0 0% 30%;
-    --chart-4: 0 0% 75%;
-    --chart-5: 0 0% 50%;
-  }
+		--accent: 240 4% 13%;
+		--accent-foreground: 0 0% 95%;
+
+		--success: 150 45% 60%;
+		--success-soft: 152 30% 13%;
+		--warning: 38 80% 62%;
+		--warning-soft: 36 40% 13%;
+		--destructive: 2 70% 62%;
+		--destructive-soft: 2 40% 15%;
+		--destructive-foreground: 0 0% 100%;
+
+		--border: 240 4% 14%;
+		--input: 240 4% 11.5%;
+		--ring: 205 95% 70%;
+
+		--inverse: 240 8% 5%;
+		--inverse-foreground: 0 0% 94%;
+
+		--chart-1: 205 95% 70%;
+		--chart-2: 150 45% 55%;
+		--chart-3: 38 80% 60%;
+		--chart-4: 199 70% 60%;
+		--chart-5: 38 8% 50%;
+	}
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+	* {
+		@apply border-border;
+	}
 
-  body {
-    @apply bg-background text-foreground;
+	html {
+		-webkit-text-size-adjust: 100%;
+		text-rendering: optimizeLegibility;
+	}
 
-    font-family: var(--font-geist-sans), sans-serif;
-  }
+	body {
+		@apply bg-background text-foreground antialiased;
 
-  ::-webkit-scrollbar {
-    width: 5px;
-  }
+		font-family: var(--font-geist-sans), system-ui, sans-serif;
+	}
 
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-display), system-ui, sans-serif;
+		text-wrap: balance;
+	}
 
-  ::-webkit-scrollbar-thumb {
-    background: hsl(var(--border));
-    border-radius: 5px;
-  }
+	p {
+		text-wrap: pretty;
+	}
 
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: hsl(var(--border)) transparent;
-  }
+	::selection {
+		background: hsl(var(--primary) / 0.18);
+	}
+
+	:focus-visible {
+		outline: 2px solid hsl(var(--ring));
+		outline-offset: 2px;
+	}
+
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: hsl(var(--border));
+		border-radius: 6px;
+	}
+
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: hsl(var(--border)) transparent;
+	}
+}
+
+@layer components {
+	.page-container {
+		@apply mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8;
+	}
+
+	/* Wider frame for full-bleed panels (hero, bento) */
+	.frame-container {
+		@apply mx-auto w-full max-w-[1440px] px-3 sm:px-5 lg:px-6;
+	}
+
+	/* Film grain on top of solid color panels */
+	.grain::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0.22;
+		mix-blend-mode: overlay;
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	}
+
+	/* Small uppercase label above section headings */
+	.eyebrow {
+		@apply font-mono text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground;
+	}
 }

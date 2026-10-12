@@ -34,11 +34,6 @@ const config: NextConfig = {
 				source: '/auth/callback',
 				destination: '/auth/login',
 				permanent: false
-			},
-			{
-				source: '/auth/verify/:token',
-				destination: '/auth/register',
-				permanent: false
 			}
 		]
 	}

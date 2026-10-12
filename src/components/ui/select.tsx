@@ -24,7 +24,7 @@ const SelectValue = SelectPrimitives.Value
 SelectValue.displayName = 'SelectValue'
 
 const selectTriggerStyles = cva(
-	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-md border px-3 py-2 shadow-sm outline-none transition text-sm',
+	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-xl border border-border bg-input px-3.5 py-2 outline-none transition text-sm hover:border-foreground/25',
 	{
 		variants: {
 			disabled: {
@@ -32,7 +32,7 @@ const selectTriggerStyles = cva(
 				false: 'bg-popover text-popover-foreground border'
 			},
 			placeholder: {
-				true: 'text-gray-500 dark:text-gray-500',
+				true: 'text-muted-foreground',
 				false: ''
 			},
 			hover: {
@@ -122,7 +122,7 @@ const SelectContent = forwardRef<
 			<SelectPrimitives.Content
 				ref={forwardedRef}
 				className={cn(
-					'relative z-50 max-h-[--radix-select-content-available-height] min-w-[calc(var(--radix-select-trigger-width)-2px)] max-w-[95vw] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-xl shadow-black/[2.5%] will-change-[transform,opacity]',
+					'relative z-50 max-h-[--radix-select-content-available-height] min-w-[calc(var(--radix-select-trigger-width)-2px)] max-w-[95vw] overflow-hidden rounded-xl bg-popover text-popover-foreground shadow-popover will-change-[transform,opacity]',
 					className
 				)}
 				sideOffset={sideOffset}
@@ -168,7 +168,7 @@ const SelectItem = forwardRef<
 		<SelectPrimitives.Item
 			ref={forwardedRef}
 			className={cn(
-				'grid cursor-pointer grid-cols-[1fr_20px] gap-x-2 rounded px-3 py-2 text-sm text-accent-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent data-[disabled]:pointer-events-none data-[state=checked]:font-semibold data-[disabled]:text-gray-400 data-[disabled]:hover:bg-none',
+				'grid cursor-pointer grid-cols-[1fr_20px] gap-x-2 rounded-lg px-3 py-2 text-sm text-accent-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent data-[disabled]:pointer-events-none data-[state=checked]:font-semibold data-[disabled]:text-muted-foreground data-[disabled]:hover:bg-none',
 				className
 			)}
 			{...props}
@@ -178,7 +178,7 @@ const SelectItem = forwardRef<
 			</SelectPrimitives.ItemText>
 			<SelectPrimitives.ItemIndicator>
 				<RiCheckLine
-					className='size-5 shrink-0 text-gray-800 dark:text-gray-200'
+					className='size-5 shrink-0 text-foreground'
 					aria-hidden='true'
 				/>
 			</SelectPrimitives.ItemIndicator>
@@ -194,7 +194,7 @@ const SelectSeparator = forwardRef<
 >(({ className, ...props }, forwardedRef) => (
 	<SelectPrimitives.Separator
 		ref={forwardedRef}
-		className={`-mx-1 my-1 h-px bg-gray-300 dark:bg-gray-700 ${className}`}
+		className={`-mx-1 my-1 h-px bg-border ${className}`}
 		{...props}
 	/>
 ))

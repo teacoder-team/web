@@ -57,10 +57,20 @@ export default async function CoursePage({
 }) {
 	const { slug } = await params
 
-	const [course, lessons] = await Promise.all([
+	const [course, lessons, config] = await Promise.all([
 		getCourse(slug),
-		getCoursesBySlugLessonsQuery(slug)
+		getCoursesBySlugLessonsQuery(slug),
+		getAppConfig()
 	])
 
-	return <CourseDetails course={course} lessons={lessons} />
+	// Resolved on the server: the client hook has no storage URL during SSR
+	const coverSrc = getMediaSource(
+		course.thumbnail,
+		'courses',
+		config?.features.orion.url
+	)
+
+	return (
+		<CourseDetails course={course} lessons={lessons} coverSrc={coverSrc} />
+	)
 }

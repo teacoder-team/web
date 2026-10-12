@@ -36,6 +36,7 @@ import {
 	FormMessage
 } from '../../ui/form'
 import { Input } from '../../ui/input'
+import { SettingsRow } from '../account-ui'
 
 import { ConfirmCodeStep } from './confirm-code-step'
 
@@ -117,140 +118,127 @@ export function PasswordForm({ user }: PasswordFormProps) {
 	}
 
 	return (
-		<div className='flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0'>
-			<div className='mr-5 flex w-full items-start gap-x-4 md:w-auto md:items-center'>
-				<div className='hidden rounded-full bg-blue-600 p-2.5 md:flex'>
-					<KeyRound className='size-5 stroke-[1.7px] text-white' />
-				</div>
-				<div className='flex w-full flex-col'>
-					<h2 className='mb-1 font-semibold'>Пароль</h2>
-					<p className='text-sm text-muted-foreground'>
-						Пароль — ключ к вашей учетной записи. Никому его не
-						сообщайте. При необходимости вы можете изменить его
-						здесь для повышения безопасности.
-					</p>
-				</div>
-			</div>
-			<div>
-				<Dialog
-					open={isOpen}
-					onOpenChange={state => {
-						form.reset()
-						setIsCodeSent(false)
-						setIsOpen(state)
-					}}
-				>
-					<DialogTrigger asChild>
-						<Button variant='outline'>Изменить</Button>
-					</DialogTrigger>
-					<DialogContent>
-						{isCodeSent ? (
-							<ConfirmCodeStep
-								title='Обновление пароля'
-								description={`Мы отправили 6-значный код на ${user?.email ?? 'вашу почту'}.`}
-								isLoading={isConfirming}
-								onSubmit={code => confirm({ data: { code } })}
-							/>
-						) : (
-							<>
-								<DialogHeader>
-									<DialogTitle>Обновление пароля</DialogTitle>
-									<DialogDescription>
-										{user?.hasPassword
-											? 'Введите текущий и новый пароль для обновления.'
-											: 'Введите новый пароль.'}
-									</DialogDescription>
-								</DialogHeader>
-								<Form {...form}>
-									<form
-										onSubmit={form.handleSubmit(onSubmit)}
-										className='grid gap-4'
-									>
-										{user?.hasPassword && (
-											<FormField
-												control={form.control}
-												name='currentPassword'
-												render={({ field }) => (
-													<FormItem>
-														<FormLabel>
-															Текущий пароль
-														</FormLabel>
-														<FormControl>
-															<Input
-																type='password'
-																placeholder='******'
-																disabled={
-																	isPending
-																}
-																{...field}
-															/>
-														</FormControl>
-														<FormMessage />
-													</FormItem>
-												)}
-											/>
+		<SettingsRow
+			icon={<KeyRound />}
+			title='Пароль'
+			description='Пароль - ключ к вашему аккаунту. Никому его не сообщайте и меняйте при любых подозрениях.'
+		>
+			<Dialog
+				open={isOpen}
+				onOpenChange={state => {
+					form.reset()
+					setIsCodeSent(false)
+					setIsOpen(state)
+				}}
+			>
+				<DialogTrigger asChild>
+					<Button variant='outline'>Изменить</Button>
+				</DialogTrigger>
+				<DialogContent>
+					{isCodeSent ? (
+						<ConfirmCodeStep
+							title='Обновление пароля'
+							description={`Мы отправили 6-значный код на ${user?.email ?? 'вашу почту'}.`}
+							isLoading={isConfirming}
+							onSubmit={code => confirm({ data: { code } })}
+						/>
+					) : (
+						<>
+							<DialogHeader>
+								<DialogTitle>Обновление пароля</DialogTitle>
+								<DialogDescription>
+									{user?.hasPassword
+										? 'Введите текущий и новый пароль для обновления.'
+										: 'Введите новый пароль.'}
+								</DialogDescription>
+							</DialogHeader>
+							<Form {...form}>
+								<form
+									onSubmit={form.handleSubmit(onSubmit)}
+									className='grid gap-4'
+								>
+									{user?.hasPassword && (
+										<FormField
+											control={form.control}
+											name='currentPassword'
+											render={({ field }) => (
+												<FormItem>
+													<FormLabel>
+														Текущий пароль
+													</FormLabel>
+													<FormControl>
+														<Input
+															type='password'
+															placeholder='******'
+															disabled={isPending}
+															{...field}
+														/>
+													</FormControl>
+													<FormMessage />
+												</FormItem>
+											)}
+										/>
+									)}
+									<FormField
+										control={form.control}
+										name='newPassword'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>
+													Новый пароль
+												</FormLabel>
+												<FormControl>
+													<Input
+														type='password'
+														placeholder='******'
+														disabled={isPending}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
 										)}
-										<FormField
-											control={form.control}
-											name='newPassword'
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>
-														Новый пароль
-													</FormLabel>
-													<FormControl>
-														<Input
-															type='password'
-															placeholder='******'
-															disabled={isPending}
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<FormField
-											control={form.control}
-											name='confirmPassword'
-											render={({ field }) => (
-												<FormItem>
-													<FormLabel>
-														Подтвердите новый пароль
-													</FormLabel>
-													<FormControl>
-														<Input
-															type='password'
-															placeholder='******'
-															disabled={isPending}
-															{...field}
-														/>
-													</FormControl>
-													<FormMessage />
-												</FormItem>
-											)}
-										/>
-										<DialogFooter>
-											<DialogClose asChild>
-												<Button variant='outline'>
-													Отмена
-												</Button>
-											</DialogClose>
-											<Button
-												type='submit'
-												variant='primary'
-												isLoading={isPending}
-											>
-												Обновить
+									/>
+									<FormField
+										control={form.control}
+										name='confirmPassword'
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>
+													Подтвердите новый пароль
+												</FormLabel>
+												<FormControl>
+													<Input
+														type='password'
+														placeholder='******'
+														disabled={isPending}
+														{...field}
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+									<DialogFooter>
+										<DialogClose asChild>
+											<Button variant='outline'>
+												Отмена
 											</Button>
-										</DialogFooter>
-									</form>
-								</Form>
-							</>
-						)}
-					</DialogContent>
-				</Dialog>
-			</div>
-		</div>
+										</DialogClose>
+										<Button
+											type='submit'
+											variant='primary'
+											isLoading={isPending}
+										>
+											Обновить
+										</Button>
+									</DialogFooter>
+								</form>
+							</Form>
+						</>
+					)}
+				</DialogContent>
+			</Dialog>
+		</SettingsRow>
 	)
 }

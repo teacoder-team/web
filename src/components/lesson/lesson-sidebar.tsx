@@ -1,14 +1,7 @@
 'use client'
 
-import {
-	ArrowLeft,
-	CircleCheckBig,
-	Library,
-	PauseCircle,
-	PlayCircle
-} from 'lucide-react'
+import { ArrowLeft, Check, Play } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 
 import type {
 	CourseLessonListResponseItem,
@@ -17,107 +10,249 @@ import type {
 
 import { ROUTES } from '@/constants/routes'
 
-import { useCourseProgress } from '@/hooks/use-course-progress'
+import type { ProgramLesson } from '@/lib/course-program'
+import { cn, getLessonLabel } from '@/lib/utils'
 
-import { cn } from '@/lib/utils'
-
-import { CourseProgress } from '../shared/course-progress'
-import { buttonVariants } from '../ui/button'
-import { ScrollArea } from '../ui/scroll-area'
+import {
+	Accordion,
+	AccordionContent,
+	AccordionItem,
+	AccordionTrigger
+} from '../ui/accordion'
+import { Progress } from '../ui/progress'
+import { Skeleton } from '../ui/skeleton'
 
 interface LessonSidebarProps {
 	course: LessonResponseCourse
-	lessons: CourseLessonListResponseItem[]
+	program: CourseLessonListResponseItem[]
+	isProgramLoading: boolean
+	activeLessonId: string
+	completedLessons: string[]
+	onNavigate?: () => void
 }
 
-export function LessonSidebar({ course, lessons }: LessonSidebarProps) {
-	const { completedLessons, percentage } = useCourseProgress(course.id)
+export function LessonSidebar({
+	course,
+	program,
+	isProgramLoading,
+	activeLessonId,
+	completedLessons,
+	onNavigate
+}: LessonSidebarProps) {
+	const lessons = program.flatMap(item =>
+		'lessons' in item ? item.lessons : [item]
+	)
+	const completed = lessons.filter(lesson =>
+		completedLessons.includes(lesson.id)
+	).length
+	const percentage = lessons.length
+		? Math.round((completed / lessons.length) * 100)
+		: 0
 
-	const pathname = usePathname()
+	const numbers = new Map(
+		lessons.map((lesson, index) => [lesson.id, index + 1])
+	)
+	const activeSection = program.find(
+		item =>
+			'lessons' in item &&
+			item.lessons.some(lesson => lesson.id === activeLessonId)
+	)
+
+	const rowProps = {
+		activeLessonId,
+		completedLessons,
+		numbers,
+		onNavigate
+	}
 
 	return (
-		<aside className='fixed inset-y-0 left-0 z-40 hidden bg-background pb-20 md:z-50 md:block md:w-80 md:border-r'>
-			<div className='flex h-full flex-col'>
-				<div className='flex flex-col gap-y-4 border-b p-5'>
-					<div className='flex items-center justify-between'>
-						<Link
-							href={ROUTES.COURSES.ROOT}
-							className='flex items-center gap-x-2 text-sm hover:text-blue-600 hover:transition-colors'
-						>
-							<ArrowLeft className='size-4' />
-							<div className='flex items-center gap-x-2'>
-								<Library className='size-4' />
-								Все курсы
-							</div>
-						</Link>
-					</div>
-
-					<div className='space-y-4'>
-						<h1 className='text-xl font-semibold'>
-							{course.title}
-						</h1>
-						<CourseProgress
-							progress={percentage}
-							variant='success'
-							isShowPercentage
-							label='Прогресс'
-						/>
+		<div className='flex h-full flex-col'>
+			<div className='border-b border-border p-5'>
+				<Link
+					href={ROUTES.COURSES.SINGLE(course.slug)}
+					onClick={onNavigate}
+					className='inline-flex items-center gap-1.5 rounded-sm text-sm text-muted-foreground transition-colors hover:text-foreground'
+				>
+					<ArrowLeft className='size-4' />К странице курса
+				</Link>
+				<p className='mt-5 font-serif text-xl font-medium leading-snug tracking-[-0.01em]'>
+					{course.title}
+				</p>
+				<div className='mt-4'>
+					<Progress value={percentage} />
+					<div className='mt-2 flex items-center justify-between text-xs text-muted-foreground'>
+						<span className='font-medium text-brand'>
+							{percentage}% пройдено
+						</span>
+						<span className='tabular-nums'>
+							{completed} / {lessons.length}{' '}
+							{getLessonLabel(lessons.length)}
+						</span>
 					</div>
 				</div>
-
-				<ScrollArea className='flex-1'>
-					<div className='group flex flex-col gap-2 px-2 py-4'>
-						<nav className='flex flex-col gap-3 px-2'>
-							{lessons.map((lesson, index) => {
-								const isCompleted = completedLessons.includes(
-									lesson.id
-								)
-								const isActive =
-									pathname ===
-									ROUTES.COURSES.LESSON(lesson.id)
-
-								const Icon = isActive
-									? PauseCircle
-									: isCompleted
-										? CircleCheckBig
-										: PlayCircle
-
-								return (
-									<Link
-										key={index}
-										href={ROUTES.COURSES.LESSON(lesson.id)}
-										className={cn(
-											buttonVariants({
-												variant: 'ghost',
-												size: 'lg'
-											}),
-											'hover:bg-muted',
-											isActive && 'h-10 bg-muted',
-											'h-10 justify-start'
-										)}
-									>
-										<Icon
-											size={22}
-											className={cn(
-												isCompleted &&
-													'text-emerald-600'
-											)}
-										/>
-										<span
-											className={cn(
-												isCompleted &&
-													'text-emerald-600'
-											)}
-										>
-											{lesson.title}
-										</span>
-									</Link>
-								)
-							})}
-						</nav>
-					</div>
-				</ScrollArea>
 			</div>
-		</aside>
+
+			<nav
+				aria-label='Программа курса'
+				className='flex-1 overflow-y-auto overscroll-contain p-3'
+			>
+				{isProgramLoading ? (
+					<div className='space-y-2 p-2'>
+						{Array.from({ length: 6 }).map((_, index) => (
+							<Skeleton key={index} className='h-11 w-full' />
+						))}
+					</div>
+				) : (
+					<Accordion
+						type='multiple'
+						defaultValue={activeSection ? [activeSection.id] : []}
+						className='space-y-1'
+					>
+						{program.map((item, index) =>
+							'lessons' in item ? (
+								<AccordionItem
+									key={item.id}
+									value={item.id}
+									className='border-none'
+								>
+									<AccordionTrigger className='min-w-0 items-center rounded-xl px-3 py-3 text-left text-sm hover:bg-secondary/70 hover:no-underline'>
+										<SectionHeader
+											index={index}
+											title={item.title}
+											lessons={item.lessons}
+											completedLessons={completedLessons}
+										/>
+									</AccordionTrigger>
+									<AccordionContent className='pb-2 pt-1'>
+										<ul className='space-y-0.5'>
+											{item.lessons.map(lesson => (
+												<LessonLink
+													key={lesson.id}
+													lesson={lesson}
+													{...rowProps}
+												/>
+											))}
+										</ul>
+									</AccordionContent>
+								</AccordionItem>
+							) : (
+								<ul key={item.id}>
+									<LessonLink lesson={item} {...rowProps} />
+								</ul>
+							)
+						)}
+					</Accordion>
+				)}
+			</nav>
+		</div>
+	)
+}
+
+function SectionHeader({
+	index,
+	title,
+	lessons,
+	completedLessons
+}: {
+	index: number
+	title: string
+	lessons: ProgramLesson[]
+	completedLessons: string[]
+}) {
+	const done = lessons.filter(lesson =>
+		completedLessons.includes(lesson.id)
+	).length
+	const isDone = done > 0 && done === lessons.length
+
+	return (
+		<span className='flex min-w-0 flex-1 items-center gap-3'>
+			<span
+				className={cn(
+					'flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-[11px]',
+					isDone
+						? 'bg-success-soft text-success'
+						: 'bg-secondary text-muted-foreground'
+				)}
+			>
+				{isDone ? (
+					<Check className='size-3.5' strokeWidth={2.5} />
+				) : (
+					String(index + 1).padStart(2, '0')
+				)}
+			</span>
+			<span className='min-w-0 flex-1'>
+				<span className='line-clamp-2 font-medium leading-snug text-foreground'>
+					{title}
+				</span>
+				<span className='mt-0.5 block text-xs font-normal text-muted-foreground'>
+					{done} / {lessons.length} {getLessonLabel(lessons.length)}
+				</span>
+			</span>
+		</span>
+	)
+}
+
+interface LessonLinkProps {
+	lesson: ProgramLesson
+	activeLessonId: string
+	completedLessons: string[]
+	numbers: Map<string, number>
+	onNavigate?: () => void
+}
+
+function LessonLink({
+	lesson,
+	activeLessonId,
+	completedLessons,
+	numbers,
+	onNavigate
+}: LessonLinkProps) {
+	const isActive = lesson.id === activeLessonId
+	const isCompleted = completedLessons.includes(lesson.id)
+
+	return (
+		<li>
+			<Link
+				href={ROUTES.COURSES.LESSON(lesson.id)}
+				onClick={onNavigate}
+				aria-current={isActive ? 'page' : undefined}
+				className={cn(
+					'relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-colors',
+					isActive
+						? 'bg-brand-soft text-foreground'
+						: 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground'
+				)}
+			>
+				{isActive && (
+					<span className='absolute inset-y-2 left-0 w-0.5 rounded-full bg-primary' />
+				)}
+				<span
+					className={cn(
+						'flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] tabular-nums',
+						isActive
+							? 'bg-primary text-primary-foreground'
+							: isCompleted
+								? 'bg-success-soft text-success'
+								: 'border border-border'
+					)}
+				>
+					{isActive ? (
+						<Play className='size-2.5 translate-x-px fill-current' />
+					) : isCompleted ? (
+						<Check className='size-3' strokeWidth={3} />
+					) : (
+						numbers.get(lesson.id)
+					)}
+				</span>
+				<span
+					className={cn(
+						'line-clamp-2 min-w-0 flex-1 leading-snug',
+						isActive && 'font-medium'
+					)}
+				>
+					{lesson.title}
+				</span>
+			</Link>
+		</li>
 	)
 }

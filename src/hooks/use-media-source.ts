@@ -15,7 +15,11 @@ export function useMediaSource() {
 		(
 			path: string | null | undefined,
 			tag: Parameters<typeof getMediaSource>[1]
-		) => getMediaSource(path, tag, storageUrl),
+		) =>
+			// A bare file id is not a usable src until the storage URL arrives
+			storageUrl || path?.startsWith('https://')
+				? getMediaSource(path, tag, storageUrl)
+				: '',
 		[storageUrl]
 	)
 }

@@ -98,8 +98,8 @@ export function PasskeyModal() {
 										>
 											<div className='flex items-start justify-between'>
 												<div className='flex items-start gap-3'>
-													<div className='flex items-center justify-center rounded-full bg-blue-600 p-2'>
-														<KeyRound className='h-4 w-4 text-white' />
+													<div className='flex items-center justify-center rounded-xl bg-secondary p-2'>
+														<KeyRound className='size-4 text-foreground' />
 													</div>
 													<div>
 														<h4 className='text-sm font-medium'>

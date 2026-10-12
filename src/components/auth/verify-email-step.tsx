@@ -30,14 +30,19 @@ export function VerifyEmailStep({
 	const [isSending, setIsSending] = useState(false)
 	const [captchaKey, setCaptchaKey] = useState(0)
 	const isCaptchaRequired = useCaptchaRequired()
-	const form = useForm<{ captcha: string }>({ defaultValues: { captcha: '' } })
+	const form = useForm<{ captcha: string }>({
+		defaultValues: { captcha: '' }
+	})
 
 	useEffect(() => {
 		if (remaining <= 0) {
 			return
 		}
 
-		const timer = window.setTimeout(() => setRemaining(value => Math.max(0, value - 1)), 1000)
+		const timer = window.setTimeout(
+			() => setRemaining(value => Math.max(0, value - 1)),
+			1000
+		)
 
 		return () => window.clearTimeout(timer)
 	}, [remaining])
@@ -76,25 +81,51 @@ export function VerifyEmailStep({
 	return (
 		<AuthWrapper
 			heading='Проверьте почту'
-			description={'Мы отправили ссылку подтверждения на ' + email + '. Откройте письмо и перейдите по ссылке, чтобы подтвердить почту и войти.'}
+			description={
+				'Мы отправили ссылку подтверждения на ' +
+				email +
+				'. Откройте письмо и перейдите по ссылке, чтобы подтвердить почту и войти.'
+			}
 		>
 			<div className='grid gap-4'>
-				<Mail className='mx-auto size-12 text-blue-500' aria-hidden='true' />
+				<span className='flex size-14 items-center justify-center rounded-full bg-brand-soft'>
+					<Mail className='size-6 text-brand' aria-hidden='true' />
+				</span>
 				<p className='text-sm text-muted-foreground'>
-					Ссылка действует 30 минут. Если письма нет, проверьте папку «Спам»
-					или отправьте его ещё раз. Новая ссылка заменит предыдущую.
+					Ссылка действует 30 минут. Если письма нет, проверьте папку
+					«Спам» или отправьте его ещё раз. Новая ссылка заменит
+					предыдущую.
 				</p>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(resend)} className='grid gap-4'>
+					<form
+						onSubmit={form.handleSubmit(resend)}
+						className='grid gap-4'
+					>
 						{remaining === 0 && (
-							<CaptchaField control={form.control} name='captcha' resetKey={captchaKey} />
+							<CaptchaField
+								control={form.control}
+								name='captcha'
+								resetKey={captchaKey}
+							/>
 						)}
-						<Button type='submit' variant='primary' disabled={remaining > 0 || isSending} isLoading={isSending}>
-							{remaining > 0 ? 'Отправить повторно через ' + remaining + ' с' : 'Отправить письмо ещё раз'}
+						<Button
+							type='submit'
+							variant='primary'
+							disabled={remaining > 0 || isSending}
+							isLoading={isSending}
+						>
+							{remaining > 0
+								? 'Отправить повторно через ' + remaining + ' с'
+								: 'Отправить письмо ещё раз'}
 						</Button>
 					</form>
 				</Form>
-				<Button type='button' variant='outline' disabled={isSending} onClick={onBack}>
+				<Button
+					type='button'
+					variant='outline'
+					disabled={isSending}
+					onClick={onBack}
+				>
 					Изменить данные
 				</Button>
 			</div>

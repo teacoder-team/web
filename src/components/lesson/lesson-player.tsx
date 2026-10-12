@@ -1,16 +1,15 @@
 'use client'
 
+import { Loader2, VideoOff } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 interface LessonPlayerProps {
-	videoId: string
+	videoId: string | null
 }
 
 export function LessonPlayer({ videoId }: LessonPlayerProps) {
-	const embedUrl = `https://kinescope.io/embed/${videoId}`
-
 	const [isInView, setIsInView] = useState(false)
-	const [iframeLoaded, setIframeLoaded] = useState(false)
+	const [isLoaded, setIsLoaded] = useState(false)
 	const containerRef = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
@@ -18,12 +17,10 @@ export function LessonPlayer({ videoId }: LessonPlayerProps) {
 
 		const observer = new IntersectionObserver(
 			entries => {
-				entries.forEach(entry => {
-					if (entry.isIntersecting) {
-						setIsInView(true)
-						observer.disconnect()
-					}
-				})
+				if (entries.some(entry => entry.isIntersecting)) {
+					setIsInView(true)
+					observer.disconnect()
+				}
 			},
 			{ threshold: 0.3 }
 		)
@@ -35,25 +32,32 @@ export function LessonPlayer({ videoId }: LessonPlayerProps) {
 	return (
 		<div
 			ref={containerRef}
-			className='relative mx-auto aspect-video w-full max-w-5xl overflow-hidden rounded-lg bg-muted'
+			className='relative aspect-video w-full overflow-hidden rounded-2xl bg-inverse text-inverse-foreground ring-1 ring-border'
 		>
-			{!iframeLoaded && (
-				<div className='absolute inset-0 flex flex-col items-center justify-center bg-muted'>
-					<div className='z-10 text-base text-muted-foreground'>
-						Загрузка видео…
-					</div>
+			{!videoId ? (
+				<div className='absolute inset-0 flex flex-col items-center justify-center gap-3 text-inverse-foreground/60'>
+					<VideoOff className='size-7' />
+					<p className='text-sm'>Видео для этого урока пока нет</p>
 				</div>
-			)}
-
-			{isInView && (
-				<iframe
-					className='h-full w-full'
-					src={embedUrl}
-					allow='fullscreen; picture-in-picture; encrypted-media'
-					allowFullScreen
-					frameBorder='0'
-					onLoad={() => setIframeLoaded(true)}
-				/>
+			) : (
+				<>
+					{!isLoaded && (
+						<div className='absolute inset-0 flex flex-col items-center justify-center gap-3 text-inverse-foreground/60'>
+							<Loader2 className='size-6 animate-spin' />
+							<p className='text-sm'>Загрузка видео…</p>
+						</div>
+					)}
+					{isInView && (
+						<iframe
+							title='Видео урока'
+							className='absolute inset-0 h-full w-full'
+							src={`https://kinescope.io/embed/${videoId}`}
+							allow='fullscreen; picture-in-picture; encrypted-media'
+							allowFullScreen
+							onLoad={() => setIsLoaded(true)}
+						/>
+					)}
+				</>
 			)}
 		</div>
 	)

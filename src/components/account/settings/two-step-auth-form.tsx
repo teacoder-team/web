@@ -1,9 +1,9 @@
-import { KeyRound, ListOrdered, Mail, Smartphone } from 'lucide-react'
+import { KeyRound, ListOrdered, Smartphone } from 'lucide-react'
 
 import type { MfaStatusResponse } from '@/generated/model'
 
 import { Badge } from '../../ui/badge'
-import { Card, CardContent } from '../../ui/card'
+import { SettingsRow } from '../account-ui'
 
 import { DisableTotpForm } from './disable-totp-form'
 import { EnableTotpForm } from './enable-totp-form'
@@ -16,112 +16,54 @@ interface TwoFactorAuthFormProps {
 }
 
 export function TwoStepAuthForm({ status }: TwoFactorAuthFormProps) {
+	const isTotpEnabled = !!status?.totp.enabled
 	const hasKeys = (status?.webauthn.credentials ?? 0) > 0
 	const hasRecoveryCodes = (status?.recoveryCodes.total ?? 0) > 0
 
 	return (
-		<div className='flex flex-col gap-y-3'>
-			<h2 className='text-[19px] font-medium'>
-				Многофакторная аутентификация
-			</h2>
-			<Card className='shadow-none'>
-				<CardContent className='p-4'>
-					<div className='space-y-8'>
-						<div className='flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0'>
-							<div className='mr-5 flex items-start gap-x-4 md:items-center'>
-								<div className='hidden rounded-full bg-blue-600 p-2.5 md:flex'>
-									<Smartphone className='size-5 stroke-[1.7px] text-white' />
-								</div>
-								<div className='w-full'>
-									<div className='mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center'>
-										<h2 className='font-semibold'>
-											Приложение для аутентификации
-										</h2>
-										{status?.totp.enabled ? (
-											<Badge variant='success'>
-												Включено
-											</Badge>
-										) : (
-											<Badge variant='error'>
-												Отключено
-											</Badge>
-										)}
-									</div>
-									<p className='text-sm text-muted-foreground'>
-										{status?.totp.enabled
-											? 'Двухфакторная аутентификация через TOTP включена. Для входа в аккаунт используйте приложение-аутентификатор, чтобы получить код.'
-											: 'Обеспечьте безопасность своего аккаунта с помощью двухфакторной аутентификации через TOTP.'}
-									</p>
-								</div>
-							</div>
-							<div>
-								{status?.totp.enabled ? (
-									<DisableTotpForm />
-								) : (
-									<EnableTotpForm />
-								)}
-							</div>
-						</div>
+		<>
+			<SettingsRow
+				icon={<Smartphone />}
+				title='Приложение-аутентификатор'
+				badge={
+					isTotpEnabled ? (
+						<Badge variant='success'>Включено</Badge>
+					) : (
+						<Badge variant='neutral'>Выключено</Badge>
+					)
+				}
+				description={
+					isTotpEnabled
+						? 'При входе мы попросим код из приложения-аутентификатора.'
+						: 'Защитите аккаунт одноразовыми кодами из приложения на телефоне.'
+				}
+			>
+				{isTotpEnabled ? <DisableTotpForm /> : <EnableTotpForm />}
+			</SettingsRow>
 
-						<div className='flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0'>
-							<div className='mr-5 flex items-start gap-x-4 md:items-center'>
-								<div className='hidden rounded-full bg-blue-600 p-2.5 md:flex'>
-									<KeyRound className='size-5 stroke-[1.7px] text-white' />
-								</div>
-								<div className='w-full'>
-									<div className='mb-1 flex flex-col items-start gap-2 sm:flex-row sm:items-center'>
-										<h2 className='font-semibold'>
-											Ключи доступа
-										</h2>
-										{/* {hasKeys ? (
-											<Badge variant='success'>
-												Включено
-											</Badge>
-										) : (
-											<Badge variant='error'>
-												Отключено
-											</Badge>
-										)} */}
-									</div>
-									<p className='text-sm text-muted-foreground'>
-										{hasKeys
-											? 'Ключ доступа добавлен как второй фактор. Вы можете использовать его для подтверждения входа.'
-											: 'Добавьте ключ доступа, чтобы повысить уровень защиты аккаунта.'}
-									</p>
-								</div>
-							</div>
-							<div className='flex gap-3'>
-								{hasKeys && <PasskeyModal />}
-								<RegisterPasskeyForm />
-							</div>
-						</div>
+			<SettingsRow
+				icon={<KeyRound />}
+				title='Ключи доступа'
+				badge={hasKeys && <Badge variant='success'>Добавлены</Badge>}
+				description={
+					hasKeys
+						? 'Ключ доступа подтверждает вход вместо кода - биометрией или аппаратным ключом.'
+						: 'Добавьте ключ доступа, чтобы входить по отпечатку, лицу или аппаратному ключу.'
+				}
+			>
+				{hasKeys && <PasskeyModal />}
+				<RegisterPasskeyForm />
+			</SettingsRow>
 
-						{hasRecoveryCodes && (
-							<div className='flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0'>
-								<div className='mr-5 flex items-center gap-x-4'>
-									<div className='hidden rounded-full bg-blue-600 p-2.5 md:flex'>
-										<ListOrdered className='size-5 stroke-[1.7px] text-white' />
-									</div>
-									<div className='flex w-full flex-col'>
-										<h2 className='font-semibold'>
-											Коды восстановления
-										</h2>
-										<p className='text-sm text-muted-foreground'>
-											Вы можете использовать коды
-											восстановления для доступа к
-											аккаунту, если потеряете доступ к
-											своему устройству.
-										</p>
-									</div>
-								</div>
-								<div>
-									<RecoveryCodesModal />
-								</div>
-							</div>
-						)}
-					</div>
-				</CardContent>
-			</Card>
-		</div>
+			{hasRecoveryCodes && (
+				<SettingsRow
+					icon={<ListOrdered />}
+					title='Резервные коды'
+					description='Одноразовые коды на случай, если вы потеряете доступ к телефону или ключу.'
+				>
+					<RecoveryCodesModal />
+				</SettingsRow>
+			)}
+		</>
 	)
 }

@@ -10,7 +10,8 @@ export const ROUTES = {
 	},
 	DOCUMENTS: {
 		PRIVACY: '/document/privacy-policy',
-		TERMS: '/document/terms-of-use'
+		TERMS: '/document/terms-of-use',
+		COOKIES: '/document/cookie-policy'
 	},
 	COURSES: {
 		ROOT: '/courses',

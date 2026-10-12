@@ -63,7 +63,7 @@ export function MfaRecoveryStep({
 					className='w-full'
 					disabled={isLoading}
 				>
-					<ArrowLeftIcon className='mr-2 h-4 w-4' />
+					<ArrowLeftIcon />
 					Выбрать другой метод
 				</Button>
 			</div>

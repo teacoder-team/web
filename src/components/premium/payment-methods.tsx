@@ -9,9 +9,8 @@ import { PAYMENT_METHOD_ICONS } from '@/constants/payment-icons'
 import { useAppConfig } from '@/lib/config/use-app-config'
 import { cn } from '@/lib/utils'
 
+import type { PaymentFormValues } from '../billing/payment-dialog'
 import { Skeleton } from '../ui/skeleton'
-
-import type { PaymentFormValues } from './premium'
 
 interface PaymentMethodsProps {
 	control: Control<PaymentFormValues>
@@ -53,46 +52,33 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 										key={method.id}
 										htmlFor={method.id}
 										className={cn(
-											'flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all duration-200',
+											'flex cursor-pointer items-center gap-3 rounded-2xl border p-3.5 transition-colors duration-200',
 											isSelected
-												? 'border-blue-500 bg-blue-50 dark:border-border dark:bg-neutral-800'
-												: 'border-neutral-200 bg-white hover:border-neutral-300 dark:border-neutral-700 dark:bg-background'
+												? 'border-primary bg-brand-soft/60'
+												: 'border-border bg-input hover:border-foreground/20'
 										)}
 									>
 										<div
 											className={cn(
-												'flex size-10 items-center justify-center rounded-lg',
+												'flex size-10 shrink-0 items-center justify-center rounded-full',
 												isSelected
-													? 'bg-blue-500'
-													: 'bg-blue-100'
+													? 'bg-primary text-primary-foreground'
+													: 'bg-brand-soft text-brand'
 											)}
 										>
-											<Icon
-												className={cn(
-													'size-5',
-													isSelected
-														? 'text-white'
-														: 'text-blue-500'
-												)}
-											/>
+											<Icon className='size-5' />
 										</div>
 										<div className='flex flex-1 flex-col'>
 											<span
 												className={cn(
-													'font-medium',
-													isSelected
-														? 'text-blue-900 dark:text-white'
-														: 'text-foreground'
+													'font-medium text-foreground'
 												)}
 											>
 												{method.name}
 											</span>
 											<span
 												className={cn(
-													'mt-0.5 text-sm font-normal',
-													isSelected
-														? 'text-blue-700 dark:text-neutral-300'
-														: 'text-muted-foreground'
+													'mt-0.5 text-sm font-normal text-muted-foreground'
 												)}
 											>
 												{method.description}
@@ -116,8 +102,8 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 
 export function PaymentMethodSkeleton() {
 	return (
-		<div className='flex items-center gap-3 rounded-xl border border-neutral-200 bg-white p-3.5 dark:border-neutral-700 dark:bg-neutral-900'>
-			<Skeleton className='h-10 w-10 rounded-lg' />
+		<div className='flex items-center gap-3 rounded-2xl border border-border bg-input p-3.5'>
+			<Skeleton className='size-10 rounded-full' />
 			<div className='flex flex-1 flex-col gap-2'>
 				<Skeleton className='h-4 w-1/3' />
 				<Skeleton className='h-3 w-2/3' />
