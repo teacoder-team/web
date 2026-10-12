@@ -1,63 +1,208 @@
 'use client'
 
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useState } from 'react'
+import { FaYoutube } from 'react-icons/fa6'
+
 import type {
 	CourseLessonListResponseItem,
 	CourseResponse
 } from '@/generated/model'
 
+import { ROUTES } from '@/constants/routes'
+
+import { useCourseAccess } from '@/hooks/use-course-access'
 import { useCourseProgress } from '@/hooks/use-course-progress'
 
-import { Skeleton } from '../ui/skeleton'
+import { flattenCourseProgram } from '@/lib/course-program'
+import { cn, getLessonLabel } from '@/lib/utils'
 
-import { CourseContent } from './course-content'
-import { CourseSidebar } from './course-sidebar'
+import { Button } from '../ui/button'
+
+import { CourseAside } from './course-aside'
+import { CourseProgram } from './course-program'
+
+const DESCRIPTION_PREVIEW_LENGTH = 520
 
 interface CourseDetailsProps {
 	course: CourseResponse
 	lessons: CourseLessonListResponseItem[]
+	coverSrc: string
 }
 
-export function CourseDetails({ course, lessons }: CourseDetailsProps) {
-	const { completedLessons, isLoading } = useCourseProgress(course.id)
+export function CourseDetails({
+	course,
+	lessons,
+	coverSrc
+}: CourseDetailsProps) {
+	const progress = useCourseProgress(course.id)
+	const access = useCourseAccess(course)
 
-	if (isLoading) {
-		return (
-			<div className='mx-auto mt-4 max-w-screen-xl animate-pulse px-5 pb-10 md:px-0'>
-				<div className='grid grid-cols-1 gap-8 lg:grid-cols-6'>
-					<div className='order-1 col-span-1 space-y-6 lg:col-span-4'>
-						<Skeleton className='h-[450px] rounded-xl' />{' '}
-						<Skeleton className='h-8 w-3/4 rounded' />{' '}
-						<Skeleton className='h-4 w-full rounded' />
-						<Skeleton className='h-4 w-5/6 rounded' />
-						<Skeleton className='my-5 h-[0.5px] bg-border' />
-						<Skeleton className='h-6 w-1/4 rounded' />{' '}
-						<Skeleton className='h-4 w-full rounded' />
-						<Skeleton className='h-4 w-5/6 rounded' />
-					</div>
+	const flatLessons = flattenCourseProgram(lessons)
+	const sectionCount = lessons.filter(item => 'lessons' in item).length
+	const lessonIds = new Set(flatLessons.map(lesson => lesson.id))
+	const completed = progress.completedLessons.filter(id => lessonIds.has(id))
 
-					<div className='order-2 space-y-4 lg:col-span-2'>
-						<Skeleton className='h-40 rounded-xl' />
-						<Skeleton className='h-32 rounded-xl' />
-					</div>
-				</div>
-			</div>
-		)
-	}
+	const nextLesson =
+		flatLessons.find(lesson => !completed.includes(lesson.id)) ??
+		flatLessons[0] ??
+		null
 
 	return (
-		<div className='mx-auto mt-4 max-w-screen-xl px-5 pb-10 md:px-0'>
-			<div className='grid grid-cols-1 gap-8 lg:grid-cols-6'>
-				<CourseContent
-					course={course}
-					lessons={lessons}
-					completedLessons={completedLessons}
-				/>
-				<CourseSidebar
-					course={course}
-					lessons={lessons}
-					completedLessons={completedLessons}
-				/>
+		<main className='page-container pb-24 pt-6 sm:pb-32 sm:pt-10'>
+			<nav
+				aria-label='Навигация'
+				className='flex items-center gap-1.5 text-sm text-muted-foreground'
+			>
+				<Link
+					href={ROUTES.COURSES.ROOT}
+					className='rounded-sm transition-colors hover:text-foreground'
+				>
+					Курсы
+				</Link>
+				<ChevronRight className='size-3.5 shrink-0' />
+				<span className='truncate text-foreground'>{course.title}</span>
+			</nav>
+
+			<div className='mt-6 grid gap-8 lg:mt-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:gap-12'>
+				<aside className='lg:sticky lg:top-24 lg:self-start'>
+					<CourseAside
+						course={course}
+						coverSrc={coverSrc}
+						lessonCount={flatLessons.length}
+						sectionCount={sectionCount}
+						completedCount={completed.length}
+						percentage={
+							flatLessons.length > 0
+								? (completed.length / flatLessons.length) * 100
+								: 0
+						}
+						nextLesson={nextLesson}
+						hasAccess={access.hasAccess}
+						isLoading={access.isLoading || progress.isLoading}
+					/>
+				</aside>
+
+				<div className='min-w-0'>
+					<h1 className='font-serif text-display-xl font-medium tracking-[-0.02em]'>
+						{course.title}
+					</h1>
+					{course.shortDescription && (
+						<p className='mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl'>
+							{course.shortDescription}
+						</p>
+					)}
+
+					{course.fullDescription && (
+						<section className='mt-12'>
+							<h2 className='font-display text-display-md font-medium'>
+								О курсе
+							</h2>
+							<Description text={course.fullDescription} />
+						</section>
+					)}
+
+					<section className='mt-12'>
+						<div className='flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1'>
+							<h2 className='font-display text-display-md font-medium'>
+								Программа курса
+							</h2>
+							{flatLessons.length > 0 && (
+								<p className='text-sm text-muted-foreground'>
+									{flatLessons.length}{' '}
+									{getLessonLabel(flatLessons.length)}
+									{sectionCount > 0 &&
+										` · ${sectionCount} ${getSectionLabel(sectionCount)}`}
+								</p>
+							)}
+						</div>
+
+						<div className='mt-6'>
+							{lessons.length > 0 ? (
+								<CourseProgram
+									program={lessons}
+									completedLessons={completed}
+									nextLessonId={nextLesson?.id ?? null}
+									isLocked={
+										!access.isLoading && !access.hasAccess
+									}
+								/>
+							) : (
+								<div className='flex flex-col items-start gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between'>
+									<div>
+										<p className='font-medium'>
+											Курс доступен на YouTube
+										</p>
+										<p className='mt-1 text-sm text-muted-foreground'>
+											Уроков на платформе пока нет -
+											полная версия опубликована на
+											канале.
+										</p>
+									</div>
+									{course.youtubeUrl && (
+										<Button variant='outline' asChild>
+											<Link
+												href={course.youtubeUrl}
+												target='_blank'
+											>
+												<FaYoutube />
+												Открыть
+											</Link>
+										</Button>
+									)}
+								</div>
+							)}
+						</div>
+					</section>
+				</div>
 			</div>
+		</main>
+	)
+}
+
+function Description({ text }: { text: string }) {
+	const [isExpanded, setIsExpanded] = useState(false)
+	const isLong = text.length > DESCRIPTION_PREVIEW_LENGTH
+
+	return (
+		<div className='mt-5'>
+			<div
+				className={cn(
+					'relative whitespace-pre-line text-[17px] leading-relaxed text-foreground/85',
+					isLong &&
+						!isExpanded &&
+						'max-h-56 overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent)]'
+				)}
+			>
+				{text}
+			</div>
+			{isLong && (
+				<button
+					type='button'
+					onClick={() => setIsExpanded(value => !value)}
+					aria-expanded={isExpanded}
+					className='mt-3 inline-flex items-center gap-1 rounded-sm text-sm font-medium text-brand underline-offset-4 hover:underline'
+				>
+					{isExpanded ? 'Свернуть' : 'Показать полностью'}
+					<ChevronDown
+						className={cn(
+							'size-4 transition-transform',
+							isExpanded && 'rotate-180'
+						)}
+					/>
+				</button>
+			)}
 		</div>
 	)
+}
+
+function getSectionLabel(count: number) {
+	const mod10 = count % 10
+	const mod100 = count % 100
+
+	if (mod10 === 1 && mod100 !== 11) return 'раздел'
+	if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
+		return 'раздела'
+	return 'разделов'
 }

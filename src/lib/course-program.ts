@@ -1,6 +1,8 @@
 import type { LessonResponse } from '@/generated/model'
 
-export type ProgramLesson = Pick<LessonResponse, 'id' | 'title' | 'slug'>
+export type ProgramLesson = Pick<LessonResponse, 'id' | 'title' | 'slug'> & {
+	isCompleted?: boolean
+}
 
 export type CourseProgramItem =
 	| ProgramLesson

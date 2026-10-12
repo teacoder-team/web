@@ -14,7 +14,7 @@ export default function AboutPage() {
 					</h1>
 					<div className='mt-6 space-y-4 leading-7 text-foreground sm:leading-8'>
 						<p>
-							Меня зовут Вадим, и я - веб-разработчик. В свои 15
+							Меня зовут Вадим, и я - веб-разработчик. В свои 16
 							лет я уже успел создать свою образовательную
 							платформу{' '}
 							<span className='text-blue-600'>TeaCoder</span> и

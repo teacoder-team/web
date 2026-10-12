@@ -9,9 +9,8 @@ import { PAYMENT_METHOD_ICONS } from '@/constants/payment-icons'
 import { useAppConfig } from '@/lib/config/use-app-config'
 import { cn } from '@/lib/utils'
 
+import type { PaymentFormValues } from '../billing/payment-dialog'
 import { Skeleton } from '../ui/skeleton'
-
-import type { PaymentFormValues } from './premium'
 
 interface PaymentMethodsProps {
 	control: Control<PaymentFormValues>

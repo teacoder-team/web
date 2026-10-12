@@ -46,6 +46,8 @@ export type CourseLessonListResponseItem = {
   title: string;
   /** Идентификатор урока для URL. */
   slug: string;
+  /** Пройден ли урок текущим пользователем. Возвращается только при авторизации. */
+  isCompleted?: boolean;
 }[];
 } | {
   /** Идентификатор урока. */
@@ -54,4 +56,6 @@ export type CourseLessonListResponseItem = {
   title: string;
   /** Идентификатор урока для URL. */
   slug: string;
+  /** Пройден ли урок текущим пользователем. Возвращается только при авторизации. */
+  isCompleted?: boolean;
 };

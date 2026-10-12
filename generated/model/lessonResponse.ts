@@ -51,8 +51,6 @@ export interface LessonResponse {
   /** `FREE` - открыт всем, `PREMIUM` - нужна подписка или покупка курса. */
   access: LessonResponseAccess;
   kinescopeId: string | null;
-  /** Курс, к которому относится урок. */
-  courseId: string;
   /** Курс урока - чтобы показать программу и заголовок без лишних запросов. */
   course: LessonResponseCourse;
 }
