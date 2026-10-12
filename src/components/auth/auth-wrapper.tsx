@@ -1,7 +1,19 @@
-import { Route } from 'next'
+'use client'
+
+import { ArrowLeft, Mail } from 'lucide-react'
+import type { Route } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import type { ReactNode } from 'react'
+import { type ReactNode, useState } from 'react'
+
+import { ROUTES } from '@/constants/routes'
+import { isSsoProvider } from '@/constants/sso-providers'
+
+import { useAppConfig } from '@/lib/config/use-app-config'
+
+import { Logo } from '../shared/logo'
+import { Button } from '../ui/button'
+import { Skeleton } from '../ui/skeleton'
 
 import { AuthSocial } from './auth-social'
 
@@ -26,87 +38,172 @@ export function AuthWrapper({
 	isShowSocial,
 	isShowPasskey
 }: AuthWrapperProps) {
+	const { data: config, isLoading } = useAppConfig()
+	const [isEmailStep, setIsEmailStep] = useState(false)
+
+	const hasProviders =
+		(config?.features.auth.providers.filter(isSsoProvider).length ?? 0) > 0
+	// Sign-in methods come first; the email form opens on demand
+	const hasChoice =
+		!!isShowSocial && (isLoading || hasProviders || !!isShowPasskey)
+	const showChoice = hasChoice && !isEmailStep
+
 	return (
-		<div className='container relative flex min-h-svh w-full flex-col items-center justify-center lg:grid lg:max-w-none lg:grid-cols-2 lg:px-0'>
-			<div className='w-full px-4 py-8 sm:px-6 md:py-12'>
-				<div className='mx-auto flex w-full max-w-[400px] flex-col justify-center space-y-5'>
-					<div className='flex flex-col space-y-3'>
-						<h1 className='text-3xl font-semibold'>{heading}</h1>
+		<div className='relative isolate flex min-h-svh flex-col overflow-hidden bg-background'>
+			<AuthBackdrop />
+
+			<header className='page-container flex h-16 items-center justify-between'>
+				<Link
+					href={ROUTES.HOME}
+					className='flex items-center gap-2.5 rounded-lg font-display text-lg font-semibold tracking-tight'
+				>
+					<Logo className='h-7 w-auto' />
+					TeaCoder
+				</Link>
+				<Link
+					href={ROUTES.HOME}
+					className='inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground'
+				>
+					<ArrowLeft className='size-4' />
+					На главную
+				</Link>
+			</header>
+
+			<main className='flex flex-1 flex-col items-center justify-center px-4 py-12 sm:py-16'>
+				<div className='w-full max-w-[440px] duration-500 ease-out animate-in fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none'>
+					<div className='text-center'>
+						<h1 className='font-display text-[clamp(2rem,1.5rem+2vw,2.75rem)] font-medium leading-[1.08] tracking-[-0.035em]'>
+							{heading}
+						</h1>
 						{description && (
-							<p className='text-sm text-muted-foreground'>
+							<p className='mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-muted-foreground'>
 								{description}
 							</p>
 						)}
 					</div>
-					{isShowSocial && (
-						<AuthSocial isShowPasskey={isShowPasskey} />
-					)}
-					<div className='p-0'>{children}</div>
-					{/* <p className='text-xs text-muted-foreground'>
-						Нажимая продолжить, вы соглашаетесь с нашим{' '}
-						<Link
-							href='/document/terms-of-use'
-							className='text-primary hover:underline'
-							target='_blank'
-						>
-							Пользовательским соглашением
-						</Link>{' '}
-						и{' '}
-						<Link
-							href='/document/privacy-policy'
-							className='text-primary hover:underline'
-							target='_blank'
-						>
-							Политикой Конфиденциальности
-						</Link>
-						.
-					</p> */}
-					{bottomText && bottomLinkText && bottomLinkHref && (
-						<p className='text-center text-sm text-muted-foreground'>
-							{bottomText}{' '}
-							<Link
-								href={bottomLinkHref}
-								className='font-medium text-blue-500'
+
+					<div className='mt-8 rounded-3xl border border-border bg-popover p-5 shadow-[0_24px_64px_-32px_hsl(var(--foreground)/0.25)] sm:p-7 [&_button[type=submit]]:mt-2 [&_button[type=submit]]:h-12'>
+						{isShowSocial && isLoading ? (
+							<div
+								className='flex flex-col gap-3'
+								aria-busy='true'
+								aria-label='Загрузка способов входа'
 							>
-								{bottomLinkText}
-							</Link>
-						</p>
-					)}
-				</div>
-				<div className='absolute bottom-4 right-4 flex items-center justify-center gap-4 text-muted-foreground'></div>
-			</div>
+								{Array.from({ length: 3 }).map((_, index) => (
+									<Skeleton
+										key={index}
+										className='h-[42px] w-full rounded-full'
+									/>
+								))}
+							</div>
+						) : showChoice ? (
+							<div className='duration-300 animate-in fade-in-0'>
+								<AuthSocial isShowPasskey={isShowPasskey} />
+								<Button
+									variant='outline'
+									onClick={() => setIsEmailStep(true)}
+									className='mt-3 h-[42px] w-full'
+								>
+									<Mail />
+									Продолжить с почтой
+								</Button>
+							</div>
+						) : (
+							<div className='duration-300 animate-in fade-in-0 slide-in-from-bottom-1'>
+								{hasChoice && (
+									<button
+										type='button'
+										onClick={() => setIsEmailStep(false)}
+										className='-ml-1 mb-5 inline-flex items-center gap-1.5 rounded-full px-1 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
+									>
+										<ArrowLeft className='size-4' />
+										Другие способы входа
+									</button>
+								)}
+								{children}
+							</div>
+						)}
 
-			<div className='relative hidden h-full flex-col p-10 text-primary lg:flex'>
-				<div className='absolute inset-0'>
-					<Image
-						src='/images/bg-auth.png'
-						alt='Background'
-						className='h-full w-full object-cover'
-						fill
-					/>
-				</div>
-
-				{/* <div className='absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-400 to-blue-800'>
-					<div className='absolute inset-0 backdrop-blur-[100px]'>
-						<div className='absolute left-1/4 top-1/4 h-64 w-64 rounded-full bg-blue-300/20 blur-3xl'></div>
-						<div className='absolute bottom-1/3 right-1/3 h-72 w-72 rounded-full bg-indigo-500/20 blur-3xl'></div>
-						<div className='absolute left-1/3 top-2/3 h-48 w-48 rounded-full bg-sky-400/20 blur-3xl'></div>
+						{(isShowSocial ||
+							(bottomText &&
+								bottomLinkText &&
+								bottomLinkHref)) && (
+							<div className='mt-6 space-y-3 border-t border-border pt-5 text-center'>
+								{bottomText &&
+									bottomLinkText &&
+									bottomLinkHref && (
+										<p className='text-sm text-foreground'>
+											{bottomText}{' '}
+											<Link
+												href={bottomLinkHref}
+												className='font-medium text-brand underline-offset-4 hover:underline'
+											>
+												{bottomLinkText}
+											</Link>
+										</p>
+									)}
+								{isShowSocial && (
+									<p className='text-xs leading-relaxed text-muted-foreground'>
+										Продолжая, вы соглашаетесь с{' '}
+										<Link
+											href={ROUTES.DOCUMENTS.TERMS}
+											target='_blank'
+											className='text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground'
+										>
+											Пользовательским соглашением
+										</Link>{' '}
+										и{' '}
+										<Link
+											href={ROUTES.DOCUMENTS.PRIVACY}
+											target='_blank'
+											className='text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground'
+										>
+											Политикой конфиденциальности
+										</Link>
+										.
+									</p>
+								)}
+							</div>
+						)}
 					</div>
-				</div> */}
+				</div>
+			</main>
 
-				{/* Блок с совой и сообщением */}
-				{/* <div className='absolute bottom-0 right-0 flex flex-col items-end gap-2 p-4'>
-					<p className='max-w-xs rounded-xl bg-white px-4 py-2 text-sm text-black shadow-lg'>
-						Привет! Я твой мудрый гид по обучению. Давай начнём
-						вместе!
-					</p>
-					<img
-						src='/images/owl.png'
-						alt='Сова'
-						className='-mb-4 size-[800px] object-contain'
-					/>
-				</div> */}
-			</div>
+			<footer className='pb-6 text-center text-xs text-muted-foreground'>
+				TeaCoder © {new Date().getFullYear()}
+			</footer>
+		</div>
+	)
+}
+
+/**
+ * Static decoration only: animated or blurred layers behind the form made
+ * these pages janky, so nothing here moves.
+ */
+function AuthBackdrop() {
+	return (
+		<div
+			aria-hidden='true'
+			className='pointer-events-none absolute inset-0 -z-10'
+		>
+			<div className='absolute inset-0 bg-[radial-gradient(70%_45%_at_50%_0%,hsl(var(--primary)/0.14),transparent_70%)]' />
+			<Image
+				src='/images/art/sphere-halftone.png'
+				unoptimized
+				alt=''
+				width={960}
+				height={960}
+				priority
+				className='absolute -right-24 -top-40 hidden w-[560px] max-w-none opacity-25 dark:opacity-40 sm:block'
+			/>
+			<Image
+				src='/images/art/planet-wide.png'
+				unoptimized
+				alt=''
+				width={2400}
+				height={560}
+				className='absolute bottom-0 left-1/2 w-[1600px] max-w-none -translate-x-1/2 opacity-30 dark:opacity-45'
+			/>
 		</div>
 	)
 }

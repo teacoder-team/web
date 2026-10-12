@@ -9,7 +9,7 @@ export function useCourseProgress(courseId: string) {
 	const { status } = useSession()
 
 	const { data, isLoading } = useGetProgressByCourseIdQuery(courseId, {
-		query: { enabled: status === 'authenticated' }
+		query: { enabled: status === 'authenticated' && Boolean(courseId) }
 	})
 
 	return {

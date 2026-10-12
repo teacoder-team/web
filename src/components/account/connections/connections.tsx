@@ -1,6 +1,5 @@
 'use client'
 
-import { FaGoogle } from 'react-icons/fa6'
 import { toast } from 'sonner'
 
 import {
@@ -17,10 +16,14 @@ import {
 import { getErrorMessage } from '@/lib/api/errors'
 import { useAppConfig } from '@/lib/config/use-app-config'
 
-import { Heading } from '../../shared/heading'
+import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
-import { Card, CardContent } from '../../ui/card'
-import { Skeleton } from '../../ui/skeleton'
+import {
+	AccountHeader,
+	SettingsRow,
+	SettingsRowSkeleton,
+	SettingsSection
+} from '../account-ui'
 
 import { ConnectionError } from './connection-error'
 import { UnlinkProvider } from './unlink-provider'
@@ -37,7 +40,8 @@ export function Connections() {
 			.map(account => account.slug)
 	)
 
-	const { mutate, isPending } = usePostAuthSsoByProviderLinkMutation()
+	const { mutate, isPending, variables } =
+		usePostAuthSsoByProviderLinkMutation()
 
 	/** The provider returns to `/auth/callback/:provider`, which finishes the link. */
 	function link(provider: SsoProvider) {
@@ -58,87 +62,63 @@ export function Connections() {
 
 	return (
 		<>
-			<div className='w-full'>
-				<div className='mx-auto flex h-full max-w-5xl flex-col gap-4 rounded-xl'>
-					<Heading
-						title='Сторонние сервисы'
-						description='Подключите и управляйте своими аккаунтами на сторонних сервисах, таких как Google и GitHub'
-					/>
-					<div className='mt-2 space-y-5'>
-						{isLoadingConfig || isLoadingAccounts
-							? Array.from({ length: 4 }).map((_, index) => (
-									<ConnectionsSkeleton key={index} />
-								))
-							: providers?.map((provider, index) => {
-									const meta = SSO_PROVIDERS[provider]
+			<div className='space-y-10'>
+				<AccountHeader
+					title='Связанные аккаунты'
+					description='Подключите сервисы, чтобы входить в TeaCoder в один клик.'
+				/>
+				<SettingsSection>
+					{isLoadingConfig || isLoadingAccounts
+						? Array.from({ length: 4 }).map((_, index) => (
+								<SettingsRowSkeleton key={index} />
+							))
+						: providers?.map(provider => {
+								const meta = SSO_PROVIDERS[provider]
+								const isConnected =
+									linkedProviders.has(provider)
 
-									const isConnected =
-										linkedProviders.has(provider)
-
-									return (
-										<Card
-											key={index}
-											className='shadow-none'
-										>
-											<CardContent className='flex items-center justify-between p-4'>
-												<div className='flex items-center gap-x-3'>
-													<div className='rounded-full bg-blue-600 p-2.5'>
-														{provider ===
-														'google' ? (
-															<FaGoogle className='size-5 text-white' />
-														) : (
-															<meta.icon className='size-5 text-white' />
-														)}
-													</div>
-													<div>
-														<h2 className='font-semibold'>
-															{meta.name}
-														</h2>
-														<p className='text-sm text-muted-foreground'>
-															{meta.description}
-														</p>
-													</div>
-												</div>
-												{isConnected ? (
-													<UnlinkProvider
-														provider={provider}
-													/>
-												) : (
-													<Button
-														onClick={() =>
-															link(provider)
-														}
-														variant='outline'
-														isLoading={isPending}
-													>
-														Привязать
-													</Button>
-												)}
-											</CardContent>
-										</Card>
-									)
-								})}
-					</div>
-				</div>
+								return (
+									<SettingsRow
+										key={provider}
+										icon={
+											<meta.icon
+												style={{ color: meta.color }}
+											/>
+										}
+										title={meta.name}
+										badge={
+											isConnected && (
+												<Badge variant='success'>
+													Подключён
+												</Badge>
+											)
+										}
+										description={meta.description}
+									>
+										{isConnected ? (
+											<UnlinkProvider
+												provider={provider}
+											/>
+										) : (
+											<Button
+												variant='outline'
+												onClick={() => link(provider)}
+												isLoading={
+													isPending &&
+													variables?.provider ===
+														provider
+												}
+												disabled={isPending}
+											>
+												Привязать
+											</Button>
+										)}
+									</SettingsRow>
+								)
+							})}
+				</SettingsSection>
 			</div>
 			<ConnectionError />
 		</>
-	)
-}
-
-export function ConnectionsSkeleton() {
-	return (
-		<Card className='shadow-none'>
-			<CardContent className='flex items-center justify-between p-4'>
-				<div className='flex items-center gap-x-3'>
-					<Skeleton className='h-10 w-10 rounded-full' />
-					<div className='flex flex-1 flex-col gap-2'>
-						<Skeleton className='h-4 w-24 rounded-md' />
-						<Skeleton className='h-3 w-40 rounded-md' />
-					</div>
-				</div>
-				<Skeleton className='h-10 w-28 rounded-lg' />
-			</CardContent>
-		</Card>
 	)
 }

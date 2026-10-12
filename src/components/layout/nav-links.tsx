@@ -1,7 +1,12 @@
+'use client'
+
 import type { Route } from 'next'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 import { ROUTES } from '@/constants/routes'
+
+import { cn } from '@/lib/utils'
 
 interface NavLink {
 	title: string
@@ -15,17 +20,29 @@ export const navLinks: NavLink[] = [
 ]
 
 export function NavLinks() {
+	const pathname = usePathname()
+
 	return (
-		<nav className='hidden items-center space-x-7 text-sm font-medium md:flex'>
-			{navLinks.map((link, index) => (
-				<Link
-					key={index}
-					href={link.href}
-					className='text-sm text-neutral-600 transition hover:text-foreground dark:text-neutral-300 dark:hover:text-white'
-				>
-					{link.title}
-				</Link>
-			))}
+		<nav className='hidden items-center gap-7 md:flex'>
+			{navLinks.map((link, index) => {
+				const isActive = pathname.startsWith(link.href)
+
+				return (
+					<Link
+						key={index}
+						href={link.href}
+						aria-current={isActive ? 'page' : undefined}
+						className={cn(
+							'rounded-sm text-[15px] transition-colors duration-200',
+							isActive
+								? 'text-foreground'
+								: 'text-muted-foreground hover:text-foreground'
+						)}
+					>
+						{link.title}
+					</Link>
+				)
+			})}
 		</nav>
 	)
 }

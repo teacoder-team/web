@@ -24,7 +24,7 @@ const DialogOverlay = forwardRef<
 	<DialogPrimitive.Overlay
 		ref={ref}
 		className={cn(
-			'fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+			'fixed inset-0 z-50 bg-foreground/40 backdrop-blur-[2px] dark:bg-black/60 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
 			className
 		)}
 		{...props}
@@ -41,15 +41,15 @@ const DialogContent = forwardRef<
 		<DialogPrimitive.Content
 			ref={ref}
 			className={cn(
-				'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 bg-background p-7 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg',
+				'fixed left-[50%] top-[50%] z-50 grid max-h-[calc(100svh-2rem)] w-[calc(100%-2rem)] max-w-lg translate-x-[-50%] translate-y-[-50%] gap-5 overflow-y-auto rounded-3xl bg-popover p-6 text-popover-foreground shadow-popover duration-200 sm:p-8 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]',
 				className
 			)}
 			{...props}
 		>
 			{children}
-			<DialogPrimitive.Close className='absolute right-5 top-5 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground'>
-				<X className='size-5 hover:text-accent-foreground' />
-				<span className='sr-only'>Close</span>
+			<DialogPrimitive.Close className='absolute right-4 top-4 flex size-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none sm:right-5 sm:top-5'>
+				<X className='size-[18px]' />
+				<span className='sr-only'>Закрыть</span>
 			</DialogPrimitive.Close>
 		</DialogPrimitive.Content>
 	</DialogPortal>
@@ -62,7 +62,7 @@ const DialogHeader = ({
 }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			'flex flex-col space-y-2 text-center sm:text-left',
+			'flex flex-col gap-2 pr-8 text-left',
 			className
 		)}
 		{...props}
@@ -76,7 +76,7 @@ const DialogFooter = ({
 }: HTMLAttributes<HTMLDivElement>) => (
 	<div
 		className={cn(
-			'mt-2 flex flex-col-reverse space-y-2 sm:flex-row sm:justify-end sm:space-x-2 sm:space-y-0',
+			'mt-1 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
 			className
 		)}
 		{...props}
@@ -90,7 +90,7 @@ const DialogTitle = forwardRef<
 >(({ className, ...props }, ref) => (
 	<DialogPrimitive.Title
 		ref={ref}
-		className={cn('text-xl font-semibold leading-none', className)}
+		className={cn('font-display text-2xl font-medium leading-tight tracking-tight', className)}
 		{...props}
 	/>
 ))
@@ -102,7 +102,7 @@ const DialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
 	<DialogPrimitive.Description
 		ref={ref}
-		className={cn('text-[15px] text-muted-foreground', className)}
+		className={cn('text-sm leading-relaxed text-muted-foreground', className)}
 		{...props}
 	/>
 ))

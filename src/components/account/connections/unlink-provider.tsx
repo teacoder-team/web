@@ -9,7 +9,7 @@ import {
 	useDeleteAuthSsoAccountsByProviderMutation
 } from '@/generated/api'
 
-import type { SsoProvider } from '@/constants/sso-providers'
+import { SSO_PROVIDERS, type SsoProvider } from '@/constants/sso-providers'
 
 import { getErrorMessage } from '@/lib/api/errors'
 
@@ -39,10 +39,12 @@ export function UnlinkProvider({ provider }: UnlinkProviderProps) {
 		}
 	})
 
+	const name = SSO_PROVIDERS[provider].name
+
 	return (
 		<ConfirmDialog
-			title={`Отключить ${provider.charAt(0).toUpperCase() + provider.slice(1)}`}
-			description={`Вы уверены, что хотите отключить аккаунт ${provider.charAt(0).toUpperCase() + provider.slice(1)}? После этого вы не сможете входить с его помощью.`}
+			title={`Отвязать ${name}?`}
+			description={`После этого вы не сможете входить в TeaCoder через ${name}. Привязать аккаунт снова можно в любой момент.`}
 			confirmText='Отключить'
 			destructive
 			handleConfirm={() => mutate({ provider })}
@@ -50,7 +52,7 @@ export function UnlinkProvider({ provider }: UnlinkProviderProps) {
 			open={isOpen}
 			onOpenChange={setIsOpen}
 		>
-			<Button variant='outline'>Отвязать</Button>
+			<Button variant='ghost'>Отвязать</Button>
 		</ConfirmDialog>
 	)
 }

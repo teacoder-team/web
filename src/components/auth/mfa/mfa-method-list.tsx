@@ -23,7 +23,7 @@ export function MfaMethodList({
 			heading='Подтвердите вход'
 			description='Включена многофакторная аутентификация. Выберите способ подтверждения.'
 		>
-			<div className='space-y-4'>
+			<div className='space-y-3'>
 				{options.map(option => {
 					const Icon = option.icon
 					return (
@@ -31,25 +31,24 @@ export function MfaMethodList({
 							key={option.id}
 							onClick={() => onSelect(option)}
 							className={cn(
-								'w-full rounded-lg border p-4 text-left transition-all duration-200',
-								'hover:border-blue-300 hover:bg-blue-50/50 dark:hover:bg-blue-950/20',
-								'focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500',
-								'border-border bg-card'
+								'group w-full rounded-2xl border border-border bg-input p-4 text-left transition-colors duration-200',
+								'hover:border-foreground/20',
+								'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 							)}
 						>
 							<div className='flex items-center gap-4'>
 								<div
 									className={cn(
-										'flex size-10 items-center justify-center rounded-lg bg-blue-500'
+										'flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand'
 									)}
 								>
-									<Icon className={cn('size-5 text-white')} />
+									<Icon className='size-5' />
 								</div>
 								<div className='min-w-0 flex-1'>
 									<h3 className='font-medium text-foreground'>
 										{option.name}
 									</h3>
-									<p className='mt-1 text-sm text-muted-foreground'>
+									<p className='mt-0.5 text-sm text-muted-foreground'>
 										{option.description}
 									</p>
 								</div>
@@ -63,7 +62,7 @@ export function MfaMethodList({
 					onClick={onBack}
 					className='mt-6 w-full'
 				>
-					<ArrowLeftIcon className='mr-2 h-4 w-4' />
+					<ArrowLeftIcon />
 					Назад к входу
 				</Button>
 			</div>

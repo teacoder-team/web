@@ -27,7 +27,7 @@
  *
  * ## Повторные запросы и оплата
  *
- * На один курс (или подписку) у пользователя всегда не больше одного открытого счёта - второй, который можно случайно оплатить, не создаётся. Повторное создание платежа тем же способом возвращает уже открытый счёт.
+ * Повторное создание платежа тем же способом возвращает его открытый счёт. Неоплаченный счёт другим способом не блокирует новый: пользователь может выбрать СБП, карту или криптовалюту, не дожидаясь истечения предыдущего счёта. Платёж в статусе PROCESSING по этому товару блокирует создание новых счетов до завершения обработки.
  *
  * `POST /billing/create` принимает заголовок `Idempotency-Key` (например, UUID): повтор с тем же ключом и теми же параметрами вернёт тот же платёж, с другими параметрами - ошибку 422. Подробности - в описании метода.
  * OpenAPI spec version: 1.0.0
@@ -61,6 +61,7 @@ import type {
   ChangePasswordPayload,
   ConfirmCodePayload,
   CourseLessonListResponse,
+  CourseLibraryResponse,
   CourseListResponse,
   CourseProgressListResponse,
   CourseProgressResponse,
@@ -86,6 +87,7 @@ import type {
   OAuthCallbackResponse,
   OAuthStartResponse,
   PaymentMethodsResponse,
+  PaymentResponse,
   PostAuthWebauthnLoginOptionsMutationBodyOne,
   PostAuthWebauthnLoginOptionsMutationBodyThree,
   PostAuthWebauthnLoginOptionsMutationBodyTwo,
@@ -3330,17 +3332,16 @@ export function useGetBillingMethodsQuery<TData = Awaited<ReturnType<typeof getB
 
 
 /**
- * Возвращает ссылку на страницу оплаты - на неё нужно перенаправить пользователя. С `courseId` оплачивается курс, без него - премиум-подписка. Платёж остаётся в статусе `REQUIRES_PAYMENT`, пока провайдер не подтвердит оплату; доступ к курсу открывается автоматически.
+ * Возвращает ссылку на страницу оплаты - на неё нужно перенаправить пользователя. С `courseId` оплачивается курс, без него - премиум-подписка. Платёж остаётся в статусе `REQUIRES_PAYMENT`, пока провайдер не подтвердит оплату; доступ открывается автоматически.
  *
- * **Один открытый счёт на товар.** Если у пользователя уже есть неоплаченный счёт на этот курс (или подписку) тем же способом - вернётся он, новый не создаётся. Счёт считается открытым час, потом истекает.
+ * **Смена способа оплаты.** Неоплаченный счёт другим способом не мешает создать новый: можно начать оплату через Heleket, затем выбрать СБП или карту. Повторный запрос тем же способом возвращает его открытый счёт. Неоплаченные счета истекают через час.
  *
  * **Ответы 409:**
  * - курс уже куплен;
- * - открыт неоплаченный счёт другим способом - его нужно оплатить или дождаться, пока он истечёт (время указано в ошибке);
- * - по товару уже идёт оплата (например, криптовалюта ждёт подтверждений);
+ * - по товару уже идёт оплата в статусе `PROCESSING`, например криптовалюта ждёт подтверждений;
  * - параллельный запрос на этот же товар ещё выполняется - повторите через секунду.
  *
- * **Идемпотентность.** Заголовок `Idempotency-Key` делает запрос безопасным для повтора: тот же ключ с теми же параметрами вернёт тот же платёж, с другими - ошибку 422. Если провайдер не ответил, ключ не расходуется и запрос можно повторить с ним же.
+ * **Идемпотентность.** Заголовок `Idempotency-Key` делает запрос безопасным для повтора: тот же ключ с теми же параметрами вернёт тот же платёж, с другими - ошибку 422. При смене способа используйте новый ключ. Если провайдер не ответил, ключ не расходуется и запрос можно повторить с ним же.
  * @summary Создание платежа
  */
 export const postBillingCreateMutation = (
@@ -3407,6 +3408,100 @@ export const usePostBillingCreateMutation = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getPostBillingCreateMutationMutationOptions(options), queryClient);
     }
+
+/**
+ * Статус платежа текущего пользователя и что он оплачивает. Подходит для опроса после возврата со страницы оплаты: провайдер подтверждает оплату вебхуком, и после этого статус становится `CAPTURED`, а доступ уже выдан. Неоплаченная ссылка через час переводится в `EXPIRED`. Чужой или несуществующий платёж - 404.
+ * @summary Платёж
+ */
+export const getBillingPaymentsByIdQuery = (
+    id: string,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<PaymentResponse>(
+      {url: `/billing/payments/${id}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetBillingPaymentsByIdQueryQueryKey = (id: string,) => {
+    return [
+    `/billing/payments/${id}`
+    ] as const;
+    }
+
+
+export const getGetBillingPaymentsByIdQueryQueryOptions = <TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetBillingPaymentsByIdQueryQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>> = ({ signal }) => getBillingPaymentsByIdQuery(id, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetBillingPaymentsByIdQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>>
+export type GetBillingPaymentsByIdQueryQueryError = ErrorType<unknown>
+
+
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Платёж
+ */
+
+export function useGetBillingPaymentsByIdQuery<TData = Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getBillingPaymentsByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetBillingPaymentsByIdQueryQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
 /**
  * Действует ли премиум, до какой даты оплачен и включено ли автопродление. Если подписки никогда не было - все флаги `false`.
@@ -3733,6 +3828,100 @@ export function useGetCoursesQuery<TData = Awaited<ReturnType<typeof getCoursesQ
 
 
 /**
+ * Курсы, доступные текущему пользователю: опубликованные Premium-курсы при активной подписке и купленные курсы независимо от наличия подписки. Покупка сохраняет доступ, даже если режим курса изменён с PURCHASE на PREMIUM. Курсы с текущим режимом FREE исключены, в том числе ранее купленные. Каждый курс возвращается один раз, сначала новые. Без доступных курсов возвращается пустой массив.
+ * @summary Библиотека курсов
+ */
+export const getCoursesLibraryQuery = (
+
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<CourseLibraryResponse>(
+      {url: `/courses/library`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetCoursesLibraryQueryQueryKey = () => {
+    return [
+    `/courses/library`
+    ] as const;
+    }
+
+
+export const getGetCoursesLibraryQueryQueryOptions = <TData = Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCoursesLibraryQueryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCoursesLibraryQuery>>> = ({ signal }) => getCoursesLibraryQuery(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCoursesLibraryQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getCoursesLibraryQuery>>>
+export type GetCoursesLibraryQueryQueryError = ErrorType<unknown>
+
+
+export function useGetCoursesLibraryQuery<TData = Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCoursesLibraryQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getCoursesLibraryQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCoursesLibraryQuery<TData = Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCoursesLibraryQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getCoursesLibraryQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCoursesLibraryQuery<TData = Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Библиотека курсов
+ */
+
+export function useGetCoursesLibraryQuery<TData = Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCoursesLibraryQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCoursesLibraryQueryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
  * Полная информация об опубликованном курсе и `access` - открыт ли он текущему пользователю и почему (авторизация необязательна). Увеличивает счётчик просмотров - не чаще раза в 30 минут для одного IP.
  * @summary Страница курса
  */
@@ -3827,7 +4016,7 @@ export function useGetCoursesBySlugQuery<TData = Awaited<ReturnType<typeof getCo
 
 
 /**
- * Опубликованные уроки курса по порядку. `isLocked` показывает, откроется ли урок текущему пользователю (авторизация необязательна); само видео отдаёт `GET /lessons/{id}`.
+ * Программа курса доступна без авторизации. Без секций возвращается плоский список опубликованных уроков: `id`, `title`, `slug` и `isCompleted` для авторизованного пользователя. При наличии секций верхний массив содержит секции `{ id, title, lessons }` и уроки без секции `{ id, title, slug }` с тем же `isCompleted`. Они отсортированы вместе по `position`; уроки внутри каждой секции - по собственному `position`. При одинаковой позиции порядок определяется по ID. Пустые секции возвращаются с пустым массивом `lessons`. Значения `position` в ответ не включаются. `isCompleted` - пройден ли урок текущим пользователем; возвращается только при авторизации, без неё поля нет. Содержимое урока и проверка доступа - `GET /lessons/{id}`.
  * @summary Программа курса
  */
 export const getCoursesBySlugLessonsQuery = (
@@ -4082,7 +4271,7 @@ export function useGetDownloadsByTokenQuery<TData = Awaited<ReturnType<typeof ge
 
 
 /**
- * Содержимое урока вместе с видео и курс, к которому он относится. Ознакомительные уроки (`access: FREE`) и все уроки бесплатного курса открыты всем, даже без входа. Остальные - по правилам курса (`accessMode`): покупка курса или, в режиме `PREMIUM`, премиум-подписка; иначе 403. Авторизация необязательна.
+ * Содержимое урока вместе с видео и курс, к которому он относится. Авторизация обязательна для любого урока, включая бесплатные и ознакомительные: передайте access-токен в `Authorization: Bearer <token>`. Без токена, с просроченным токеном или отозванной сессией - 401. Бесплатные уроки доступны любому авторизованному пользователю; для закрытых проверяется доступ по подписке или покупке курса, иначе - 403.
  * @summary Урок
  */
 export const getLessonsByIdQuery = (

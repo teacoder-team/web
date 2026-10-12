@@ -1,99 +1,60 @@
 'use client'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Mail, Monitor } from 'lucide-react'
+import { Monitor, Moon, Palette, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
-import { Form, FormControl, FormField, FormItem } from '../../ui/form'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue
-} from '../../ui/select'
+import { cn } from '@/lib/utils'
 
-const appearanceSchema = z.object({
-	theme: z.string()
-})
+import { SettingsRow } from '../account-ui'
 
-export type Appearance = z.infer<typeof appearanceSchema>
+const THEMES = [
+	{ value: 'light', label: 'Светлая', icon: Sun },
+	{ value: 'dark', label: 'Тёмная', icon: Moon },
+	{ value: 'system', label: 'Системная', icon: Monitor }
+]
 
 export function AppearanceForm() {
 	const { theme, setTheme } = useTheme()
 
-	const form = useForm<Appearance>({
-		resolver: zodResolver(appearanceSchema),
-		defaultValues: {
-			theme: theme || 'system'
-		}
-	})
-
-	useEffect(() => {
-		if (theme) {
-			form.setValue('theme', theme)
-		}
-	}, [theme, form])
-
-	const handleThemeChange = (value: string) => {
-		setTheme(value)
-	}
+	// The stored theme is only known after hydration
+	const [isMounted, setIsMounted] = useState(false)
+	useEffect(() => setIsMounted(true), [])
 
 	return (
-		<div className='flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0'>
-			<div className='mr-5 flex w-full items-start gap-x-4 md:w-auto md:items-center'>
-				<div className='hidden rounded-full bg-blue-600 p-2.5 md:flex'>
-					<Monitor className='size-5 stroke-[1.7px] text-white' />
-				</div>
-				<div className='flex w-full flex-col'>
-					<h2 className='mb-1 font-semibold'>Тема</h2>
-					<p className='text-sm text-muted-foreground'>
-						Выберите светлую или тёмную тему, или синхронизируйте с
-						настройками ОС.
-					</p>
-				</div>
-			</div>
-			<div className='w-[150px]'>
-				<Form {...form}>
-					<form>
-						<FormField
-							control={form.control}
-							name='theme'
-							render={({ field }) => (
-								<FormItem>
-									<Select
-										onValueChange={value => {
-											field.onChange(value)
-											handleThemeChange(value)
-										}}
-										value={field.value}
-									>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder='Выберите тему' />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											<SelectItem value='system'>
-												Системная
-											</SelectItem>
-											<SelectItem value='light'>
-												Светлая
-											</SelectItem>
-											<SelectItem value='dark'>
-												Тёмная
-											</SelectItem>
-										</SelectContent>
-									</Select>
-								</FormItem>
+		<SettingsRow
+			icon={<Palette />}
+			title='Тема'
+			description='Светлая, тёмная или как в системе.'
+		>
+			<div
+				role='radiogroup'
+				aria-label='Тема оформления'
+				className='flex rounded-full bg-secondary p-1'
+			>
+				{THEMES.map(option => {
+					const isActive = isMounted && theme === option.value
+
+					return (
+						<button
+							key={option.value}
+							type='button'
+							role='radio'
+							aria-checked={isActive}
+							onClick={() => setTheme(option.value)}
+							className={cn(
+								'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors',
+								isActive
+									? 'bg-card font-medium text-foreground shadow-card'
+									: 'text-muted-foreground hover:text-foreground'
 							)}
-						/>
-					</form>
-				</Form>
+						>
+							<option.icon className='size-4' />
+							{option.label}
+						</button>
+					)
+				})}
 			</div>
-		</div>
+		</SettingsRow>
 	)
 }

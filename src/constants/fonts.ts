@@ -51,3 +51,29 @@ export const geist = localFont({
 	variable: '--font-geist-sans',
 	display: 'swap'
 })
+
+export const onest = localFont({
+	src: '../assets/fonts/Onest/Onest.woff2',
+	weight: '100 900',
+	style: 'normal',
+	variable: '--font-display',
+	display: 'swap'
+})
+
+export const garamond = localFont({
+	src: [
+		{
+			path: '../assets/fonts/EBGaramond/EBGaramond.woff2',
+			weight: '400 800',
+			style: 'normal'
+		},
+		{
+			path: '../assets/fonts/EBGaramond/EBGaramond-Italic.woff2',
+			weight: '400 800',
+			style: 'italic'
+		}
+	],
+	variable: '--font-serif',
+	display: 'swap',
+	fallback: ['Georgia', 'serif']
+})

@@ -1,11 +1,12 @@
 'use client'
 
-import { Loader2 } from 'lucide-react'
-import { Fragment } from 'react'
-
 import { useGetSessionsQuery } from '@/generated/api'
 
-import { Heading } from '../../shared/heading'
+import {
+	AccountHeader,
+	SettingsRowSkeleton,
+	SettingsSection
+} from '../account-ui'
 
 import { RemoveAllSessions } from './remove-all-sessions'
 import { SessionItem } from './session-item'
@@ -16,34 +17,24 @@ export function Sessions() {
 	// The API sorts by last activity; the current device goes first, as before.
 	const sessions =
 		data && [...data].sort((a, b) => Number(b.current) - Number(a.current))
+	const hasOthers = (sessions?.length ?? 0) > 1
 
 	return (
-		<div className='w-full'>
-			<div className='mx-auto flex h-full max-w-5xl flex-col gap-4 rounded-xl'>
-				{isLoading ? (
-					<div className='flex h-[75vh] items-center justify-center'>
-						<Loader2 className='size-10 animate-spin text-muted-foreground' />
-					</div>
-				) : (
-					<Fragment>
-						<div className='block items-center justify-between space-y-3 md:flex md:space-y-0'>
-							<Heading
-								title='Устройства'
-								description='Здесь отображаются устройства, с которых выполнен вход в вашу учетную запись'
-							/>
-							<RemoveAllSessions />
-						</div>
-						<div className='mt-2 space-y-5'>
-							{sessions?.map(session => (
-								<SessionItem
-									key={session.id}
-									session={session}
-								/>
-							))}
-						</div>
-					</Fragment>
-				)}
-			</div>
+		<div className='space-y-10'>
+			<AccountHeader
+				title='Устройства'
+				description='Устройства, с которых выполнен вход в ваш аккаунт. Завершите сеанс, если не узнаёте устройство.'
+				action={hasOthers && <RemoveAllSessions />}
+			/>
+			<SettingsSection>
+				{isLoading
+					? Array.from({ length: 3 }).map((_, index) => (
+							<SettingsRowSkeleton key={index} />
+						))
+					: sessions?.map(session => (
+							<SessionItem key={session.id} session={session} />
+						))}
+			</SettingsSection>
 		</div>
 	)
 }

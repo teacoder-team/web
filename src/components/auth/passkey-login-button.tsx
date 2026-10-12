@@ -41,7 +41,7 @@ export function PasskeyLoginButton() {
 		<Button
 			onClick={() => mutate()}
 			variant='outline'
-			className='[&_svg]:size-5'
+			className='h-[42px] [&_svg]:size-[18px]'
 			isLoading={isPending}
 		>
 			<KeyRound />
