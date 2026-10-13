@@ -146,24 +146,22 @@ export function PaymentDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='flex max-h-[calc(100svh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-md sm:p-0'>
+			<DialogContent className='block max-h-[calc(100dvh-2rem)] overflow-hidden p-0 sm:max-w-md sm:p-0'>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className='flex min-h-0 flex-1 flex-col'
+						className='flex max-h-[calc(100dvh-2rem)] flex-col'
 					>
-						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 pt-6 sm:px-8 sm:pt-8'>
-							<DialogHeader>
-								<DialogTitle>
-									Выберите способ оплаты
-								</DialogTitle>
-								{summaryText && (
-									<DialogDescription>
-										{summaryText}
-									</DialogDescription>
-								)}
-							</DialogHeader>
+						<DialogHeader className='shrink-0 px-6 pb-4 pt-6 sm:px-8 sm:pt-8'>
+							<DialogTitle>Выберите способ оплаты</DialogTitle>
+							{summaryText && (
+								<DialogDescription>
+									{summaryText}
+								</DialogDescription>
+							)}
+						</DialogHeader>
 
+						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 sm:px-8'>
 							{hasUnstableMethods && (
 								<Alert variant='warning'>
 									<TriangleAlertIcon className='size-4' />
