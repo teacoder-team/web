@@ -44,29 +44,35 @@ export function Header() {
 							className='flex items-center gap-2.5 rounded-lg font-display text-lg font-semibold tracking-tight'
 						>
 							<Logo className='h-7 w-auto' />
-							TeaCoder
+							<span
+								className={cn(
+									!isAuthorized && 'max-[430px]:hidden'
+								)}
+							>
+								TeaCoder
+							</span>
 						</Link>
 						<NavLinks />
 					</div>
-					<div className='flex items-center gap-2'>
-						<div className='hidden items-center md:flex'>
-							{isAuthorized ? (
+					<div className='flex items-center gap-1 sm:gap-2'>
+						{isAuthorized ? (
+							<div className='hidden md:block'>
 								<UserMenu />
-							) : (
-								<div className='flex items-center gap-2'>
-									<Button variant='ghost' size='sm' asChild>
-										<Link href={ROUTES.AUTH.LOGIN()}>
-											Войти
-										</Link>
-									</Button>
-									<Button size='sm' asChild>
-										<Link href={ROUTES.AUTH.REGISTER}>
-											Регистрация
-										</Link>
-									</Button>
-								</div>
-							)}
-						</div>
+							</div>
+						) : (
+							<div className='flex items-center gap-1 sm:gap-2'>
+								<Button variant='ghost' size='sm' asChild>
+									<Link href={ROUTES.AUTH.LOGIN()}>
+										Войти
+									</Link>
+								</Button>
+								<Button size='sm' asChild>
+									<Link href={ROUTES.AUTH.REGISTER}>
+										Регистрация
+									</Link>
+								</Button>
+							</div>
+						)}
 						<div className='md:hidden'>
 							<MobileNav />
 						</div>
