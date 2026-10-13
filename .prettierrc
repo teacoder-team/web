@@ -21,6 +21,7 @@
 	],
 	"importOrderSeparation": true,
 	"importOrderSortSpecifiers": true,
+	"tailwindStylesheet": "./src/assets/styles/globals.css",
 	"plugins": [
 		"@trivago/prettier-plugin-sort-imports",
 		"prettier-plugin-tailwindcss"

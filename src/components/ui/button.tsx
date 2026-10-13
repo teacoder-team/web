@@ -6,7 +6,7 @@ import { type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react'
 import { cn } from '@/src/lib/utils'
 
 const buttonVariants = cva(
-	'inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-[background-color,color,border-color,transform] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&>svg:last-child:not(:first-child)]:transition-transform [&>svg:last-child:not(:first-child)]:duration-200 hover:[&>svg:last-child:not(:first-child)]:translate-x-0.5',
+	'inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-full text-sm font-medium transition-[background-color,color,border-color,transform] duration-200 ease-out focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 [&>svg:last-child:not(:first-child)]:transition-transform [&>svg:last-child:not(:first-child)]:duration-200 [&>svg:last-child:not(:first-child)]:hover:translate-x-0.5',
 	{
 		variants: {
 			variant: {
@@ -18,7 +18,7 @@ const buttonVariants = cva(
 				highlight:
 					'bg-highlight text-inverse hover:bg-highlight/85',
 				// Translucent pill for dark panels
-				glass: 'border border-inverse-foreground/15 bg-inverse-foreground/[0.06] text-inverse-foreground backdrop-blur-md hover:bg-inverse-foreground/[0.12]',
+				glass: 'border border-inverse-foreground/15 bg-inverse-foreground/6 text-inverse-foreground backdrop-blur-md hover:bg-inverse-foreground/12',
 				// Light button for use on top of primary-filled blocks
 				contrast:
 					'bg-primary-foreground text-primary hover:bg-primary-foreground/90',

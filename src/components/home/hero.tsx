@@ -59,7 +59,7 @@ export function Hero() {
 				<motion.div
 					aria-hidden='true'
 					style={{ x: sphereX, y: sphereY }}
-					className='pointer-events-none absolute -right-[4%] top-[5%] -z-10 hidden w-[42%] max-w-[580px] md:block'
+					className='pointer-events-none absolute top-[5%] right-[-4%] -z-10 hidden w-[42%] max-w-[580px] md:block'
 					initial={reduceMotion ? false : { opacity: 0, scale: 0.94 }}
 					animate={{ opacity: 1, scale: 1 }}
 					transition={{ duration: 1.4, delay: 0.2, ease: EASE }}
@@ -75,7 +75,7 @@ export function Hero() {
 					/>
 				</motion.div>
 
-				<div className='px-6 pb-12 pt-16 sm:px-12 sm:pt-24 lg:px-16 lg:pt-32'>
+				<div className='px-6 pt-16 pb-12 sm:px-12 sm:pt-24 lg:px-16 lg:pt-32'>
 					<motion.p
 						{...fadeUp(0)}
 						className='inline-flex rounded-full border border-highlight/40 px-3.5 py-1.5 text-sm font-medium text-highlight'

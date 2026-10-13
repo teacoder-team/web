@@ -37,7 +37,7 @@ export function CookieDialog() {
 			role='dialog'
 			aria-modal='false'
 			aria-labelledby={titleId}
-			className='fixed inset-x-3 bottom-3 z-[60] mx-auto max-w-[400px] rounded-2xl bg-popover p-5 text-popover-foreground shadow-popover duration-500 ease-out animate-in fade-in-0 slide-in-from-bottom-4 motion-reduce:animate-none sm:inset-x-auto sm:bottom-5 sm:right-5'
+			className='fixed inset-x-3 bottom-3 z-60 mx-auto max-w-[400px] animate-in rounded-2xl bg-popover p-5 text-popover-foreground shadow-popover duration-500 ease-out fade-in-0 slide-in-from-bottom-4 motion-reduce:animate-none sm:inset-x-auto sm:right-5 sm:bottom-5'
 		>
 			<div className='flex items-center gap-3'>
 				<span className='flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary'>

@@ -56,9 +56,9 @@ TabsList.displayName = 'TabsList'
 function getVariantStyles(tabVariant: TabsListVariant) {
 	switch (tabVariant) {
 		case 'line':
-			return '-mb-px items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 pb-2.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+			return '-mb-px items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 pb-2.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:border-foreground data-[state=active]:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50'
 		case 'solid':
-			return 'inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-card data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
+			return 'inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors text-muted-foreground hover:text-foreground data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-card data-disabled:pointer-events-none data-disabled:opacity-50'
 	}
 }
 
@@ -86,7 +86,7 @@ const TabsContent = forwardRef<
 >(({ className, ...props }, forwardedRef) => (
 	<TabsPrimitives.Content
 		ref={forwardedRef}
-		className={cn('outline-none', focusRing, className)}
+		className={cn('outline-hidden', focusRing, className)}
 		{...props}
 	/>
 ))

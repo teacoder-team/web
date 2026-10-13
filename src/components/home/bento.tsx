@@ -28,7 +28,7 @@ interface BentoProps {
 export function Bento({ covers }: BentoProps) {
 	return (
 		<section className='page-container pb-20 sm:pb-28'>
-			<div className='grid gap-5 lg:grid-cols-2 [&>*]:min-w-0'>
+			<div className='grid gap-5 *:min-w-0 lg:grid-cols-2'>
 				<Reveal>
 					<TextCard
 						title='Разнообразие курсов.'
@@ -114,7 +114,7 @@ function CoursesMarqueeCard({ covers }: { covers: CourseCover[] }) {
 								href={ROUTES.COURSES.SINGLE(cover.slug)}
 								tabIndex={isClone ? -1 : 0}
 								aria-hidden={isClone}
-								className='group/card w-72 shrink-0 rounded-2xl bg-inverse p-2.5 text-inverse-foreground shadow-[0_24px_48px_-24px_hsl(var(--inverse)/0.7)] transition-transform duration-300 ease-out hover:-translate-y-1 sm:w-80'
+								className='group/card w-72 shrink-0 rounded-2xl bg-inverse p-2.5 text-inverse-foreground shadow-lifted transition-transform duration-300 ease-out hover:-translate-y-1 sm:w-80'
 							>
 								<div className='relative aspect-video overflow-hidden rounded-xl'>
 									<Image
@@ -125,7 +125,7 @@ function CoursesMarqueeCard({ covers }: { covers: CourseCover[] }) {
 										className='object-cover'
 									/>
 								</div>
-								<div className='px-2 pb-2 pt-4'>
+								<div className='px-2 pt-4 pb-2'>
 									<p className='line-clamp-1 font-medium'>
 										{cover.title}
 									</p>
@@ -185,11 +185,11 @@ function ProgressCard() {
 
 			<div
 				aria-hidden='true'
-				className='ml-auto mt-auto w-[88%] rounded-tl-2xl border-l border-t border-inverse-foreground/10 bg-inverse/80 p-5 backdrop-blur-xl sm:p-6'
+				className='mt-auto ml-auto w-[88%] rounded-tl-2xl border-t border-l border-inverse-foreground/10 bg-inverse/80 p-5 backdrop-blur-xl sm:p-6'
 			>
 				<div className='flex items-center justify-between text-sm'>
 					<span className='font-medium'>Прогресс курса</span>
-					<span className='font-mono tabular-nums text-highlight'>
+					<span className='font-mono text-highlight tabular-nums'>
 						{percent}%
 					</span>
 				</div>
@@ -208,7 +208,7 @@ function ProgressCard() {
 							className={cn(
 								'flex items-center gap-3 rounded-lg',
 								row.current &&
-									'-mx-2 bg-inverse-foreground/[0.06] px-2 py-1.5'
+									'-mx-2 bg-inverse-foreground/6 px-2 py-1.5'
 							)}
 						>
 							<motion.span
@@ -216,7 +216,7 @@ function ProgressCard() {
 									'flex size-5 shrink-0 items-center justify-center rounded-full',
 									row.done
 										? 'bg-highlight text-inverse'
-										: 'ring-1 ring-inset ring-inverse-foreground/25'
+										: 'ring-1 ring-inverse-foreground/25 ring-inset'
 								)}
 								initial={row.done ? { scale: 0 } : false}
 								animate={{ scale: play || !row.done ? 1 : 0 }}
@@ -295,7 +295,7 @@ function CodeWindow() {
 			<pre className='overflow-x-auto p-5 font-mono text-[13px] leading-7'>
 				{CODE_LINES.map((_, index) => (
 					<div key={index} className='flex gap-5'>
-						<span className='w-4 shrink-0 select-none text-right text-muted-foreground/50'>
+						<span className='w-4 shrink-0 text-right text-muted-foreground/50 select-none'>
 							{index + 1}
 						</span>
 						<code className='whitespace-pre'>

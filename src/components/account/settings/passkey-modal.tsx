@@ -102,12 +102,12 @@ export function PasskeyModal() {
 														<KeyRound className='size-4 text-foreground' />
 													</div>
 													<div className='min-w-0'>
-														<h4 className='break-words text-sm font-medium'>
+														<h4 className='text-sm font-medium wrap-break-word'>
 															{passkey.name}
 														</h4>
 														<div className='mt-2 space-y-1'>
 															<div className='flex items-start text-xs text-muted-foreground'>
-																<Calendar className='mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0' />
+																<Calendar className='mt-0.5 mr-1.5 h-3.5 w-3.5 shrink-0' />
 																<span>
 																	Добавлен:{' '}
 																	{formatDate(
@@ -116,7 +116,7 @@ export function PasskeyModal() {
 																</span>
 															</div>
 															<div className='flex items-start text-xs text-muted-foreground'>
-																<Calendar className='mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0' />
+																<Calendar className='mt-0.5 mr-1.5 h-3.5 w-3.5 shrink-0' />
 																<span>
 																	Последнее
 																	использование:{' '}

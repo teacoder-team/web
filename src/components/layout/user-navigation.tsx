@@ -81,7 +81,7 @@ export function UserNavigation() {
 			<nav
 				ref={navRef}
 				aria-label='Разделы аккаунта'
-				className='-mx-4 mt-3 flex gap-1 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mt-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden'
+				className='-mx-4 mt-3 flex scrollbar-none gap-1 overflow-x-auto px-4 pb-1 sm:mt-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden'
 			>
 				{links.map(link => {
 					const isActive = pathname === link.href
@@ -92,7 +92,7 @@ export function UserNavigation() {
 							href={link.href}
 							aria-current={isActive ? 'page' : undefined}
 							className={cn(
-								'flex shrink-0 items-center gap-3 whitespace-nowrap rounded-full px-4 py-2.5 text-sm transition-colors lg:rounded-xl lg:px-3',
+								'flex shrink-0 items-center gap-3 rounded-full px-4 py-2.5 text-sm whitespace-nowrap transition-colors lg:rounded-xl lg:px-3',
 								isActive
 									? 'bg-card font-medium text-foreground shadow-card'
 									: 'text-muted-foreground hover:bg-secondary/70 hover:text-foreground'

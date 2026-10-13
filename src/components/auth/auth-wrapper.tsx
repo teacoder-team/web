@@ -69,9 +69,9 @@ export function AuthWrapper({
 			</header>
 
 			<main className='flex flex-1 flex-col items-center justify-center px-4 py-12 sm:py-16'>
-				<div className='w-full max-w-[440px] duration-500 ease-out animate-in fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none'>
+				<div className='w-full max-w-[440px] animate-in duration-500 ease-out fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none'>
 					<div className='text-center'>
-						<h1 className='font-display text-[clamp(2rem,1.5rem+2vw,2.75rem)] font-medium leading-[1.08] tracking-[-0.035em]'>
+						<h1 className='font-display text-[clamp(2rem,1.5rem+2vw,2.75rem)] leading-[1.08] font-medium tracking-[-0.035em]'>
 							{heading}
 						</h1>
 						{description && (
@@ -81,7 +81,7 @@ export function AuthWrapper({
 						)}
 					</div>
 
-					<div className='mt-8 rounded-3xl border border-border bg-popover p-5 shadow-[0_24px_64px_-32px_hsl(var(--foreground)/0.25)] sm:p-7 [&_button[type=submit]]:mt-2 [&_button[type=submit]]:h-12'>
+					<div className='mt-8 rounded-3xl border border-border bg-popover p-5 shadow-panel sm:p-7 [&_button[type=submit]]:mt-2 [&_button[type=submit]]:h-12'>
 						{isShowSocial && isLoading ? (
 							<div
 								className='flex flex-col gap-3'
@@ -96,7 +96,7 @@ export function AuthWrapper({
 								))}
 							</div>
 						) : showChoice ? (
-							<div className='duration-300 animate-in fade-in-0'>
+							<div className='animate-in duration-300 fade-in-0'>
 								<AuthSocial isShowPasskey={isShowPasskey} />
 								<Button
 									variant='outline'
@@ -108,12 +108,12 @@ export function AuthWrapper({
 								</Button>
 							</div>
 						) : (
-							<div className='duration-300 animate-in fade-in-0 slide-in-from-bottom-1'>
+							<div className='animate-in duration-300 fade-in-0 slide-in-from-bottom-1'>
 								{hasChoice && (
 									<button
 										type='button'
 										onClick={() => setIsEmailStep(false)}
-										className='-ml-1 mb-5 inline-flex items-center gap-1.5 rounded-full px-1 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
+										className='mb-5 -ml-1 inline-flex items-center gap-1.5 rounded-full px-1 py-1 text-sm text-muted-foreground transition-colors hover:text-foreground'
 									>
 										<ArrowLeft className='size-4' />
 										Другие способы входа
@@ -182,7 +182,7 @@ function AuthBackdrop() {
 			aria-hidden='true'
 			className='pointer-events-none absolute inset-0 -z-10'
 		>
-			<div className='absolute inset-0 bg-[radial-gradient(70%_45%_at_50%_0%,hsl(var(--primary)/0.14),transparent_70%)]' />
+			<div className='absolute inset-0 bg-[radial-gradient(70%_45%_at_50%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]' />
 			<Image
 				src='/images/art/sphere-halftone.png'
 				unoptimized
@@ -190,7 +190,7 @@ function AuthBackdrop() {
 				width={960}
 				height={960}
 				priority
-				className='absolute -right-24 -top-40 hidden w-[560px] max-w-none opacity-25 dark:opacity-40 sm:block'
+				className='absolute -top-40 -right-24 hidden w-[560px] max-w-none opacity-25 sm:block dark:opacity-40'
 			/>
 			<Image
 				src='/images/art/planet-wide.png'

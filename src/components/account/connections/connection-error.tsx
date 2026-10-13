@@ -86,8 +86,8 @@ export function ConnectionError() {
 	if (!isVisible || !errorInfo) return null
 
 	return (
-		<div className='fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm'>
-			<Card className='w-full max-w-md shadow-lg duration-300 animate-in fade-in zoom-in'>
+		<div className='fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-xs'>
+			<Card className='w-full max-w-md animate-in shadow-lg duration-300 fade-in zoom-in'>
 				<CardHeader className='border-b border-border pb-4'>
 					<div className='flex items-center gap-2'>
 						<AlertTriangle className='h-6 w-6' />

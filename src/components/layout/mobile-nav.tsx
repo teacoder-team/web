@@ -94,9 +94,9 @@ export function MobileNav() {
 			</SheetTrigger>
 			<SheetContent
 				side='right'
-				className='flex w-[88%] max-w-[360px] flex-col gap-0 rounded-l-[2rem] border-none p-0 sm:max-w-[360px]'
+				className='flex w-[88%] max-w-[360px] flex-col gap-0 rounded-l-4xl border-none p-0 sm:max-w-[360px]'
 			>
-				<div className='flex h-16 shrink-0 items-center justify-between pl-6 pr-3'>
+				<div className='flex h-16 shrink-0 items-center justify-between pr-3 pl-6'>
 					<SheetTitle asChild>
 						<span className='flex items-center gap-2.5 text-lg font-semibold tracking-tight'>
 							<Logo className='h-7 w-auto' />
@@ -118,7 +118,7 @@ export function MobileNav() {
 					</SheetClose>
 				</div>
 
-				<div className='min-h-0 flex-1 space-y-6 overflow-y-auto px-3 pb-4 pt-2'>
+				<div className='min-h-0 flex-1 space-y-6 overflow-y-auto px-3 pt-2 pb-4'>
 					{isAuthorized && user && (
 						<SheetClose asChild>
 							<Link
@@ -151,7 +151,7 @@ export function MobileNav() {
 					)}
 
 					<nav aria-label='Основная навигация'>
-						<p className='eyebrow mb-2 px-4'>Платформа</p>
+						<p className='mb-2 px-4 eyebrow'>Платформа</p>
 						<div className='space-y-1'>
 							{navLinks.map(link => (
 								<DrawerLink
@@ -167,7 +167,7 @@ export function MobileNav() {
 
 					{isAuthorized && (
 						<nav aria-label='Разделы аккаунта'>
-							<p className='eyebrow mb-2 px-4'>Аккаунт</p>
+							<p className='mb-2 px-4 eyebrow'>Аккаунт</p>
 							<div className='space-y-1'>
 								{accountLinks.map(link => (
 									<DrawerLink

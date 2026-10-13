@@ -32,7 +32,7 @@ export function MfaMethodList({
 							className={cn(
 								'group w-full rounded-2xl border border-border bg-input p-4 text-left transition-colors duration-200',
 								'hover:border-foreground/20',
-								'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+								'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden'
 							)}
 						>
 							<div className='flex items-center gap-4'>

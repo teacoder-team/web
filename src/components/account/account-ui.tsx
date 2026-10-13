@@ -16,7 +16,7 @@ export function AccountHeader({
 	return (
 		<header className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
 			<div>
-				<h1 className='text-balance font-display text-display-lg font-medium'>
+				<h1 className='font-display text-display-lg font-medium text-balance'>
 					{title}
 				</h1>
 				{description && (
@@ -25,9 +25,7 @@ export function AccountHeader({
 					</p>
 				)}
 			</div>
-			{action && (
-				<div className='shrink-0 max-sm:[&>*]:w-full'>{action}</div>
-			)}
+			{action && <div className='shrink-0 max-sm:*:w-full'>{action}</div>}
 		</header>
 	)
 }
@@ -120,7 +118,7 @@ export function SettingsRow({
 				</div>
 			</div>
 			{children && (
-				<div className='flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end max-sm:[&>*]:flex-1'>
+				<div className='flex w-full shrink-0 flex-wrap items-center gap-2 max-sm:*:flex-1 sm:w-auto sm:justify-end'>
 					{children}
 				</div>
 			)}
@@ -132,13 +130,13 @@ export function SettingsRowSkeleton() {
 	return (
 		<div className='flex items-center justify-between gap-6 p-4 sm:p-6'>
 			<div className='flex items-center gap-4'>
-				<div className='size-10 animate-pulse rounded-2xl bg-foreground/[0.06]' />
+				<div className='size-10 animate-pulse rounded-2xl bg-foreground/6' />
 				<div className='space-y-2'>
-					<div className='h-4 w-32 animate-pulse rounded-md bg-foreground/[0.06]' />
-					<div className='h-3 w-56 animate-pulse rounded-md bg-foreground/[0.06]' />
+					<div className='h-4 w-32 animate-pulse rounded-md bg-foreground/6' />
+					<div className='h-3 w-56 animate-pulse rounded-md bg-foreground/6' />
 				</div>
 			</div>
-			<div className='h-10 w-28 animate-pulse rounded-full bg-foreground/[0.06]' />
+			<div className='h-10 w-28 animate-pulse rounded-full bg-foreground/6' />
 		</div>
 	)
 }

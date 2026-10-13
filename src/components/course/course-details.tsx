@@ -44,7 +44,7 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 		null
 
 	return (
-		<main className='page-container pb-24 pt-6 sm:pb-32 sm:pt-10'>
+		<main className='page-container pt-6 pb-24 sm:pt-10 sm:pb-32'>
 			<nav
 				aria-label='Навигация'
 				className='flex items-center gap-1.5 text-sm text-muted-foreground'
@@ -161,10 +161,10 @@ function Description({ text }: { text: string }) {
 		<div className='mt-5'>
 			<div
 				className={cn(
-					'relative whitespace-pre-line text-[17px] leading-relaxed text-foreground/85',
+					'relative text-[17px] leading-relaxed whitespace-pre-line text-foreground/85',
 					isLong &&
 						!isExpanded &&
-						'max-h-56 overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent)]'
+						'max-h-56 overflow-hidden mask-[linear-gradient(to_bottom,black_55%,transparent)]'
 				)}
 			>
 				{text}

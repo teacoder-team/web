@@ -64,13 +64,13 @@ export function SubscriptionStatus({ subscription }: SubscriptionStatusProps) {
 		: []
 
 	return (
-		<section className='relative isolate overflow-hidden rounded-3xl bg-inverse p-6 text-inverse-foreground dark:ring-1 dark:ring-border sm:p-8'>
+		<section className='relative isolate overflow-hidden rounded-3xl bg-inverse p-6 text-inverse-foreground sm:p-8 dark:ring-1 dark:ring-border'>
 			<Image
 				src='/images/art/hero-grain.webp'
 				alt=''
 				fill
 				sizes='(min-width: 1024px) 900px, 100vw'
-				className='-z-20 object-cover object-right-top'
+				className='-z-20 object-cover object-top-right'
 			/>
 			<Image
 				src='/images/art/sphere-halftone.png'
@@ -79,10 +79,10 @@ export function SubscriptionStatus({ subscription }: SubscriptionStatusProps) {
 				width={960}
 				height={960}
 				aria-hidden='true'
-				className='pointer-events-none absolute -right-16 -top-20 -z-10 hidden w-80 opacity-70 sm:block'
+				className='pointer-events-none absolute -top-20 -right-16 -z-10 hidden w-80 opacity-70 sm:block'
 			/>
 
-			<p className='font-mono text-xs uppercase tracking-[0.18em] text-highlight'>
+			<p className='font-mono text-xs tracking-[0.18em] text-highlight uppercase'>
 				TeaCoder Premium
 			</p>
 			<div className='mt-4 flex flex-wrap items-center gap-3'>

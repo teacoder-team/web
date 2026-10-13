@@ -4,7 +4,7 @@ Instructions for agents (Claude Code and others) working in this repository. `CL
 
 ## Project
 
-An educational platform for web development. Next.js 16 (App Router), React 19, TypeScript strict, Tailwind 3 + reworked shadcn/ui, TanStack Query 5, axios, react-hook-form + zod, next-themes, framer-motion, sonner, lucide-react. Package manager: **bun**. The backend is a separate repository (`../elysia-backend`); the API defaults to `http://localhost:8000`.
+An educational platform for web development. Next.js 16 (App Router), React 19, TypeScript strict, Tailwind 4 (CSS-first config, OKLCH tokens) + reworked shadcn/ui, TanStack Query 5, axios, react-hook-form + zod, next-themes, framer-motion, sonner, lucide-react. Package manager: **bun**. The backend is a separate repository (`../elysia-backend`); the API defaults to `http://localhost:8000`.
 
 ## Commands
 
@@ -85,7 +85,7 @@ Don't touch, move or rename `analytics.auth.*` calls or event names. Metrica loa
 ### Code
 
 - TypeScript strict, no `any`. Types come from `generated/model`.
-- Prettier: tabs, single quotes, no semicolons, width 80, sorted imports and Tailwind classes.
+- Prettier: tabs, single quotes, no semicolons, width 80, sorted imports and Tailwind classes (the plugin reads `src/assets/styles/globals.css`).
 - Comments in English, only where the "why" isn't obvious.
 - UI text in Russian.
 - Keep every state: skeletons, empty, error, `isLoading`, `disabled`, toasts (`sonner`).

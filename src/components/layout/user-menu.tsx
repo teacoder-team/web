@@ -37,7 +37,7 @@ export function UserMenu() {
 			<DropdownMenuContent className='w-56' align='end'>
 				<DropdownMenuLabel className='font-normal'>
 					<div className='flex flex-col space-y-1'>
-						<p className='text-sm font-medium leading-none'>
+						<p className='text-sm leading-none font-medium'>
 							{user?.displayName}
 						</p>
 						<p className='text-xs leading-none text-muted-foreground'>
@@ -61,7 +61,7 @@ export function UserMenu() {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onClick={() => mutate()}
-						className='!text-rose-600'
+						className='text-rose-600!'
 					>
 						<LogOut />
 						Выйти
