@@ -1,7 +1,7 @@
 {
 	"name": "@teacoder/web",
-	"version": "1.0.0",
-	"description": "Frontend for Teacoder platform",
+	"version": "3.0.0",
+	"description": "High-quality web interface for modern learning",
 	"author": {
 		"name": "Vadim",
 		"url": "https://teacoder.ru",
