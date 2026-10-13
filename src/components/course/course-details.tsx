@@ -20,6 +20,7 @@ import { LESSON, SECTION, cn, pluralize } from '@/lib/utils'
 import { Button } from '../ui/button'
 
 import { CourseAside } from './course-aside'
+import { CourseOutcomes } from './course-outcomes'
 import { CourseProgram } from './course-program'
 
 const DESCRIPTION_PREVIEW_LENGTH = 520
@@ -86,6 +87,8 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 							{course.shortDescription}
 						</p>
 					)}
+
+					<CourseOutcomes outcomes={course.learningOutcomes} />
 
 					{course.fullDescription && (
 						<section className='mt-12'>

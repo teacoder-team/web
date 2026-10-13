@@ -47,7 +47,7 @@ export type CourseLibraryResponseItem = {
   shortDescription: string | null;
   thumbnail: string | null;
   price: number | null;
-  originalPrice: number | null;
+  discountPrice: number | null;
   /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме. */
   accessMode: CourseLibraryResponseItemAccessMode;
   /** Есть ли у курса материалы (исходный код). Скачать - `POST /courses/{slug}/materials/link`. */

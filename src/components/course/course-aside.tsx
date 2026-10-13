@@ -24,12 +24,14 @@ import { useSession } from '@/lib/auth/auth-provider'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import type { ProgramLesson } from '@/lib/courses/program'
 import { ROUTES } from '@/lib/routes'
-import { LESSON, formatPrice, pluralize } from '@/lib/utils'
+import { LESSON, formatPrice, getPayablePrice, pluralize } from '@/lib/utils'
 
 import { PaymentDialog } from '../billing/payment-dialog'
 import { Button } from '../ui/button'
 import { Progress } from '../ui/progress'
 import { Skeleton } from '../ui/skeleton'
+
+import { CoursePrice } from './course-price'
 
 interface CourseAsideProps {
 	course: CourseResponse
@@ -59,10 +61,9 @@ export function CourseAside({
 	const [isPaymentOpen, setIsPaymentOpen] = useState(false)
 
 	const currency = config?.features.premium.currency
+	const payable = getPayablePrice(course.price, course.discountPrice)
 	const price =
-		course.price !== null && currency
-			? formatPrice(course.price, currency)
-			: null
+		payable !== null && currency ? formatPrice(payable, currency) : null
 
 	const courseUrl = ROUTES.COURSES.SINGLE(course.slug)
 	const isStarted = completedCount > 0
@@ -168,10 +169,10 @@ export function CourseAside({
 					</div>
 				</div>
 
-				<div className='px-5 pb-5 pt-3'>
+				<div className='px-5 pt-3 pb-5'>
 					<AccessSummary
 						course={course}
-						price={price}
+						currency={currency}
 						hasAccess={hasAccess && !isLoading}
 					/>
 
@@ -181,7 +182,7 @@ export function CourseAside({
 								<span className='text-muted-foreground'>
 									Пройдено {completedCount} из {lessonCount}
 								</span>
-								<span className='font-mono tabular-nums text-foreground'>
+								<span className='font-mono text-foreground tabular-nums'>
 									{Math.round(percentage)}%
 								</span>
 							</div>
@@ -260,13 +261,22 @@ export function CourseAside({
 
 function AccessSummary({
 	course,
-	price,
+	currency,
 	hasAccess
 }: {
 	course: CourseResponse
-	price: string | null
+	currency: string | undefined
 	hasAccess: boolean
 }) {
+	const price = (
+		<CoursePrice
+			price={course.price}
+			discountPrice={course.discountPrice}
+			currency={currency}
+		/>
+	)
+	const hasPrice = course.price !== null && Boolean(currency)
+
 	if (course.accessMode === 'FREE') {
 		return (
 			<p className='font-display text-3xl font-medium tracking-tight text-success'>
@@ -292,8 +302,8 @@ function AccessSummary({
 				<p className='font-display text-3xl font-medium tracking-tight text-brand'>
 					По подписке
 				</p>
-				{price && (
-					<p className='mt-1 text-sm text-muted-foreground'>
+				{hasPrice && (
+					<p className='mt-1.5 text-sm text-muted-foreground'>
 						или навсегда за {price}
 					</p>
 				)}
@@ -302,8 +312,16 @@ function AccessSummary({
 	}
 
 	return (
-		<p className='font-display text-3xl font-medium tabular-nums tracking-tight'>
-			{price ?? 'Покупка'}
+		<p className='font-display text-3xl font-medium tracking-tight'>
+			{hasPrice ? (
+				<CoursePrice
+					price={course.price}
+					discountPrice={course.discountPrice}
+					currency={currency}
+				/>
+			) : (
+				'Покупка'
+			)}
 		</p>
 	)
 }
