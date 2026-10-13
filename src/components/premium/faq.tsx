@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
 import { formatPrice } from '@/lib/utils'
 
 import {

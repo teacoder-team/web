@@ -7,14 +7,13 @@ import {
 	usePostAuthSsoByProviderLinkMutation
 } from '@/generated/api'
 
+import { getErrorMessage } from '@/lib/api/errors'
 import {
 	SSO_PROVIDERS,
 	type SsoProvider,
 	isSsoProvider
-} from '@/constants/sso-providers'
-
-import { getErrorMessage } from '@/lib/api/errors'
-import { useAppConfig } from '@/lib/config/use-app-config'
+} from '@/lib/auth/sso-providers'
+import { useAppConfig } from '@/lib/config/useAppConfig'
 
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'

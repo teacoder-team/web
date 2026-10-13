@@ -11,14 +11,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
-import { useMediaSource } from '@/hooks/use-media-source'
-
 import { useSession } from '@/lib/auth/auth-provider'
+import { ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { UserAvatar } from '../shared/user-avatar'
 
 export const links = [
 	{ title: 'Мой прогресс', href: ROUTES.ACCOUNT.ROOT, icon: ChartArea },
@@ -39,7 +36,6 @@ export const links = [
 export function UserNavigation() {
 	const pathname = usePathname()
 	const { user } = useSession()
-	const getMediaSource = useMediaSource()
 
 	const navRef = useRef<HTMLElement>(null)
 
@@ -60,15 +56,12 @@ export function UserNavigation() {
 	return (
 		<aside className='min-w-0 lg:sticky lg:top-24 lg:self-start'>
 			<div className='flex items-center gap-3 rounded-3xl border border-border bg-card p-3 sm:p-4'>
-				<Avatar className='size-11 sm:size-12'>
-					<AvatarImage
-						src={getMediaSource(user?.avatar, 'users')}
-						alt=''
-					/>
-					<AvatarFallback className='text-lg'>
-						{user?.displayName.slice(0, 1)}
-					</AvatarFallback>
-				</Avatar>
+				<UserAvatar
+					name={user?.displayName}
+					src={user?.avatar}
+					className='size-11 sm:size-12'
+					fallbackClassName='text-lg'
+				/>
 				<div className='min-w-0'>
 					<p className='truncate font-medium'>{user?.displayName}</p>
 					{user?.email && (

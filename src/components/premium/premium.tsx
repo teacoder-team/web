@@ -7,11 +7,10 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useSession } from '@/lib/auth/auth-provider'
-import { useAppConfig } from '@/lib/config/use-app-config'
-import { formatPrice, monthsTranslator } from '@/lib/utils'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
+import { MONTH, formatPrice, pluralize } from '@/lib/utils'
 
 import { PaymentDialog } from '../billing/payment-dialog'
 import { Skeleton } from '../ui/skeleton'
@@ -35,7 +34,7 @@ export function Premium() {
 	const period = premium
 		? premium.months === 1
 			? 'месяц'
-			: `${premium.months} ${monthsTranslator(premium.months)}`
+			: pluralize(premium.months, MONTH)
 		: null
 
 	function handleSubscribe() {

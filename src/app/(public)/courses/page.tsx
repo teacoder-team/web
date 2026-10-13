@@ -5,7 +5,7 @@ import { getCoursesQuery } from '@/generated/api'
 
 import { CourseCard } from '@/components/course/course-card'
 
-import { getCourseLabel } from '@/lib/utils'
+import { COURSE, pluralize } from '@/lib/utils'
 
 export const metadata: Metadata = {
 	title: 'Курсы',
@@ -29,8 +29,7 @@ export default async function CoursesPage() {
 						className='-z-10 object-cover object-[70%_50%]'
 					/>
 					<p className='font-mono text-xs uppercase tracking-[0.18em] text-highlight'>
-						Каталог · {courses.length}{' '}
-						{getCourseLabel(courses.length)}
+						Каталог · {pluralize(courses.length, COURSE)}
 					</p>
 					<h1 className='mt-4 font-display text-display-xl font-medium'>
 						Курсы

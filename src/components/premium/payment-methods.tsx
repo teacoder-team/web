@@ -4,9 +4,8 @@ import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-import { PAYMENT_METHOD_ICONS } from '@/constants/payment-icons'
-
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { PAYMENT_METHOD_ICONS } from '@/lib/billing/payment-methods'
+import { useAppConfig } from '@/lib/config/useAppConfig'
 import { cn } from '@/lib/utils'
 
 import type { PaymentFormValues } from '../billing/payment-dialog'
@@ -51,7 +50,6 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 							}}
 							className='flex flex-col gap-4'
 						>
-							{/* `GET /` lists only the methods that work right now. */}
 							{data.map(method => {
 								const Icon = PAYMENT_METHOD_ICONS[method.id]
 								const key = getOptionKey(method)

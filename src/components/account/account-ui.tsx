@@ -40,7 +40,6 @@ interface SettingsSectionProps {
 	className?: string
 }
 
-/** A titled group of rows sharing one card with hairline dividers. */
 export function SettingsSection({
 	title,
 	description,
@@ -83,7 +82,6 @@ interface SettingsRowProps {
 	title: ReactNode
 	badge?: ReactNode
 	description?: ReactNode
-	/** Controls on the right; they wrap under the text on small screens. */
 	children?: ReactNode
 	className?: string
 }

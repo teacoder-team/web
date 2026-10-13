@@ -7,10 +7,9 @@ import type { JSX, ReactNode } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { FaTelegram, FaYoutube } from 'react-icons/fa6'
 
-import { ROUTES } from '@/constants/routes'
-
 import { env } from '@/lib/config/env'
 import { useConsent } from '@/lib/consent/consent-provider'
+import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
 
@@ -29,11 +28,6 @@ interface SocialLink {
 const generalLinks: NavLink[] = [
 	{ title: 'Курсы', href: ROUTES.COURSES.ROOT },
 	{ title: 'Об основателе', href: ROUTES.ABOUT },
-	// {
-	// 	title: 'API документация',
-	// 	href: 'https://api.teacoder.ru/docs',
-	// 	isExternal: true
-	// }
 	{ title: 'Подписка', href: ROUTES.PREMIUM }
 ]
 
@@ -59,11 +53,6 @@ const socialLinks: SocialLink[] = [
 		icon: <FaGithub className='size-[18px]' />,
 		label: 'GitHub'
 	}
-	// {
-	// 	href: 'https://boosty.to/teacoder',
-	// 	icon: <SiBoosty className='size-6' />,
-	// 	label: 'Boosty'
-	// }
 ]
 
 export function Footer() {

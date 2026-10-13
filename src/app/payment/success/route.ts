@@ -1,13 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/lib/routes'
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 /**
- * Robokassa's success URL is set in its dashboard, not per payment, so it still
- * lands here. It echoes our payment id back as `Shp_paymentId` (GET or POST,
- * depending on the dashboard setting) - forward to the live status page.
+ * Robokassa's success URL is set in its dashboard, not per payment, and echoes
+ * our id back as `Shp_paymentId` (GET or POST) - forward to the status page.
  */
 async function readPaymentId(request: NextRequest) {
 	const fromQuery = request.nextUrl.searchParams.get('Shp_paymentId')

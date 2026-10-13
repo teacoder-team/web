@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import type { CourseListResponseItem } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/lib/routes'
 
 import { CourseCard } from '../course/course-card'
 import { Reveal } from '../motion/reveal'

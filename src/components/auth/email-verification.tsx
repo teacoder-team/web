@@ -9,11 +9,10 @@ import { usePostAuthVerifyMutation } from '@/generated/api'
 
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
-
 import { analytics } from '@/lib/analytics'
 import { getErrorMessage } from '@/lib/api/errors'
-import { useSignInResult } from '@/lib/auth/use-sign-in'
+import { useSignInResult } from '@/lib/auth/useSignIn'
+import { ROUTES } from '@/lib/routes'
 
 import { AuthWrapper } from './auth-wrapper'
 import { MfaForm } from './mfa/mfa-form'

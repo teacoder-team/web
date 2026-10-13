@@ -63,7 +63,6 @@ interface EmailFormProps {
 
 export function EmailForm({ user }: EmailFormProps) {
 	const [isOpen, setIsOpen] = useState(false)
-	/** Where the confirmation code went - the dialog shows the code step. */
 	const [pendingEmail, setPendingEmail] = useState<string | null>(null)
 
 	const queryClient = useQueryClient()

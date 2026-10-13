@@ -12,11 +12,10 @@ import {
 import { EllipsisLoader } from '@/components/shared/ellipsis-loader'
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getApiError, getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { flattenCourseProgram } from '@/lib/course-program'
+import { flattenCourseProgram } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
 import {

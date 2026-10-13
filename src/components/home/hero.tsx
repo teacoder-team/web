@@ -7,32 +7,18 @@ import {
 	useSpring,
 	useTransform
 } from 'framer-motion'
-import { ArrowRight, Play, PlayCircle } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { PointerEvent } from 'react'
 
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/lib/routes'
 
-import { cn, getLessonLabel } from '@/lib/utils'
-
-import { Logo } from '../shared/logo'
 import { Button } from '../ui/button'
-
-export interface CourseCover {
-	slug: string
-	title: string
-	src: string
-	lessons: number
-}
-
-interface HeroProps {
-	covers: CourseCover[]
-}
 
 const EASE = [0.22, 1, 0.36, 1] as const
 
-export function Hero({ covers }: HeroProps) {
+export function Hero() {
 	const reduceMotion = useReducedMotion()
 
 	// Subtle pointer parallax for the sphere
@@ -130,88 +116,7 @@ export function Hero({ covers }: HeroProps) {
 						</Button>
 					</motion.div>
 				</div>
-
-				{/* {covers.length > 0 && (
-					<motion.div
-						className='ml-auto mt-4 w-full pl-6 sm:pl-12 lg:w-[76%] lg:pl-0'
-						initial={reduceMotion ? false : { opacity: 0, y: 60 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 1.1, delay: 0.45, ease: EASE }}
-					>
-						<LessonPreview covers={covers} />
-					</motion.div>
-				)} */}
 			</div>
 		</section>
-	)
-}
-
-/**
- * Illustrative window of the lesson screen built from real course data.
- * The panel's bottom edge crops it on purpose.
- */
-function LessonPreview({ covers }: { covers: CourseCover[] }) {
-	const current = covers[0]!
-	const list = covers.slice(0, 6)
-
-	return (
-		<div
-			aria-hidden='true'
-			className='h-[300px] overflow-hidden rounded-tl-2xl border-l border-t border-inverse-foreground/10 bg-inverse/85 backdrop-blur-xl sm:h-[380px]'
-		>
-			<div className='grid h-full grid-cols-1 md:grid-cols-[230px_1fr]'>
-				<aside className='hidden border-r border-inverse-foreground/10 p-4 md:block'>
-					<div className='flex items-center gap-2 text-sm font-semibold'>
-						<Logo className='h-5 w-auto' color='fill-highlight' />
-						TeaCoder
-					</div>
-					<p className='mt-6 px-2 text-xs font-medium text-inverse-foreground/40'>
-						Курсы
-					</p>
-					<ul className='mt-2 space-y-0.5'>
-						{list.map((cover, index) => (
-							<li
-								key={`${cover.slug}-${index}`}
-								className={cn(
-									'flex items-center gap-2 rounded-lg px-2 py-1.5 text-[13px]',
-									index === 0
-										? 'bg-inverse-foreground/[0.08] text-highlight'
-										: 'text-inverse-foreground/55'
-								)}
-							>
-								<PlayCircle className='size-3.5 shrink-0' />
-								<span className='truncate'>{cover.title}</span>
-							</li>
-						))}
-					</ul>
-				</aside>
-
-				<div className='min-w-0 p-5 sm:p-7'>
-					<p className='truncate text-xs text-inverse-foreground/40'>
-						Курсы / {current.title}
-					</p>
-					<p className='mt-2 truncate font-display text-xl font-medium sm:text-2xl'>
-						{current.title}
-					</p>
-					{current.lessons > 0 && (
-						<p className='mt-1 text-sm text-inverse-foreground/50'>
-							{current.lessons} {getLessonLabel(current.lessons)}
-						</p>
-					)}
-					<div className='relative mt-5 aspect-video max-w-2xl overflow-hidden rounded-xl border border-inverse-foreground/10'>
-						<Image
-							src={current.src}
-							alt=''
-							fill
-							sizes='640px'
-							className='object-cover'
-						/>
-						<span className='absolute left-1/2 top-1/2 flex size-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-inverse-foreground/20 bg-inverse/50 backdrop-blur-md'>
-							<Play className='size-5 translate-x-px fill-current' />
-						</span>
-					</div>
-				</div>
-			</div>
-		</div>
 	)
 }

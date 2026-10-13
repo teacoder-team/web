@@ -3,7 +3,7 @@ import { env } from '@/lib/config/env'
 export const SEO = {
 	name: 'TeaCoder',
 	description:
-		'Образовательная платформа для программистов и IT-специалистов. Здесь вы найдёте качественные курсы по веб-разработке, актуальные новости IT-сферы, полезные статьи и активное сообщество разработчиков.',
+		'Курсы по веб-разработке с практикой на реальных примерах: уроки, исходный код проектов и прогресс обучения. Изучай веб-разработку в удобном для себя ритме.',
 	url: env.APP_URL,
 	keywords: [
 		'веб-разработка',
@@ -22,10 +22,12 @@ export const SEO = {
 		'frontend development',
 		'backend development',
 		'website creation'
-	],
-	formatDetection: {
-		email: false,
-		address: false,
-		telephone: false
-	}
+	]
+}
+
+export const OG_IMAGE = {
+	url: new URL('/opengraph.jpg', env.APP_URL),
+	width: 2400,
+	height: 1260,
+	alt: 'TeaCoder - образовательная платформа по веб-разработке'
 }

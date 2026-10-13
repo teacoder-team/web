@@ -5,9 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useId } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useConsent } from '@/lib/consent/consent-provider'
+import { ROUTES } from '@/lib/routes'
 
 import { Button } from '../ui/button'
 

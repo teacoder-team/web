@@ -4,15 +4,14 @@ import { toast } from 'sonner'
 
 import { usePostAuthSsoByProviderStartMutation } from '@/generated/api'
 
+import { analytics } from '@/lib/analytics'
+import { getErrorMessage } from '@/lib/api/errors'
 import {
 	SSO_PROVIDERS,
 	type SsoProvider,
 	isSsoProvider
-} from '@/constants/sso-providers'
-
-import { analytics } from '@/lib/analytics'
-import { getErrorMessage } from '@/lib/api/errors'
-import { useAppConfig } from '@/lib/config/use-app-config'
+} from '@/lib/auth/sso-providers'
+import { useAppConfig } from '@/lib/config/useAppConfig'
 
 import { Button } from '../ui/button'
 

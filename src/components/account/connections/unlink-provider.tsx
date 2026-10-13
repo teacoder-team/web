@@ -9,9 +9,8 @@ import {
 	useDeleteAuthSsoAccountsByProviderMutation
 } from '@/generated/api'
 
-import { SSO_PROVIDERS, type SsoProvider } from '@/constants/sso-providers'
-
 import { getErrorMessage } from '@/lib/api/errors'
+import { SSO_PROVIDERS, type SsoProvider } from '@/lib/auth/sso-providers'
 
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'

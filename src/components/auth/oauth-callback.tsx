@@ -10,12 +10,11 @@ import {
 	usePostAuthSsoByProviderCallbackMutation
 } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-import { SSO_PROVIDERS, isSsoProvider } from '@/constants/sso-providers'
-
 import { API_ERROR, getErrorMessage, hasApiError } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { useSignInResult } from '@/lib/auth/use-sign-in'
+import { SSO_PROVIDERS, isSsoProvider } from '@/lib/auth/sso-providers'
+import { useSignInResult } from '@/lib/auth/useSignIn'
+import { ROUTES } from '@/lib/routes'
 
 import { EllipsisLoader } from '../shared/ellipsis-loader'
 

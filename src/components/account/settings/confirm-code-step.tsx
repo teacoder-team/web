@@ -20,7 +20,6 @@ interface ConfirmCodeStepProps {
 	onSubmit: (code: string) => void
 }
 
-/** Second step of a settings dialog: the 6-digit code sent by email. */
 export function ConfirmCodeStep({
 	title,
 	description,

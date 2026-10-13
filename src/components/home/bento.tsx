@@ -6,16 +6,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
-import { cn, getLessonLabel } from '@/lib/utils'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, cn, pluralize } from '@/lib/utils'
 
 import { Reveal } from '../motion/reveal'
 import { Button } from '../ui/button'
 
-import type { CourseCover } from './hero'
-
 const EASE = [0.22, 1, 0.36, 1] as const
+
+export interface CourseCover {
+	slug: string
+	title: string
+	src: string
+	lessons: number
+}
 
 interface BentoProps {
 	covers: CourseCover[]
@@ -127,7 +131,7 @@ function CoursesMarqueeCard({ covers }: { covers: CourseCover[] }) {
 									</p>
 									<p className='mt-1 text-sm text-inverse-foreground/50'>
 										{cover.lessons > 0
-											? `${cover.lessons} ${getLessonLabel(cover.lessons)}`
+											? pluralize(cover.lessons, LESSON)
 											: 'Видео на YouTube'}
 									</p>
 								</div>

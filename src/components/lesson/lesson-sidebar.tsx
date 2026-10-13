@@ -8,10 +8,9 @@ import type {
 	LessonResponseCourse
 } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
-import type { ProgramLesson } from '@/lib/course-program'
-import { cn, getLessonLabel } from '@/lib/utils'
+import type { ProgramLesson } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, cn, plural } from '@/lib/utils'
 
 import {
 	Accordion,
@@ -86,7 +85,7 @@ export function LessonSidebar({
 						</span>
 						<span className='tabular-nums'>
 							{completed} / {lessons.length}{' '}
-							{getLessonLabel(lessons.length)}
+							{plural(lessons.length, LESSON)}
 						</span>
 					</div>
 				</div>
@@ -185,7 +184,7 @@ function SectionHeader({
 					{title}
 				</span>
 				<span className='mt-0.5 block text-xs font-normal text-muted-foreground'>
-					{done} / {lessons.length} {getLessonLabel(lessons.length)}
+					{done} / {lessons.length} {plural(lessons.length, LESSON)}
 				</span>
 			</span>
 		</span>

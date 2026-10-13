@@ -15,11 +15,10 @@ import {
 } from '@/generated/api'
 import type { PaymentResponse } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getApiError } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
 import { env } from '@/lib/config/env'
+import { ROUTES } from '@/lib/routes'
 import { cn, formatPrice } from '@/lib/utils'
 
 import { Logo } from '../shared/logo'

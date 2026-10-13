@@ -19,13 +19,12 @@ import { toast } from 'sonner'
 import { usePostCoursesBySlugMaterialsLinkMutation } from '@/generated/api'
 import type { CourseResponse } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { useAppConfig } from '@/lib/config/use-app-config'
-import type { ProgramLesson } from '@/lib/course-program'
-import { formatPrice, getLessonLabel } from '@/lib/utils'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import type { ProgramLesson } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, formatPrice, pluralize } from '@/lib/utils'
 
 import { PaymentDialog } from '../billing/payment-dialog'
 import { Button } from '../ui/button'
@@ -34,7 +33,6 @@ import { Skeleton } from '../ui/skeleton'
 
 interface CourseAsideProps {
 	course: CourseResponse
-	coverSrc: string
 	lessonCount: number
 	sectionCount: number
 	completedCount: number
@@ -46,7 +44,6 @@ interface CourseAsideProps {
 
 export function CourseAside({
 	course,
-	coverSrc,
 	lessonCount,
 	sectionCount,
 	completedCount,
@@ -158,9 +155,9 @@ export function CourseAside({
 			<div className='overflow-hidden rounded-3xl border border-border bg-card'>
 				<div className='p-2'>
 					<div className='relative aspect-video overflow-hidden rounded-2xl bg-muted'>
-						{coverSrc && (
+						{course.thumbnail && (
 							<Image
-								src={coverSrc}
+								src={course.thumbnail}
 								alt={course.title}
 								fill
 								priority
@@ -234,7 +231,7 @@ export function CourseAside({
 				<dl className='divide-y divide-border border-t border-border text-sm'>
 					<MetaRow icon={<BookOpen />} label='Уроки'>
 						{lessonCount > 0
-							? `${lessonCount} ${getLessonLabel(lessonCount)}`
+							? pluralize(lessonCount, LESSON)
 							: 'Только на YouTube'}
 					</MetaRow>
 					{sectionCount > 0 && (

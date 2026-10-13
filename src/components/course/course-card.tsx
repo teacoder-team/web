@@ -3,10 +3,9 @@ import Link from 'next/link'
 
 import type { CourseListResponseItem } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getAppConfig } from '@/lib/config/app-config'
-import { formatPrice, getLessonLabel, getMediaSource } from '@/lib/utils'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, formatPrice, pluralize } from '@/lib/utils'
 
 interface CourseCardProps {
 	course: CourseListResponseItem
@@ -17,9 +16,7 @@ export async function CourseCard({ course }: CourseCardProps) {
 	const currency = config?.features.premium.currency
 
 	const meta = [
-		course.lessons > 0
-			? `${course.lessons} ${getLessonLabel(course.lessons)}`
-			: 'YouTube',
+		course.lessons > 0 ? pluralize(course.lessons, LESSON) : 'YouTube',
 		course.hasMaterials ? 'Исходный код' : null
 	].filter(Boolean)
 
@@ -29,17 +26,15 @@ export async function CourseCard({ course }: CourseCardProps) {
 			className='group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition-colors duration-300 hover:border-foreground/20'
 		>
 			<div className='relative aspect-video overflow-hidden border-b border-border bg-muted'>
-				<Image
-					src={getMediaSource(
-						course.thumbnail,
-						'courses',
-						config?.features.orion.url
-					)}
-					alt={course.title}
-					fill
-					sizes='(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw'
-					className='object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]'
-				/>
+				{course.thumbnail && (
+					<Image
+						src={course.thumbnail}
+						alt={course.title}
+						fill
+						sizes='(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw'
+						className='object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]'
+					/>
+				)}
 			</div>
 
 			<div className='flex flex-1 flex-col p-5 sm:p-6'>

@@ -10,8 +10,6 @@ import {
 	usePostAuthWebauthnLoginVerifyMutation
 } from '@/generated/api'
 
-import type { MfaOption } from '@/constants/mfa-methods'
-
 import { analytics } from '@/lib/analytics'
 import {
 	API_ERROR,
@@ -19,7 +17,8 @@ import {
 	getErrorMessage,
 	hasApiError
 } from '@/lib/api/errors'
-import { type MfaTicket, useCompleteSignIn } from '@/lib/auth/use-sign-in'
+import type { MfaOption } from '@/lib/auth/mfa-options'
+import { type MfaTicket, useCompleteSignIn } from '@/lib/auth/useSignIn'
 import {
 	authenticateWithKey,
 	isWebAuthnCancelled

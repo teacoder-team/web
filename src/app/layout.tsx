@@ -8,9 +8,6 @@ import { QueryProvider } from '@/components/providers/query-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/shared/sonner'
 
-import { garamond, geist, onest } from '@/constants/fonts'
-import { SEO } from '@/constants/seo'
-
 import { YandexMetrikaScript } from '@/lib/analytics/script-providers'
 import { AuthProvider } from '@/lib/auth/auth-provider'
 import { SESSION_MARKER } from '@/lib/auth/marker'
@@ -18,6 +15,8 @@ import { env } from '@/lib/config/env'
 import { CONSENT_COOKIE, parseConsent } from '@/lib/consent/consent'
 import { ConsentProvider } from '@/lib/consent/consent-provider'
 import { FingerprintProvider } from '@/lib/fingerprint/fingerprint-provider'
+import { garamond, geist, onest } from '@/lib/fonts'
+import { OG_IMAGE, SEO } from '@/lib/seo'
 import { cn } from '@/lib/utils'
 
 import '@/assets/styles/globals.css'
@@ -44,36 +43,26 @@ export const metadata: Metadata = {
 	},
 	manifest: '/manifest.webmanifest',
 	openGraph: {
+		type: 'website',
+		url: SEO.url,
+		siteName: SEO.name,
 		title: SEO.name,
 		description: SEO.description,
-		type: 'website',
-		emails: [env.SUPPORT_EMAIL],
-		siteName: SEO.name,
 		locale: 'ru_RU',
-		images: [
-			{
-				url: new URL(env.APP_URL + '/opengraph.jpg'),
-				width: 2400,
-				height: 1260,
-				alt: 'TeaCoder - образовательная платформа по веб-разработке'
-			}
-		],
-		url: env.APP_URL
+		emails: [env.SUPPORT_EMAIL],
+		images: [OG_IMAGE]
 	},
 	twitter: {
 		card: 'summary_large_image',
 		title: SEO.name,
 		description: SEO.description,
-		images: [
-			{
-				url: new URL(env.APP_URL + '/opengraph.jpg'),
-				width: 2400,
-				height: 1260,
-				alt: 'TeaCoder - образовательная платформа по веб-разработке'
-			}
-		]
+		images: [OG_IMAGE]
 	},
-	formatDetection: SEO.formatDetection
+	formatDetection: {
+		email: false,
+		address: false,
+		telephone: false
+	}
 }
 
 export default async function RootLayout({
@@ -128,9 +117,7 @@ export default async function RootLayout({
 
 										{process.env['NODE_ENV'] ===
 											'production' && (
-											<>
-												<YandexMetrikaScript />
-											</>
+											<YandexMetrikaScript />
 										)}
 									</ThemeProvider>
 								</AuthProvider>

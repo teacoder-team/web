@@ -8,11 +8,10 @@ import { z } from 'zod'
 
 import { usePostAuthForgotPasswordMutation } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { analytics } from '@/lib/analytics'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useCaptchaRequired } from '@/lib/captcha/captcha'
+import { ROUTES } from '@/lib/routes'
 
 import { Button } from '../ui/button'
 import {

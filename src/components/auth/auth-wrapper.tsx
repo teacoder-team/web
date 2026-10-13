@@ -6,10 +6,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { type ReactNode, useState } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-import { isSsoProvider } from '@/constants/sso-providers'
-
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { isSsoProvider } from '@/lib/auth/sso-providers'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
 import { Button } from '../ui/button'
@@ -176,10 +175,7 @@ export function AuthWrapper({
 	)
 }
 
-/**
- * Static decoration only: animated or blurred layers behind the form made
- * these pages janky, so nothing here moves.
- */
+/** Static on purpose: animated or blurred layers here made the page janky. */
 function AuthBackdrop() {
 	return (
 		<div

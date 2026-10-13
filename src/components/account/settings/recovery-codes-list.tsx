@@ -5,7 +5,6 @@ interface RecoveryCodesListProps {
 	className: string
 }
 
-/** Freshly issued codes in three columns - the API never shows them again. */
 export function RecoveryCodesList({
 	codes,
 	className

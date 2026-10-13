@@ -14,11 +14,11 @@ import {
 	RootResponseFeaturesPaymentsItemId
 } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { RECURRING_METHODS } from '@/lib/billing/payment-methods'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
 
 import { PaymentMethods } from '../premium/payment-methods'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
@@ -52,16 +52,12 @@ export const paymentSchema = z.object({
 
 export type PaymentFormValues = z.infer<typeof paymentSchema>
 
-const RECURRING_METHODS: string[] = ['BANK_CARD', 'SBP', 'T_PAY']
-
 interface PaymentDialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	/** Buys this course; without it the payment is for the subscription. */
+	/** Without it the payment is for the subscription. */
 	courseId?: string
-	/** Short line under the title, e.g. the plan and its price. */
 	summary?: (method: string) => string | null
-	/** Subscription only: price for foreign cards, shown when picked. */
 	internationalPrice?: string | null
 }
 

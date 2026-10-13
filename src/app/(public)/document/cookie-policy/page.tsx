@@ -3,9 +3,8 @@ import Link from 'next/link'
 
 import { LegalDocument } from '@/components/legal/legal-document'
 
-import { ROUTES } from '@/constants/routes'
-
 import { env } from '@/lib/config/env'
+import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = {
 	title: 'Политика использования файлов cookie'

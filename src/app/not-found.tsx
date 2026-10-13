@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
+import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = {
 	title: 'Страница не найдена'

@@ -13,16 +13,13 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
-import { useMediaSource } from '@/hooks/use-media-source'
-
 import { useSession } from '@/lib/auth/auth-provider'
-import { useSignOut } from '@/lib/auth/use-sign-out'
+import { useSignOut } from '@/lib/auth/useSignOut'
+import { ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
 import { Logo } from '../shared/logo'
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { UserAvatar } from '../shared/user-avatar'
 import { Button } from '../ui/button'
 import {
 	Sheet,
@@ -78,7 +75,6 @@ export function MobileNav() {
 	const [isOpen, setIsOpen] = useState(false)
 
 	const pathname = usePathname()
-	const getMediaSource = useMediaSource()
 
 	const { isAuthorized, user } = useSession()
 
@@ -129,18 +125,11 @@ export function MobileNav() {
 								href={ROUTES.ACCOUNT.ROOT}
 								className='flex items-center gap-3 rounded-2xl bg-secondary p-3.5'
 							>
-								<Avatar className='size-11'>
-									<AvatarImage
-										src={getMediaSource(
-											user.avatar,
-											'users'
-										)}
-										alt=''
-									/>
-									<AvatarFallback>
-										{user.displayName.slice(0, 1)}
-									</AvatarFallback>
-								</Avatar>
+								<UserAvatar
+									name={user.displayName}
+									src={user.avatar}
+									className='size-11'
+								/>
 								<div className='min-w-0'>
 									<p className='truncate font-medium'>
 										{user.displayName}

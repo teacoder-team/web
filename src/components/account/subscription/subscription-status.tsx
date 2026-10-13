@@ -6,9 +6,8 @@ import Link from 'next/link'
 
 import type { SubscriptionResponse } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
-import { cn, daysTranslator, daysUntil, formatFullDate } from '@/lib/utils'
+import { ROUTES } from '@/lib/routes'
+import { DAY, cn, daysUntil, formatFullDate, pluralize } from '@/lib/utils'
 
 import { Button } from '../../ui/button'
 
@@ -92,7 +91,7 @@ export function SubscriptionStatus({ subscription }: SubscriptionStatusProps) {
 				</h2>
 				{isEndingSoon && daysLeft !== null && (
 					<span className='rounded-full bg-warning px-2.5 py-1 text-xs font-medium text-inverse'>
-						Осталось {daysLeft} {daysTranslator(daysLeft)}
+						Осталось {pluralize(daysLeft, DAY)}
 					</span>
 				)}
 			</div>

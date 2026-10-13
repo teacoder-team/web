@@ -13,6 +13,9 @@ import {
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
+/** Methods that can carry a recurring charge for the subscription. */
+export const RECURRING_METHODS: string[] = ['BANK_CARD', 'SBP', 'T_PAY']
+
 export const PAYMENT_METHOD_ICONS: Record<
 	RootResponseFeaturesPaymentsItemId,
 	IconType

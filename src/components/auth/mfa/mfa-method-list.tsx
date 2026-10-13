@@ -1,7 +1,6 @@
 import { ArrowLeftIcon } from 'lucide-react'
 
-import type { MfaOption } from '@/constants/mfa-methods'
-
+import type { MfaOption } from '@/lib/auth/mfa-options'
 import { cn } from '@/lib/utils'
 
 import { Button } from '../../ui/button'

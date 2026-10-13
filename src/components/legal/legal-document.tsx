@@ -3,8 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
+import { ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
 const DOCUMENTS = [

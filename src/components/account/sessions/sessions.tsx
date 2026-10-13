@@ -14,7 +14,7 @@ import { SessionItem } from './session-item'
 export function Sessions() {
 	const { data, isLoading } = useGetSessionsQuery()
 
-	// The API sorts by last activity; the current device goes first, as before.
+	// The API sorts by last activity; the current device goes first.
 	const sessions =
 		data && [...data].sort((a, b) => Number(b.current) - Number(a.current))
 	const hasOthers = (sessions?.length ?? 0) > 1
