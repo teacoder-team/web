@@ -67,7 +67,7 @@ export function DisplayNameForm({ user }: DisplayNameFormProps) {
 	}
 
 	return (
-		<div className='p-5 sm:p-6'>
+		<div className='p-4 sm:p-6'>
 			<Form {...form}>
 				<form onSubmit={form.handleSubmit(onSubmit)}>
 					<FormField

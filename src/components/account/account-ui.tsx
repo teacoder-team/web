@@ -16,7 +16,7 @@ export function AccountHeader({
 	return (
 		<header className='flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between'>
 			<div>
-				<h1 className='font-display text-display-lg font-medium'>
+				<h1 className='text-balance font-display text-display-lg font-medium'>
 					{title}
 				</h1>
 				{description && (
@@ -25,7 +25,9 @@ export function AccountHeader({
 					</p>
 				)}
 			</div>
-			{action && <div className='shrink-0'>{action}</div>}
+			{action && (
+				<div className='shrink-0 max-sm:[&>*]:w-full'>{action}</div>
+			)}
 		</header>
 	)
 }
@@ -97,11 +99,11 @@ export function SettingsRow({
 	return (
 		<div
 			className={cn(
-				'flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6',
+				'flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6',
 				className
 			)}
 		>
-			<div className='flex min-w-0 items-start gap-4'>
+			<div className='flex min-w-0 items-start gap-3.5 sm:gap-4'>
 				{icon && (
 					<span className='flex size-10 shrink-0 items-center justify-center rounded-2xl bg-secondary text-foreground [&_svg]:size-[18px]'>
 						{icon}
@@ -109,7 +111,7 @@ export function SettingsRow({
 				)}
 				<div className='min-w-0'>
 					<div className='flex flex-wrap items-center gap-2'>
-						<h3 className='font-medium'>{title}</h3>
+						<h3 className='min-w-0 font-medium'>{title}</h3>
 						{badge}
 					</div>
 					{description && (
@@ -120,7 +122,7 @@ export function SettingsRow({
 				</div>
 			</div>
 			{children && (
-				<div className='flex shrink-0 flex-wrap items-center gap-2 sm:justify-end'>
+				<div className='flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end max-sm:[&>*]:flex-1'>
 					{children}
 				</div>
 			)}
@@ -130,7 +132,7 @@ export function SettingsRow({
 
 export function SettingsRowSkeleton() {
 	return (
-		<div className='flex items-center justify-between gap-6 p-5 sm:p-6'>
+		<div className='flex items-center justify-between gap-6 p-4 sm:p-6'>
 			<div className='flex items-center gap-4'>
 				<div className='size-10 animate-pulse rounded-2xl bg-foreground/[0.06]' />
 				<div className='space-y-2'>

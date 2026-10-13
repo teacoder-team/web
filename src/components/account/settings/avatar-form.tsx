@@ -61,7 +61,7 @@ export function AvatarForm({ user }: AvatarFormProps) {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6'>
+		<div className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6'>
 			<div className='flex items-center gap-4'>
 				<Avatar className='size-16'>
 					<AvatarImage src={preview ?? ''} alt='Аватар' />
@@ -79,7 +79,7 @@ export function AvatarForm({ user }: AvatarFormProps) {
 			<label
 				className={cn(
 					buttonVariants({ variant: 'outline' }),
-					'cursor-pointer'
+					'cursor-pointer max-sm:w-full'
 				)}
 			>
 				<Upload />

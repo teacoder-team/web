@@ -20,7 +20,7 @@ export function Sessions() {
 	const hasOthers = (sessions?.length ?? 0) > 1
 
 	return (
-		<div className='space-y-10'>
+		<div className='space-y-8 sm:space-y-10'>
 			<AccountHeader
 				title='Устройства'
 				description='Устройства, с которых выполнен вход в ваш аккаунт. Завершите сеанс, если не узнаёте устройство.'

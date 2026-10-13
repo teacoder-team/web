@@ -96,18 +96,18 @@ export function PasskeyModal() {
 											key={index}
 											className='p-4 transition-colors hover:bg-muted/20'
 										>
-											<div className='flex items-start justify-between'>
-												<div className='flex items-start gap-3'>
-													<div className='flex items-center justify-center rounded-xl bg-secondary p-2'>
+											<div className='flex items-start justify-between gap-2'>
+												<div className='flex min-w-0 items-start gap-3'>
+													<div className='flex shrink-0 items-center justify-center rounded-xl bg-secondary p-2'>
 														<KeyRound className='size-4 text-foreground' />
 													</div>
-													<div>
-														<h4 className='text-sm font-medium'>
+													<div className='min-w-0'>
+														<h4 className='break-words text-sm font-medium'>
 															{passkey.name}
 														</h4>
 														<div className='mt-2 space-y-1'>
-															<div className='flex items-center text-xs text-muted-foreground'>
-																<Calendar className='mr-1.5 h-3.5 w-3.5' />
+															<div className='flex items-start text-xs text-muted-foreground'>
+																<Calendar className='mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0' />
 																<span>
 																	Добавлен:{' '}
 																	{formatDate(
@@ -115,8 +115,8 @@ export function PasskeyModal() {
 																	)}
 																</span>
 															</div>
-															<div className='flex items-center text-xs text-muted-foreground'>
-																<Calendar className='mr-1.5 h-3.5 w-3.5' />
+															<div className='flex items-start text-xs text-muted-foreground'>
+																<Calendar className='mr-1.5 mt-0.5 h-3.5 w-3.5 shrink-0' />
 																<span>
 																	Последнее
 																	использование:{' '}
@@ -137,7 +137,7 @@ export function PasskeyModal() {
 														<Button
 															variant='ghost'
 															size='icon'
-															className='h-8 w-8'
+															className='h-8 w-8 shrink-0'
 														>
 															<MoreHorizontal className='h-4 w-4' />
 															<span className='sr-only'>

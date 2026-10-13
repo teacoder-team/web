@@ -1,18 +1,32 @@
 'use client'
 
-import { ChartArea, LogOut, Menu, Settings } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+import {
+	BookOpen,
+	Gem,
+	LogOut,
+	type LucideIcon,
+	Menu,
+	UserRound,
+	X
+} from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 import { ROUTES } from '@/constants/routes'
 
+import { useMediaSource } from '@/hooks/use-media-source'
+
 import { useSession } from '@/lib/auth/auth-provider'
 import { useSignOut } from '@/lib/auth/use-sign-out'
+import { cn } from '@/lib/utils'
 
+import { Logo } from '../shared/logo'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import { Button } from '../ui/button'
-import { Separator } from '../ui/separator'
 import {
 	Sheet,
+	SheetClose,
 	SheetContent,
 	SheetDescription,
 	SheetTitle,
@@ -20,19 +34,59 @@ import {
 } from '../ui/sheet'
 
 import { navLinks } from './nav-links'
+import { links as accountLinks } from './user-navigation'
+
+const NAV_ICONS: Record<string, LucideIcon> = {
+	[ROUTES.COURSES.ROOT]: BookOpen,
+	[ROUTES.ABOUT]: UserRound,
+	[ROUTES.PREMIUM]: Gem
+}
+
+interface DrawerLinkProps {
+	href: string
+	title: string
+	icon: LucideIcon
+	isActive: boolean
+}
+
+function DrawerLink({ href, title, icon: Icon, isActive }: DrawerLinkProps) {
+	return (
+		<SheetClose asChild>
+			<Link
+				href={href}
+				aria-current={isActive ? 'page' : undefined}
+				className={cn(
+					'flex h-12 items-center gap-3.5 rounded-2xl px-4 text-[15px] transition-colors',
+					isActive
+						? 'bg-secondary font-medium text-foreground'
+						: 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground'
+				)}
+			>
+				<Icon
+					className={cn(
+						'size-[18px] shrink-0',
+						isActive && 'text-brand'
+					)}
+				/>
+				{title}
+			</Link>
+		</SheetClose>
+	)
+}
 
 export function MobileNav() {
 	const [isOpen, setIsOpen] = useState(false)
 
-	const router = useRouter()
+	const pathname = usePathname()
+	const getMediaSource = useMediaSource()
 
-	const { isAuthorized } = useSession()
+	const { isAuthorized, user } = useSession()
 
 	const { mutate } = useSignOut(() => setIsOpen(false))
 
 	return (
 		<Sheet open={isOpen} onOpenChange={setIsOpen}>
-			<SheetTrigger className='md:hidden' asChild>
+			<SheetTrigger asChild>
 				<Button
 					variant='ghost'
 					size='icon'
@@ -42,88 +96,132 @@ export function MobileNav() {
 					<span className='sr-only'>Открыть меню</span>
 				</Button>
 			</SheetTrigger>
-			<SheetContent className='flex flex-col gap-4' side='left'>
-				<div className='flex flex-col gap-2'>
-					<SheetTitle>TeaCoder</SheetTitle>
-					<SheetDescription className='text-pretty text-[13px]'>
-						Образовательная платформа по веб разработке
+			<SheetContent
+				side='right'
+				className='flex w-[88%] max-w-[360px] flex-col gap-0 rounded-l-[2rem] border-none p-0 sm:max-w-[360px]'
+			>
+				<div className='flex h-16 shrink-0 items-center justify-between pl-6 pr-3'>
+					<SheetTitle asChild>
+						<span className='flex items-center gap-2.5 text-lg font-semibold tracking-tight'>
+							<Logo className='h-7 w-auto' />
+							TeaCoder
+						</span>
+					</SheetTitle>
+					<SheetDescription className='sr-only'>
+						Навигация по платформе
 					</SheetDescription>
-				</div>
-				<div className='flex flex-col gap-2'>
-					{navLinks.map((link, index) => (
+					<SheetClose asChild>
 						<Button
-							key={index}
-							onClick={() => {
-								router.push(link.href)
-								setIsOpen(false)
-							}}
 							variant='ghost'
-							size='sm'
-							className='justify-start'
+							size='icon'
+							className='size-10 rounded-full [&_svg]:size-5'
 						>
-							{link.title}
+							<X />
+							<span className='sr-only'>Закрыть меню</span>
 						</Button>
-					))}
-					<Separator className='my-1' />
+					</SheetClose>
+				</div>
+
+				<div className='min-h-0 flex-1 space-y-6 overflow-y-auto px-3 pb-4 pt-2'>
+					{isAuthorized && user && (
+						<SheetClose asChild>
+							<Link
+								href={ROUTES.ACCOUNT.ROOT}
+								className='flex items-center gap-3 rounded-2xl bg-secondary p-3.5'
+							>
+								<Avatar className='size-11'>
+									<AvatarImage
+										src={getMediaSource(
+											user.avatar,
+											'users'
+										)}
+										alt=''
+									/>
+									<AvatarFallback>
+										{user.displayName.slice(0, 1)}
+									</AvatarFallback>
+								</Avatar>
+								<div className='min-w-0'>
+									<p className='truncate font-medium'>
+										{user.displayName}
+									</p>
+									{user.email && (
+										<p className='truncate text-sm text-muted-foreground'>
+											{user.email}
+										</p>
+									)}
+								</div>
+								{user.isPremium && (
+									<Gem
+										aria-label='Premium'
+										className='ml-auto size-4 shrink-0 text-brand'
+									/>
+								)}
+							</Link>
+						</SheetClose>
+					)}
+
+					<nav aria-label='Основная навигация'>
+						<p className='eyebrow mb-2 px-4'>Платформа</p>
+						<div className='space-y-1'>
+							{navLinks.map(link => (
+								<DrawerLink
+									key={link.href}
+									href={link.href}
+									title={link.title}
+									icon={NAV_ICONS[link.href] ?? BookOpen}
+									isActive={pathname.startsWith(link.href)}
+								/>
+							))}
+						</div>
+					</nav>
+
+					{isAuthorized && (
+						<nav aria-label='Разделы аккаунта'>
+							<p className='eyebrow mb-2 px-4'>Аккаунт</p>
+							<div className='space-y-1'>
+								{accountLinks.map(link => (
+									<DrawerLink
+										key={link.href}
+										href={link.href}
+										title={link.title}
+										icon={link.icon}
+										isActive={pathname === link.href}
+									/>
+								))}
+							</div>
+						</nav>
+					)}
+				</div>
+
+				<div className='shrink-0 border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))]'>
 					{isAuthorized ? (
-						<>
-							<Button
-								onClick={() => {
-									router.push(ROUTES.ACCOUNT.ROOT)
-									setIsOpen(false)
-								}}
-								variant='ghost'
-								size='sm'
-								className='justify-start'
-							>
-								<ChartArea />
-								Мой прогресс
-							</Button>
-							<Button
-								onClick={() => {
-									router.push(ROUTES.ACCOUNT.SETTINGS)
-									setIsOpen(false)
-								}}
-								variant='ghost'
-								size='sm'
-								className='justify-start'
-							>
-								<Settings />
-								Настройки
-							</Button>
-							<Button
-								onClick={() => mutate()}
-								variant='ghost'
-								size='sm'
-								className='justify-start !text-red-500'
-							>
-								<LogOut />
-								Выйти
-							</Button>
-						</>
+						<Button
+							variant='outline'
+							size='lg'
+							className='w-full text-destructive hover:text-destructive'
+							onClick={() => mutate()}
+						>
+							<LogOut />
+							Выйти
+						</Button>
 					) : (
-						<>
-							<Button
-								onClick={() => {
-									router.push(ROUTES.AUTH.LOGIN())
-									setIsOpen(false)
-								}}
-								variant='outline'
-								size='sm'
-							>
-								Войти
+						<div className='grid gap-2.5'>
+							<Button size='lg' asChild>
+								<SheetClose asChild>
+									<Link href={ROUTES.AUTH.REGISTER}>
+										Регистрация
+									</Link>
+								</SheetClose>
 							</Button>
-							<Button
-								onClick={() => {
-									router.push(ROUTES.AUTH.REGISTER)
-									setIsOpen(false)
-								}}
-								variant='primary'
-								size='sm'
-							>
-								Регистрация
+							<Button variant='outline' size='lg' asChild>
+								<SheetClose asChild>
+									<Link href={ROUTES.AUTH.LOGIN()}>
+										Войти
+									</Link>
+								</SheetClose>
 							</Button>
-						</>
+						</div>
 					)}
 				</div>
 			</SheetContent>

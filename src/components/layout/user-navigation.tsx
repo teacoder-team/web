@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 
 import { ROUTES } from '@/constants/routes'
 
@@ -40,10 +41,26 @@ export function UserNavigation() {
 	const { user } = useSession()
 	const getMediaSource = useMediaSource()
 
+	const navRef = useRef<HTMLElement>(null)
+
+	// On phones the tabs scroll sideways - bring the current one into view.
+	useEffect(() => {
+		const nav = navRef.current
+		const active = nav?.querySelector<HTMLElement>('[aria-current=page]')
+
+		if (!nav || !active) return
+
+		nav.scrollTo({
+			left:
+				active.offsetLeft - (nav.clientWidth - active.clientWidth) / 2,
+			behavior: 'smooth'
+		})
+	}, [pathname])
+
 	return (
-		<aside className='lg:sticky lg:top-24 lg:self-start'>
-			<div className='hidden items-center gap-3 rounded-3xl border border-border bg-card p-4 lg:flex'>
-				<Avatar className='size-12'>
+		<aside className='min-w-0 lg:sticky lg:top-24 lg:self-start'>
+			<div className='flex items-center gap-3 rounded-3xl border border-border bg-card p-3 sm:p-4'>
+				<Avatar className='size-11 sm:size-12'>
 					<AvatarImage
 						src={getMediaSource(user?.avatar, 'users')}
 						alt=''
@@ -60,7 +77,7 @@ export function UserNavigation() {
 						</p>
 					)}
 					{user?.isPremium && (
-						<span className='mt-1.5 inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand'>
+						<span className='mt-1 inline-flex items-center gap-1 rounded-full bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand'>
 							<Gem className='size-3' />
 							Premium
 						</span>
@@ -69,8 +86,9 @@ export function UserNavigation() {
 			</div>
 
 			<nav
+				ref={navRef}
 				aria-label='Разделы аккаунта'
-				className='-mx-4 flex gap-1 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:mx-0 lg:mt-4 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden'
+				className='-mx-4 mt-3 flex gap-1 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mt-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden'
 			>
 				{links.map(link => {
 					const isActive = pathname === link.href

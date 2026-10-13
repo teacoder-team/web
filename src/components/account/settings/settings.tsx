@@ -20,7 +20,7 @@ export function Settings() {
 	const { data: status } = useGetMfaQuery()
 
 	return (
-		<div className='space-y-10'>
+		<div className='space-y-8 sm:space-y-10'>
 			<AccountHeader
 				title='Настройки'
 				description='Профиль, вход в аккаунт, защита и внешний вид.'

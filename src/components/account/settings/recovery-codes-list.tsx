@@ -15,7 +15,10 @@ export function RecoveryCodesList({
 			{splitIntoColumns(codes).map((column, columnIndex) => (
 				<div key={columnIndex} className='flex flex-col'>
 					{column.map((code, index) => (
-						<p key={index} className='text-[17px] font-medium'>
+						<p
+							key={index}
+							className='font-mono text-[15px] font-medium sm:text-[17px]'
+						>
 							{code}
 						</p>
 					))}

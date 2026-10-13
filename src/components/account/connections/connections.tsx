@@ -62,7 +62,7 @@ export function Connections() {
 
 	return (
 		<>
-			<div className='space-y-10'>
+			<div className='space-y-8 sm:space-y-10'>
 				<AccountHeader
 					title='Связанные аккаунты'
 					description='Подключите сервисы, чтобы входить в TeaCoder в один клик.'
