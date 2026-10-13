@@ -6,11 +6,10 @@ import Link from 'next/link'
 
 import type { CourseLessonListResponseItem } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useSession } from '@/lib/auth/auth-provider'
-import type { ProgramLesson } from '@/lib/course-program'
-import { cn, getLessonLabel } from '@/lib/utils'
+import type { ProgramLesson } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, cn, pluralize } from '@/lib/utils'
 
 import {
 	Accordion,
@@ -120,8 +119,7 @@ export function CourseProgram({
 										{item.title}
 									</span>
 									<span className='mt-0.5 block text-sm font-normal text-muted-foreground'>
-										{item.lessons.length}{' '}
-										{getLessonLabel(item.lessons.length)}
+										{pluralize(item.lessons.length, LESSON)}
 										{done > 0 &&
 											!isDone &&
 											` · пройдено ${done}`}

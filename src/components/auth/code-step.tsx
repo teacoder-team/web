@@ -18,7 +18,6 @@ interface CodeStepProps {
 	children?: ReactNode
 }
 
-/** The "enter a 6-digit code" screen: MFA via app, email confirmation. */
 export function CodeStep({
 	heading,
 	description,

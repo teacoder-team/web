@@ -2,9 +2,8 @@ import type { MetadataRoute } from 'next'
 
 import { getCoursesQuery } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { env } from '@/lib/config/env'
+import { ROUTES } from '@/lib/routes'
 
 // Built per request: the build must not depend on the API being reachable.
 export const dynamic = 'force-dynamic'

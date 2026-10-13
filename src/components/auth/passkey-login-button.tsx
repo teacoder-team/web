@@ -10,7 +10,7 @@ import {
 } from '@/generated/api'
 
 import { getErrorMessage } from '@/lib/api/errors'
-import { useCompleteSignIn } from '@/lib/auth/use-sign-in'
+import { useCompleteSignIn } from '@/lib/auth/useSignIn'
 import {
 	authenticateWithKey,
 	isWebAuthnCancelled

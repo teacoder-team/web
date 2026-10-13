@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useSession } from '@/lib/auth/auth-provider'
+import { ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
 import { Logo } from '../shared/logo'

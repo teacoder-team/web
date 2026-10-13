@@ -2,24 +2,22 @@
 
 import { useEffect, useState } from 'react'
 
-import { MFA_OPTIONS, type MfaOption } from '@/constants/mfa-methods'
-
 import { analytics } from '@/lib/analytics'
-import type { MfaTicket } from '@/lib/auth/use-sign-in'
+import { MFA_OPTIONS, type MfaOption } from '@/lib/auth/mfa-options'
+import type { MfaTicket } from '@/lib/auth/useSignIn'
 
 import { CodeStep } from '../code-step'
 
 import { MfaKeyStep } from './mfa-key-step'
 import { MfaMethodList } from './mfa-method-list'
 import { MfaRecoveryStep } from './mfa-recovery-step'
-import { useMfa } from './use-mfa'
+import { useMfa } from './useMfa'
 
 interface MfaFormProps {
 	ticket: MfaTicket
 	onBack: () => void
 }
 
-/** Second sign-in step - after a password, a reset code or a social provider. */
 export function MfaForm({ ticket, onBack }: MfaFormProps) {
 	const [selected, setSelected] = useState<MfaOption | null>(null)
 

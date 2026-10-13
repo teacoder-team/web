@@ -5,13 +5,12 @@ import { type ReactNode, useEffect } from 'react'
 
 import { useGetMfaQuery } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useSession } from '@/lib/auth/auth-provider'
+import { ROUTES } from '@/lib/routes'
 
 import { EllipsisLoader } from '../shared/ellipsis-loader'
 
-/** Loader until the session is restored; back to sign-in if it is gone (`proxy.ts` only sees a hint). */
+/** `proxy.ts` only sees a session hint, so the real check happens here. */
 export function AccountGuard({ children }: { children: ReactNode }) {
 	const router = useRouter()
 	const pathname = usePathname()

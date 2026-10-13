@@ -4,9 +4,7 @@ import { getCoursesBySlugLessonsQuery } from '@/generated/api'
 
 import { CourseDetails } from '@/components/course/course-details'
 
-import { getAppConfig } from '@/lib/config/app-config'
 import { getCourse } from '@/lib/courses/get-course'
-import { getMediaSource } from '@/lib/utils'
 
 export async function generateMetadata({
 	params
@@ -15,37 +13,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
 	const { slug } = await params
 
-	const [course, config] = await Promise.all([
-		getCourse(slug),
-		getAppConfig()
-	])
-
-	const thumbnail = getMediaSource(
-		course.thumbnail,
-		'courses',
-		config?.features.orion.url
-	)
+	const course = await getCourse(slug)
+	const images = course.thumbnail
+		? [{ url: course.thumbnail, alt: course.title }]
+		: undefined
 
 	return {
 		title: course.title,
 		description: course.shortDescription,
-		openGraph: {
-			images: [
-				{
-					url: thumbnail,
-					alt: course.title
-				}
-			]
-		},
+		openGraph: { images },
 		twitter: {
 			title: course.title,
 			description: course.shortDescription ?? '',
-			images: [
-				{
-					url: thumbnail,
-					alt: course.title
-				}
-			]
+			images
 		}
 	}
 }
@@ -57,20 +37,10 @@ export default async function CoursePage({
 }) {
 	const { slug } = await params
 
-	const [course, lessons, config] = await Promise.all([
+	const [course, lessons] = await Promise.all([
 		getCourse(slug),
-		getCoursesBySlugLessonsQuery(slug),
-		getAppConfig()
+		getCoursesBySlugLessonsQuery(slug)
 	])
 
-	// Resolved on the server: the client hook has no storage URL during SSR
-	const coverSrc = getMediaSource(
-		course.thumbnail,
-		'courses',
-		config?.features.orion.url
-	)
-
-	return (
-		<CourseDetails course={course} lessons={lessons} coverSrc={coverSrc} />
-	)
+	return <CourseDetails course={course} lessons={lessons} />
 }

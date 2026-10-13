@@ -30,7 +30,7 @@ export function AppearanceForm() {
 			<div
 				role='radiogroup'
 				aria-label='Тема оформления'
-				className='flex rounded-full bg-secondary p-1'
+				className='flex w-full rounded-full bg-secondary p-1 sm:w-auto'
 			>
 				{THEMES.map(option => {
 					const isActive = isMounted && theme === option.value
@@ -43,7 +43,7 @@ export function AppearanceForm() {
 							aria-checked={isActive}
 							onClick={() => setTheme(option.value)}
 							className={cn(
-								'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition-colors',
+								'flex flex-1 items-center justify-center gap-1.5 rounded-full px-2.5 py-2 text-sm transition-colors sm:flex-none sm:px-3 sm:py-1.5',
 								isActive
 									? 'bg-card font-medium text-foreground shadow-card'
 									: 'text-muted-foreground hover:text-foreground'

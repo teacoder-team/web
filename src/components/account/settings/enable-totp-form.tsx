@@ -142,8 +142,8 @@ export function EnableTotpForm() {
 			<DialogTrigger asChild>
 				<Button variant='primary'>Включить</Button>
 			</DialogTrigger>
-			<DialogContent className='max-w-[550px] p-0'>
-				<DialogHeader className='p-7 pb-0'>
+			<DialogContent className='max-h-[calc(100svh-2rem)] max-w-[550px] p-0'>
+				<DialogHeader className='p-5 pb-0 sm:p-7 sm:pb-0'>
 					<DialogTitle>
 						{step === 1
 							? 'Приложения для аутентификации'
@@ -164,20 +164,20 @@ export function EnableTotpForm() {
 					step === 1 && (
 						<div className='flex flex-col space-y-5'>
 							<div>
-								<div className='flex items-center gap-2 px-7 font-medium'>
+								<div className='flex items-center gap-2 px-5 font-medium sm:px-7'>
 									<Badge>Шаг 1</Badge>
 									Отсканируйте QR-код
 								</div>
-								<p className='mt-2 px-7 text-sm text-muted-foreground'>
+								<p className='mt-2 px-5 text-sm text-muted-foreground sm:px-7'>
 									Отсканируйте QR-код ниже или введите
 									секретный ключ вручную в
 									приложение-аутентификатор.
 								</p>
-								<div className='mt-4 grid grid-cols-2 items-center border bg-stone-200 px-7 py-4 dark:bg-accent'>
+								<div className='mt-4 grid items-center gap-4 border-y bg-secondary px-5 py-4 sm:grid-cols-2 sm:px-7'>
 									<img
 										src={totp?.qrCodeUrl}
 										alt='QR-код'
-										className='w-fit rounded-lg'
+										className='mx-auto w-full max-w-[180px] rounded-lg sm:mx-0 sm:w-fit sm:max-w-none'
 									/>
 									<div>
 										<h3 className='font-medium'>
@@ -186,7 +186,7 @@ export function EnableTotpForm() {
 										<p className='mt-1 text-sm text-muted-foreground'>
 											Введите секретный ключ вручную:
 										</p>
-										<div className='mt-2 h-8 w-full rounded-lg border border-border bg-input px-3 py-1.5 text-[13px]'>
+										<div className='mt-2 min-h-8 w-full break-all rounded-lg border border-border bg-input px-3 py-1.5 text-[13px]'>
 											{totp?.secret}
 										</div>
 										<Button
@@ -206,7 +206,7 @@ export function EnableTotpForm() {
 									</div>
 								</div>
 							</div>
-							<div className='px-7'>
+							<div className='px-5 sm:px-7'>
 								<div className='flex items-center gap-2 font-medium'>
 									<Badge>Шаг 2</Badge>
 									Верификация кода
@@ -238,7 +238,7 @@ export function EnableTotpForm() {
 												</FormItem>
 											)}
 										/>
-										<DialogFooter className='mt-5 pb-7'>
+										<DialogFooter className='mt-5 pb-5 sm:pb-7'>
 											<DialogClose asChild>
 												<Button variant='outline'>
 													Отмена
@@ -260,7 +260,7 @@ export function EnableTotpForm() {
 				)}
 
 				{step === 2 && recoveryCodes && (
-					<div className='flex flex-col space-y-5 px-7'>
+					<div className='flex flex-col space-y-5 px-5 sm:px-7'>
 						<Alert variant='warning'>
 							<TriangleAlert className='size-5 dark:text-yellow-500' />
 							<AlertTitle className='ml-1.5'>
@@ -273,15 +273,15 @@ export function EnableTotpForm() {
 						</Alert>
 						<RecoveryCodesList
 							codes={recoveryCodes}
-							className='mt-4 flex justify-center gap-16 rounded-lg bg-accent p-3'
+							className='mt-4 flex justify-center gap-8 rounded-lg bg-accent p-3 sm:gap-16'
 						/>
-						<DialogFooter className='flex gap-x-2 pb-7 sm:justify-between'>
+						<DialogFooter className='flex gap-2 pb-5 sm:justify-between sm:pb-7'>
 							<DialogClose asChild>
 								<Button variant='outline' className='h-9'>
 									Закрыть
 								</Button>
 							</DialogClose>
-							<div className='flex items-center gap-2'>
+							<div className='flex items-center gap-2 max-sm:[&>button]:flex-1'>
 								<Button
 									variant='outline'
 									className='h-9'

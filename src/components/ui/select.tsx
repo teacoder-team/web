@@ -24,7 +24,7 @@ const SelectValue = SelectPrimitives.Value
 SelectValue.displayName = 'SelectValue'
 
 const selectTriggerStyles = cva(
-	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-xl border border-border bg-input px-3.5 py-2 outline-none transition text-sm hover:border-foreground/25',
+	'group/trigger flex w-full select-none items-center justify-between gap-2 truncate rounded-xl border border-border bg-input px-3.5 py-2 outline-hidden transition text-sm hover:border-foreground/25',
 	{
 		variants: {
 			disabled: {
@@ -66,7 +66,7 @@ const SelectTrigger = forwardRef<
 		>
 			<span className='truncate'>{children}</span>
 			<SelectPrimitives.Icon asChild>
-				<RiExpandUpDownLine className='size-4 shrink-0 text-popover-foreground group-data-[disabled]/trigger:text-popover-foreground' />
+				<RiExpandUpDownLine className='size-4 shrink-0 text-popover-foreground group-data-disabled/trigger:text-popover-foreground' />
 			</SelectPrimitives.Icon>
 		</SelectPrimitives.Trigger>
 	)
@@ -122,7 +122,7 @@ const SelectContent = forwardRef<
 			<SelectPrimitives.Content
 				ref={forwardedRef}
 				className={cn(
-					'relative z-50 max-h-[--radix-select-content-available-height] min-w-[calc(var(--radix-select-trigger-width)-2px)] max-w-[95vw] overflow-hidden rounded-xl bg-popover text-popover-foreground shadow-popover will-change-[transform,opacity]',
+					'relative z-50 max-h-(--radix-select-content-available-height) min-w-[calc(var(--radix-select-trigger-width)-2px)] max-w-[95vw] overflow-hidden rounded-xl bg-popover text-popover-foreground shadow-popover will-change-[transform,opacity]',
 					className
 				)}
 				sideOffset={sideOffset}
@@ -132,7 +132,7 @@ const SelectContent = forwardRef<
 			>
 				<SelectScrollUpButton />
 				<SelectPrimitives.Viewport
-					className={`p-1 ${position === 'popper' ? 'h-[var(--radix-select-trigger-height)] w-full min-w-[calc(var(--radix-select-trigger-width))]' : ''}`}
+					className={`p-1 ${position === 'popper' ? 'h-(--radix-select-trigger-height) w-full min-w-[calc(var(--radix-select-trigger-width))]' : ''}`}
 				>
 					{children}
 				</SelectPrimitives.Viewport>
@@ -168,7 +168,7 @@ const SelectItem = forwardRef<
 		<SelectPrimitives.Item
 			ref={forwardedRef}
 			className={cn(
-				'grid cursor-pointer grid-cols-[1fr_20px] gap-x-2 rounded-lg px-3 py-2 text-sm text-accent-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-accent data-[disabled]:pointer-events-none data-[state=checked]:font-semibold data-[disabled]:text-muted-foreground data-[disabled]:hover:bg-none',
+				'grid cursor-pointer grid-cols-[1fr_20px] gap-x-2 rounded-lg px-3 py-2 text-sm text-accent-foreground outline-hidden transition-colors hover:bg-accent focus-visible:bg-accent data-disabled:pointer-events-none data-[state=checked]:font-semibold data-disabled:text-muted-foreground data-disabled:hover:bg-none',
 				className
 			)}
 			{...props}

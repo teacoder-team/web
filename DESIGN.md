@@ -16,7 +16,7 @@ The design should feel **calm, modern, editorial, and technical**. Combine gener
 
 ## 2. Color
 
-All UI colors must use the existing design tokens defined in the project's theme configuration. Do not introduce hardcoded colors or use arbitrary Tailwind color classes in components.
+All UI colors must use the existing design tokens, declared as OKLCH variables in `src/assets/styles/globals.css` and exposed to Tailwind through `@theme`. Do not introduce hardcoded colors or use arbitrary Tailwind color classes in components.
 
 | Token                               | Purpose                                    |
 | ----------------------------------- | ------------------------------------------ |

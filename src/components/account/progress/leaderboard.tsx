@@ -5,12 +5,10 @@ import { useState } from 'react'
 
 import { useGetUsersLeadersQuery } from '@/generated/api'
 
-import { useMediaSource } from '@/hooks/use-media-source'
-
 import { useSession } from '@/lib/auth/auth-provider'
 import { cn } from '@/lib/utils'
 
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import { UserAvatar } from '../../shared/user-avatar'
 import { Button } from '../../ui/button'
 import { Skeleton } from '../../ui/skeleton'
 import { SettingsSection } from '../account-ui'
@@ -28,7 +26,6 @@ export function Leaderboard() {
 
 	const { user } = useSession()
 	const { data, isLoading } = useGetUsersLeadersQuery()
-	const getMediaSource = useMediaSource()
 
 	const users = isExpanded ? data : data?.slice(0, PREVIEW_COUNT)
 	const canExpand = (data?.length ?? 0) > PREVIEW_COUNT
@@ -66,18 +63,11 @@ export function Leaderboard() {
 								>
 									{leader.rank}
 								</span>
-								<Avatar className='size-9'>
-									<AvatarImage
-										src={getMediaSource(
-											leader.avatar,
-											'users'
-										)}
-										alt=''
-									/>
-									<AvatarFallback>
-										{leader.displayName.slice(0, 1)}
-									</AvatarFallback>
-								</Avatar>
+								<UserAvatar
+									name={leader.displayName}
+									src={leader.avatar}
+									className='size-9'
+								/>
 								<div className='flex min-w-0 flex-1 items-center gap-2'>
 									<span className='truncate text-sm font-medium'>
 										{leader.displayName}

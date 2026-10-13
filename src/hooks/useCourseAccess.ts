@@ -6,10 +6,8 @@ import type { CourseResponse } from '@/generated/model'
 import { useSession } from '@/lib/auth/auth-provider'
 
 /**
- * Whether the signed-in user can open the course. The course itself is
- * fetched on the server without the user's token, so its `access` is the
- * guest's; the library endpoint answers for the current user without
- * re-fetching the course (that would count another view).
+ * The course is fetched on the server without the user's token, so its `access`
+ * is the guest's. The library answers for the current user without another view.
  */
 export function useCourseAccess(course: CourseResponse) {
 	const { status } = useSession()

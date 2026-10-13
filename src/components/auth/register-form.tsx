@@ -8,11 +8,10 @@ import { z } from 'zod'
 
 import { usePostAuthRegisterMutation } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { analytics } from '@/lib/analytics'
 import { getErrorMessage } from '@/lib/api/errors'
 import { useCaptchaRequired } from '@/lib/captcha/captcha'
+import { ROUTES } from '@/lib/routes'
 
 import { Button } from '../ui/button'
 import {
@@ -105,12 +104,14 @@ export function RegisterForm() {
 			<VerifyEmailStep
 				email={pendingEmail}
 				onBack={() => setPendingEmail(null)}
-					onResend={async captchaToken => {
-						const { name, email, password } = form.getValues()
-						await mutateAsync({ data: { name, email, password, captchaToken } })
+				onResend={async captchaToken => {
+					const { name, email, password } = form.getValues()
+					await mutateAsync({
+						data: { name, email, password, captchaToken }
+					})
 
-						return 60
-					}}
+					return 60
+				}}
 			/>
 		)
 	}

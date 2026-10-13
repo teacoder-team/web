@@ -13,9 +13,8 @@ import {
 } from '@/generated/api'
 import type { LessonResponse } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getErrorMessage } from '@/lib/api/errors'
+import { ROUTES } from '@/lib/routes'
 
 import { Button } from '../ui/button'
 

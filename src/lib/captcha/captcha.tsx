@@ -4,7 +4,7 @@ import { SmartCaptcha } from '@yandex/smart-captcha'
 import { useTheme } from 'next-themes'
 import Turnstile from 'react-turnstile'
 
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { useAppConfig } from '@/lib/config/useAppConfig'
 
 interface CaptchaProps {
 	onVerify: (token: string) => void

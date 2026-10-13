@@ -5,9 +5,8 @@ import { toast } from 'sonner'
 
 import { usePostAuthLogoutMutation } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getErrorMessage } from '@/lib/api/errors'
+import { ROUTES } from '@/lib/routes'
 
 import { setAccessToken } from './token'
 

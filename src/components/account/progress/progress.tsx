@@ -8,7 +8,7 @@ import { ProgressStats } from './progress-stats'
 
 export function Progress() {
 	return (
-		<div className='space-y-10'>
+		<div className='space-y-8 sm:space-y-10'>
 			<AccountHeader
 				title='Мой прогресс'
 				description='Ваши очки, пройденные уроки и место среди других учеников.'

@@ -63,7 +63,6 @@ interface EmailFormProps {
 
 export function EmailForm({ user }: EmailFormProps) {
 	const [isOpen, setIsOpen] = useState(false)
-	/** Where the confirmation code went - the dialog shows the code step. */
 	const [pendingEmail, setPendingEmail] = useState<string | null>(null)
 
 	const queryClient = useQueryClient()
@@ -147,8 +146,14 @@ export function EmailForm({ user }: EmailFormProps) {
 			{user?.email ? (
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild className='border-none ring-0'>
-						<Button variant='ghost' size='icon'>
-							<MoreHorizontal className='size-5' />
+						<Button
+							variant='outline'
+							className='sm:size-10 sm:border-transparent sm:p-0 sm:hover:bg-accent'
+						>
+							<Pencil className='sm:hidden' />
+							<span className='sm:hidden'>Изменить</span>
+							<MoreHorizontal className='hidden size-5 sm:block' />
+							<span className='sr-only sm:hidden'>Действия</span>
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align='end' side='top'>

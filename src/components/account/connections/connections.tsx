@@ -7,14 +7,13 @@ import {
 	usePostAuthSsoByProviderLinkMutation
 } from '@/generated/api'
 
+import { getErrorMessage } from '@/lib/api/errors'
 import {
 	SSO_PROVIDERS,
 	type SsoProvider,
 	isSsoProvider
-} from '@/constants/sso-providers'
-
-import { getErrorMessage } from '@/lib/api/errors'
-import { useAppConfig } from '@/lib/config/use-app-config'
+} from '@/lib/auth/sso-providers'
+import { useAppConfig } from '@/lib/config/useAppConfig'
 
 import { Badge } from '../../ui/badge'
 import { Button } from '../../ui/button'
@@ -62,7 +61,7 @@ export function Connections() {
 
 	return (
 		<>
-			<div className='space-y-10'>
+			<div className='space-y-8 sm:space-y-10'>
 				<AccountHeader
 					title='Связанные аккаунты'
 					description='Подключите сервисы, чтобы входить в TeaCoder в один клик.'

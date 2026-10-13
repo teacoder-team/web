@@ -1,6 +1,6 @@
 # TeaCoder - фронтенд
 
-Next.js 16 (App Router), React 19, TanStack Query 5, axios, react-hook-form + zod, Tailwind 3 + shadcn/ui. Клиент API генерируется orval из OpenAPI-спеки бэкенда.
+Next.js 16 (App Router), React 19, TanStack Query 5, axios, react-hook-form + zod, Tailwind 4 + shadcn/ui. Клиент API генерируется orval из OpenAPI-спеки бэкенда.
 
 ## Запуск
 

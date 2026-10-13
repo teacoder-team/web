@@ -6,7 +6,7 @@ import { CourseCard } from '@/components/course/course-card'
 import { FAQSection } from '@/components/premium/faq'
 import { Premium } from '@/components/premium/premium'
 
-import { getCourseLabel } from '@/lib/utils'
+import { COURSE, pluralize } from '@/lib/utils'
 
 export const metadata: Metadata = {
 	title: 'Подписка'
@@ -44,7 +44,7 @@ export default async function PremiumPage() {
 							Курсы в подписке
 						</h2>
 						<p className='text-muted-foreground'>
-							{included.length} {getCourseLabel(included.length)}
+							{pluralize(included.length, COURSE)}
 						</p>
 					</div>
 					<div className='mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3'>

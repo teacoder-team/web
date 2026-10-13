@@ -50,6 +50,9 @@ export interface CourseResponse {
   thumbnail: string | null;
   youtubeUrl: string | null;
   price: number | null;
+  discountPrice: number | null;
+  /** Что вы узнаете на курсе: пункты списка в порядке показа. Пустой массив, если не заполнено. */
+  learningOutcomes: string[];
   /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме. */
   accessMode: CourseResponseAccessMode;
   /** Есть ли у курса материалы (исходный код). Скачать - `POST /courses/{slug}/materials/link`. */

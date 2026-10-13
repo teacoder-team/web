@@ -56,7 +56,7 @@ export const onest = localFont({
 	src: '../assets/fonts/Onest/Onest.woff2',
 	weight: '100 900',
 	style: 'normal',
-	variable: '--font-display',
+	variable: '--font-onest',
 	display: 'swap'
 })
 
@@ -73,7 +73,7 @@ export const garamond = localFont({
 			style: 'italic'
 		}
 	],
-	variable: '--font-serif',
+	variable: '--font-garamond',
 	display: 'swap',
 	fallback: ['Georgia', 'serif']
 })

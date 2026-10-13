@@ -5,9 +5,8 @@ import Link from 'next/link'
 
 import { useGetUsersMeProgressQuery } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
-import { formatFullDate, getLessonLabel } from '@/lib/utils'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, formatFullDate, pluralize } from '@/lib/utils'
 
 import { Button } from '../../ui/button'
 import { Progress } from '../../ui/progress'
@@ -86,8 +85,7 @@ export function ProgressCourses() {
 							</div>
 							<p className='mt-2 text-sm text-muted-foreground'>
 								{course.completedLessons} из{' '}
-								{course.totalLessons}{' '}
-								{getLessonLabel(course.totalLessons)}
+								{pluralize(course.totalLessons, LESSON)}
 								{course.lastActivityAt &&
 									` · ${formatFullDate(course.lastActivityAt)}`}
 							</p>

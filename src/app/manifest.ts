@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-import { SEO } from '@/constants/seo'
+import { SEO } from '@/lib/seo'
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {

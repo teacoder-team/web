@@ -12,11 +12,10 @@ import {
 import { EllipsisLoader } from '@/components/shared/ellipsis-loader'
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getApiError, getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { flattenCourseProgram } from '@/lib/course-program'
+import { flattenCourseProgram } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
 import {
@@ -156,7 +155,7 @@ export function LessonContent({ id }: { id: string }) {
 								className='lg:hidden'
 								aria-label='Программа курса'
 							>
-								<ListVideo className='!size-5' />
+								<ListVideo className='size-5!' />
 							</Button>
 						</SheetTrigger>
 						<SheetContent
@@ -214,7 +213,7 @@ export function LessonContent({ id }: { id: string }) {
 							<span className='text-muted-foreground'>
 								Прогресс
 							</span>
-							<span className='h-1.5 w-28 overflow-hidden rounded-full bg-foreground/[0.08]'>
+							<span className='h-1.5 w-28 overflow-hidden rounded-full bg-foreground/8'>
 								<span
 									className='block h-full rounded-full bg-primary transition-[width] duration-500'
 									style={{ width: `${percentage}%` }}
@@ -233,9 +232,9 @@ export function LessonContent({ id }: { id: string }) {
 					<LessonSidebar {...sidebarProps} />
 				</aside>
 
-				<main className='min-w-0 px-4 pb-16 pt-8 sm:px-8 lg:px-12 lg:pt-10'>
+				<main className='min-w-0 px-4 pt-8 pb-16 sm:px-8 lg:px-12 lg:pt-10'>
 					<div className='mx-auto max-w-4xl'>
-						<p className='font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground'>
+						<p className='font-mono text-xs tracking-[0.14em] text-muted-foreground uppercase'>
 							{index >= 0
 								? `Урок ${index + 1} из ${lessons.length}`
 								: 'Урок'}
@@ -272,7 +271,7 @@ export function LessonContent({ id }: { id: string }) {
 						)}
 
 						{lesson.description && (
-							<div className='mt-8 whitespace-pre-line text-[17px] leading-relaxed text-foreground/85'>
+							<div className='mt-8 text-[17px] leading-relaxed whitespace-pre-line text-foreground/85'>
 								{lesson.description}
 							</div>
 						)}

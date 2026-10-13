@@ -10,17 +10,17 @@ import type {
 	CourseResponse
 } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
+import { useCourseAccess } from '@/hooks/useCourseAccess'
+import { useCourseProgress } from '@/hooks/useCourseProgress'
 
-import { useCourseAccess } from '@/hooks/use-course-access'
-import { useCourseProgress } from '@/hooks/use-course-progress'
-
-import { flattenCourseProgram } from '@/lib/course-program'
-import { cn, getLessonLabel } from '@/lib/utils'
+import { flattenCourseProgram } from '@/lib/courses/program'
+import { ROUTES } from '@/lib/routes'
+import { LESSON, SECTION, cn, pluralize } from '@/lib/utils'
 
 import { Button } from '../ui/button'
 
 import { CourseAside } from './course-aside'
+import { CourseOutcomes } from './course-outcomes'
 import { CourseProgram } from './course-program'
 
 const DESCRIPTION_PREVIEW_LENGTH = 520
@@ -28,14 +28,9 @@ const DESCRIPTION_PREVIEW_LENGTH = 520
 interface CourseDetailsProps {
 	course: CourseResponse
 	lessons: CourseLessonListResponseItem[]
-	coverSrc: string
 }
 
-export function CourseDetails({
-	course,
-	lessons,
-	coverSrc
-}: CourseDetailsProps) {
+export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 	const progress = useCourseProgress(course.id)
 	const access = useCourseAccess(course)
 
@@ -50,7 +45,7 @@ export function CourseDetails({
 		null
 
 	return (
-		<main className='page-container pb-24 pt-6 sm:pb-32 sm:pt-10'>
+		<main className='page-container pt-6 pb-24 sm:pt-10 sm:pb-32'>
 			<nav
 				aria-label='Навигация'
 				className='flex items-center gap-1.5 text-sm text-muted-foreground'
@@ -69,7 +64,6 @@ export function CourseDetails({
 				<aside className='lg:sticky lg:top-24 lg:self-start'>
 					<CourseAside
 						course={course}
-						coverSrc={coverSrc}
 						lessonCount={flatLessons.length}
 						sectionCount={sectionCount}
 						completedCount={completed.length}
@@ -94,6 +88,8 @@ export function CourseDetails({
 						</p>
 					)}
 
+					<CourseOutcomes outcomes={course.learningOutcomes} />
+
 					{course.fullDescription && (
 						<section className='mt-12'>
 							<h2 className='font-display text-display-md font-medium'>
@@ -110,10 +106,9 @@ export function CourseDetails({
 							</h2>
 							{flatLessons.length > 0 && (
 								<p className='text-sm text-muted-foreground'>
-									{flatLessons.length}{' '}
-									{getLessonLabel(flatLessons.length)}
+									{pluralize(flatLessons.length, LESSON)}
 									{sectionCount > 0 &&
-										` · ${sectionCount} ${getSectionLabel(sectionCount)}`}
+										` · ${pluralize(sectionCount, SECTION)}`}
 								</p>
 							)}
 						</div>
@@ -169,10 +164,10 @@ function Description({ text }: { text: string }) {
 		<div className='mt-5'>
 			<div
 				className={cn(
-					'relative whitespace-pre-line text-[17px] leading-relaxed text-foreground/85',
+					'relative text-[17px] leading-relaxed whitespace-pre-line text-foreground/85',
 					isLong &&
 						!isExpanded &&
-						'max-h-56 overflow-hidden [mask-image:linear-gradient(to_bottom,black_55%,transparent)]'
+						'max-h-56 overflow-hidden mask-[linear-gradient(to_bottom,black_55%,transparent)]'
 				)}
 			>
 				{text}
@@ -195,14 +190,4 @@ function Description({ text }: { text: string }) {
 			)}
 		</div>
 	)
-}
-
-function getSectionLabel(count: number) {
-	const mod10 = count % 10
-	const mod100 = count % 100
-
-	if (mod10 === 1 && mod100 !== 11) return 'раздел'
-	if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20))
-		return 'раздела'
-	return 'разделов'
 }

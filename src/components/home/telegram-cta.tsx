@@ -30,7 +30,7 @@ export function TelegramCTA() {
 		<section className='frame-container pb-3 sm:pb-5'>
 			<div
 				ref={ref}
-				className='relative isolate flex flex-col items-center overflow-hidden rounded-[1.75rem] bg-inverse px-6 pb-[clamp(11rem,24vw,22rem)] pt-20 text-center text-inverse-foreground sm:pt-28'
+				className='relative isolate flex flex-col items-center overflow-hidden rounded-[1.75rem] bg-inverse px-6 pt-20 pb-[clamp(11rem,24vw,22rem)] text-center text-inverse-foreground sm:pt-28'
 			>
 				<Image
 					src='/images/art/cta-grain.webp'
@@ -42,7 +42,7 @@ export function TelegramCTA() {
 				<motion.div
 					aria-hidden='true'
 					style={reduceMotion ? undefined : { y: planetY }}
-					className='pointer-events-none absolute -left-1/2 bottom-0 -z-10 w-[200%] sm:-left-[20%] sm:w-[140%] lg:left-0 lg:w-full'
+					className='pointer-events-none absolute bottom-0 -left-1/2 -z-10 w-[200%] sm:left-[-20%] sm:w-[140%] lg:left-0 lg:w-full'
 				>
 					<Image
 						src='/images/art/planet-wide.png'
@@ -56,7 +56,7 @@ export function TelegramCTA() {
 				</motion.div>
 
 				<Reveal className='flex flex-col items-center'>
-					<span className='flex size-14 items-center justify-center rounded-full border border-inverse-foreground/15 bg-inverse-foreground/[0.06] backdrop-blur-md'>
+					<span className='flex size-14 items-center justify-center rounded-full border border-inverse-foreground/15 bg-inverse-foreground/6 backdrop-blur-md'>
 						<FaTelegram className='size-6 text-highlight' />
 					</span>
 					<h2 className='mt-8 max-w-3xl font-display text-display-xl font-medium'>

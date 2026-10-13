@@ -9,42 +9,31 @@ import { Manifesto } from '@/components/home/manifesto'
 import { Popular } from '@/components/home/popular'
 import { TelegramCTA } from '@/components/home/telegram-cta'
 
-import { getAppConfig } from '@/lib/config/app-config'
 import { pickPopularCourses } from '@/lib/courses/popular-courses'
-import { getMediaSource } from '@/lib/utils'
 
 export const metadata: Metadata = {
 	title: 'Образовательная платформа по веб разработке'
 }
 
 export default async function HomePage() {
-	const [allCourses, config] = await Promise.all([
-		getCoursesQuery(),
-		getAppConfig()
-	])
-
+	const allCourses = await getCoursesQuery()
 	const courses = pickPopularCourses(allCourses)
-	// Popular courses lead the showcase, the rest follow
-	const ordered = [
+
+	const covers = [
 		...courses,
 		...allCourses.filter(course => !courses.includes(course))
 	]
-	const covers = ordered
+		.filter(course => course.thumbnail)
 		.map(course => ({
 			slug: course.slug,
 			title: course.title,
 			lessons: course.lessons,
-			src: getMediaSource(
-				course.thumbnail,
-				'courses',
-				config?.features.orion.url
-			)
+			src: course.thumbnail!
 		}))
-		.filter(cover => cover.src !== '')
 
 	return (
 		<Fragment>
-			<Hero covers={covers} />
+			<Hero />
 			<Manifesto />
 			<Popular courses={courses} />
 			<Bento covers={covers} />

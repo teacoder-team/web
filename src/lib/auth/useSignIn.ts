@@ -6,9 +6,9 @@ import { toast } from 'sonner'
 
 import type { AuthResponse, SignInResponse } from '@/generated/model'
 
-import type { ApiMfaMethod } from '@/constants/mfa-methods'
-import { ROUTES } from '@/constants/routes'
-import { SSO_PROVIDERS, isSsoProvider } from '@/constants/sso-providers'
+import type { ApiMfaMethod } from '@/lib/auth/mfa-options'
+import { SSO_PROVIDERS, isSsoProvider } from '@/lib/auth/sso-providers'
+import { ROUTES } from '@/lib/routes'
 
 import { setAccessToken } from './token'
 

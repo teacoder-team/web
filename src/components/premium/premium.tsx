@@ -7,11 +7,10 @@ import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 
-import { ROUTES } from '@/constants/routes'
-
 import { useSession } from '@/lib/auth/auth-provider'
-import { useAppConfig } from '@/lib/config/use-app-config'
-import { formatPrice, monthsTranslator } from '@/lib/utils'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
+import { MONTH, formatPrice, pluralize } from '@/lib/utils'
 
 import { PaymentDialog } from '../billing/payment-dialog'
 import { Skeleton } from '../ui/skeleton'
@@ -35,7 +34,7 @@ export function Premium() {
 	const period = premium
 		? premium.months === 1
 			? 'месяц'
-			: `${premium.months} ${monthsTranslator(premium.months)}`
+			: pluralize(premium.months, MONTH)
 		: null
 
 	function handleSubscribe() {
@@ -48,13 +47,13 @@ export function Premium() {
 	return (
 		<>
 			<section className='page-container grid gap-5 lg:grid-cols-[1.1fr_1fr]'>
-				<div className='relative isolate flex min-h-[440px] flex-col justify-between overflow-hidden rounded-3xl bg-inverse p-7 text-inverse-foreground dark:ring-1 dark:ring-border sm:p-10'>
+				<div className='relative isolate flex min-h-[440px] flex-col justify-between overflow-hidden rounded-3xl bg-inverse p-7 text-inverse-foreground sm:p-10 dark:ring-1 dark:ring-border'>
 					<Image
 						src='/images/art/hero-grain.webp'
 						alt=''
 						fill
 						sizes='(min-width: 1024px) 50vw, 100vw'
-						className='-z-20 object-cover object-right-top'
+						className='-z-20 object-cover object-top-right'
 					/>
 					<Image
 						src='/images/art/sphere-halftone.png'
@@ -63,17 +62,17 @@ export function Premium() {
 						width={960}
 						height={960}
 						aria-hidden='true'
-						className='pointer-events-none absolute -right-20 -top-16 -z-10 w-72 opacity-80 sm:w-96'
+						className='pointer-events-none absolute -top-16 -right-20 -z-10 w-72 opacity-80 sm:w-96'
 					/>
 
-					<p className='font-mono text-xs uppercase tracking-[0.18em] text-highlight'>
+					<p className='font-mono text-xs tracking-[0.18em] text-highlight uppercase'>
 						Premium
 					</p>
 
 					<div className='mt-16'>
 						{premium ? (
 							<p className='flex flex-wrap items-baseline gap-x-3'>
-								<span className='font-display text-[clamp(3rem,2.2rem+3vw,4.5rem)] font-medium leading-none tracking-[-0.04em]'>
+								<span className='font-display text-[clamp(3rem,2.2rem+3vw,4.5rem)] leading-none font-medium tracking-[-0.04em]'>
 									{formatPrice(
 										premium.prices.standard,
 										premium.currency

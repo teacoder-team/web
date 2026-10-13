@@ -14,11 +14,11 @@ import {
 	RootResponseFeaturesPaymentsItemId
 } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { useAppConfig } from '@/lib/config/use-app-config'
+import { RECURRING_METHODS } from '@/lib/billing/payment-methods'
+import { useAppConfig } from '@/lib/config/useAppConfig'
+import { ROUTES } from '@/lib/routes'
 
 import { PaymentMethods } from '../premium/payment-methods'
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
@@ -52,16 +52,12 @@ export const paymentSchema = z.object({
 
 export type PaymentFormValues = z.infer<typeof paymentSchema>
 
-const RECURRING_METHODS: string[] = ['BANK_CARD', 'SBP', 'T_PAY']
-
 interface PaymentDialogProps {
 	open: boolean
 	onOpenChange: (open: boolean) => void
-	/** Buys this course; without it the payment is for the subscription. */
+	/** Without it the payment is for the subscription. */
 	courseId?: string
-	/** Short line under the title, e.g. the plan and its price. */
 	summary?: (method: string) => string | null
-	/** Subscription only: price for foreign cards, shown when picked. */
 	internationalPrice?: string | null
 }
 
@@ -146,24 +142,22 @@ export function PaymentDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className='flex max-h-[calc(100svh-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-md sm:p-0'>
+			<DialogContent className='block max-h-[calc(100dvh-2rem)] overflow-hidden p-0 sm:max-w-md sm:p-0'>
 				<Form {...form}>
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
-						className='flex min-h-0 flex-1 flex-col'
+						className='flex max-h-[calc(100dvh-2rem)] flex-col'
 					>
-						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 pt-6 sm:px-8 sm:pt-8'>
-							<DialogHeader>
-								<DialogTitle>
-									Выберите способ оплаты
-								</DialogTitle>
-								{summaryText && (
-									<DialogDescription>
-										{summaryText}
-									</DialogDescription>
-								)}
-							</DialogHeader>
+						<DialogHeader className='shrink-0 px-6 pb-4 pt-6 sm:px-8 sm:pt-8'>
+							<DialogTitle>Выберите способ оплаты</DialogTitle>
+							{summaryText && (
+								<DialogDescription>
+									{summaryText}
+								</DialogDescription>
+							)}
+						</DialogHeader>
 
+						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 sm:px-8'>
 							{hasUnstableMethods && (
 								<Alert variant='warning'>
 									<TriangleAlertIcon className='size-4' />

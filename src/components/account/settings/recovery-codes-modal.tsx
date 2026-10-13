@@ -87,7 +87,7 @@ export function RecoveryCodesModal({
 					<Button variant='outline'>Просмотреть</Button>
 				</DialogTrigger>
 			)}
-			<DialogContent className='w-[500px]'>
+			<DialogContent className='sm:max-w-[500px]'>
 				<DialogTitle>Коды восстановления</DialogTitle>
 				<DialogDescription>
 					Эти коды помогут вам получить доступ к учетной записи, если
@@ -107,7 +107,7 @@ export function RecoveryCodesModal({
 				{codes ? (
 					<RecoveryCodesList
 						codes={codes}
-						className='flex justify-center gap-10'
+						className='flex justify-center gap-6 sm:gap-10'
 					/>
 				) : (
 					<div className='space-y-3'>

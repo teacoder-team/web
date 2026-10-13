@@ -14,13 +14,13 @@ import { SessionItem } from './session-item'
 export function Sessions() {
 	const { data, isLoading } = useGetSessionsQuery()
 
-	// The API sorts by last activity; the current device goes first, as before.
+	// The API sorts by last activity; the current device goes first.
 	const sessions =
 		data && [...data].sort((a, b) => Number(b.current) - Number(a.current))
 	const hasOthers = (sessions?.length ?? 0) > 1
 
 	return (
-		<div className='space-y-10'>
+		<div className='space-y-8 sm:space-y-10'>
 			<AccountHeader
 				title='Устройства'
 				description='Устройства, с которых выполнен вход в ваш аккаунт. Завершите сеанс, если не узнаёте устройство.'

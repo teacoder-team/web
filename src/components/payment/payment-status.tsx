@@ -15,11 +15,10 @@ import {
 } from '@/generated/api'
 import type { PaymentResponse } from '@/generated/model'
 
-import { ROUTES } from '@/constants/routes'
-
 import { getApiError } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
 import { env } from '@/lib/config/env'
+import { ROUTES } from '@/lib/routes'
 import { cn, formatPrice } from '@/lib/utils'
 
 import { Logo } from '../shared/logo'
@@ -285,10 +284,10 @@ export function PaymentStatus({ id }: { id: string }) {
 				className={cn(
 					'pointer-events-none absolute inset-0 -z-10 transition-colors duration-700',
 					phase === 'success'
-						? 'bg-[radial-gradient(60%_45%_at_50%_0%,hsl(var(--success)/0.14),transparent_70%)]'
+						? 'bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--success)_14%,transparent),transparent_70%)]'
 						: phase === 'failed' || query.isError
-							? 'bg-[radial-gradient(60%_45%_at_50%_0%,hsl(var(--destructive)/0.12),transparent_70%)]'
-							: 'bg-[radial-gradient(60%_45%_at_50%_0%,hsl(var(--primary)/0.14),transparent_70%)]'
+							? 'bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--destructive)_12%,transparent),transparent_70%)]'
+							: 'bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--primary)_14%,transparent),transparent_70%)]'
 				)}
 			/>
 			<header className='page-container flex h-16 items-center'>
@@ -301,7 +300,7 @@ export function PaymentStatus({ id }: { id: string }) {
 				</Link>
 			</header>
 			<main className='flex flex-1 items-center justify-center px-4 py-12'>
-				<div className='w-full max-w-md duration-500 ease-out animate-in fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none'>
+				<div className='w-full max-w-md animate-in duration-500 ease-out fade-in-0 slide-in-from-bottom-2 motion-reduce:animate-none'>
 					{content}
 				</div>
 			</main>
@@ -338,7 +337,7 @@ function StatusCard({
 	return (
 		<section
 			aria-live='polite'
-			className='rounded-3xl border border-border bg-popover p-6 text-center shadow-[0_24px_64px_-32px_hsl(var(--foreground)/0.25)] sm:p-8'
+			className='rounded-3xl border border-border bg-popover p-6 text-center shadow-panel sm:p-8'
 		>
 			<div className='relative mx-auto flex size-16 items-center justify-center'>
 				{tone === 'pending' && (

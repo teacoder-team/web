@@ -11,12 +11,10 @@ import {
 } from '@/generated/api'
 import type { UserResponse } from '@/generated/model'
 
-import { useMediaSource } from '@/hooks/use-media-source'
-
 import { getErrorMessage } from '@/lib/api/errors'
 import { cn } from '@/lib/utils'
 
-import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar'
+import { UserAvatar } from '../../shared/user-avatar'
 import { buttonVariants } from '../../ui/button'
 import { Input } from '../../ui/input'
 
@@ -25,11 +23,7 @@ interface AvatarFormProps {
 }
 
 export function AvatarForm({ user }: AvatarFormProps) {
-	const getMediaSource = useMediaSource()
-
-	const [preview, setPreview] = useState<string | null>(
-		user?.avatar ? getMediaSource(user.avatar, 'users') : null
-	)
+	const [preview, setPreview] = useState(user?.avatar ?? null)
 
 	const queryClient = useQueryClient()
 
@@ -61,14 +55,14 @@ export function AvatarForm({ user }: AvatarFormProps) {
 	}
 
 	return (
-		<div className='flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6'>
+		<div className='flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-8 sm:p-6'>
 			<div className='flex items-center gap-4'>
-				<Avatar className='size-16'>
-					<AvatarImage src={preview ?? ''} alt='Аватар' />
-					<AvatarFallback className='text-xl'>
-						{user?.displayName.slice(0, 1)}
-					</AvatarFallback>
-				</Avatar>
+				<UserAvatar
+					name={user?.displayName}
+					src={preview}
+					className='size-16'
+					fallbackClassName='text-xl'
+				/>
 				<div>
 					<h3 className='font-medium'>Аватар</h3>
 					<p className='mt-1 text-sm text-muted-foreground'>
@@ -79,7 +73,7 @@ export function AvatarForm({ user }: AvatarFormProps) {
 			<label
 				className={cn(
 					buttonVariants({ variant: 'outline' }),
-					'cursor-pointer'
+					'cursor-pointer max-sm:w-full'
 				)}
 			>
 				<Upload />

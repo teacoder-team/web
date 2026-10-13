@@ -16,7 +16,7 @@ export function Subscription() {
 	const { data: subscription, isLoading } = useGetBillingSubscriptionQuery()
 
 	return (
-		<div className='space-y-10'>
+		<div className='space-y-8 sm:space-y-10'>
 			<AccountHeader
 				title='Подписка'
 				description='Статус TeaCoder Premium и автопродление.'

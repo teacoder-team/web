@@ -3,7 +3,7 @@
 import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 
-import { useSignOut } from '@/lib/auth/use-sign-out'
+import { useSignOut } from '@/lib/auth/useSignOut'
 
 import { ConfirmDialog } from '../../shared/confirm-dialog'
 import { Button } from '../../ui/button'

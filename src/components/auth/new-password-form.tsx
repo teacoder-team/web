@@ -9,11 +9,10 @@ import { z } from 'zod'
 
 import { usePostAuthResetPasswordMutation } from '@/generated/api'
 
-import { ROUTES } from '@/constants/routes'
-
 import { analytics } from '@/lib/analytics'
 import { getErrorMessage } from '@/lib/api/errors'
-import { useSignInResult } from '@/lib/auth/use-sign-in'
+import { useSignInResult } from '@/lib/auth/useSignIn'
+import { ROUTES } from '@/lib/routes'
 
 import { Button } from '../ui/button'
 import {

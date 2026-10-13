@@ -7,10 +7,9 @@ import type { JSX, ReactNode } from 'react'
 import { FaGithub } from 'react-icons/fa'
 import { FaTelegram, FaYoutube } from 'react-icons/fa6'
 
-import { ROUTES } from '@/constants/routes'
-
 import { env } from '@/lib/config/env'
 import { useConsent } from '@/lib/consent/consent-provider'
+import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
 
@@ -29,11 +28,6 @@ interface SocialLink {
 const generalLinks: NavLink[] = [
 	{ title: 'Курсы', href: ROUTES.COURSES.ROOT },
 	{ title: 'Об основателе', href: ROUTES.ABOUT },
-	// {
-	// 	title: 'API документация',
-	// 	href: 'https://api.teacoder.ru/docs',
-	// 	isExternal: true
-	// }
 	{ title: 'Подписка', href: ROUTES.PREMIUM }
 ]
 
@@ -59,17 +53,12 @@ const socialLinks: SocialLink[] = [
 		icon: <FaGithub className='size-[18px]' />,
 		label: 'GitHub'
 	}
-	// {
-	// 	href: 'https://boosty.to/teacoder',
-	// 	icon: <SiBoosty className='size-6' />,
-	// 	label: 'Boosty'
-	// }
 ]
 
 export function Footer() {
 	return (
 		<footer className='relative overflow-hidden bg-inverse text-inverse-foreground'>
-			<div className='page-container grid gap-12 pb-10 pt-16 sm:pt-20 lg:grid-cols-12 lg:gap-8'>
+			<div className='page-container grid gap-12 pt-16 pb-10 sm:pt-20 lg:grid-cols-12 lg:gap-8'>
 				<div className='lg:col-span-5'>
 					<Link
 						href={ROUTES.HOME}
@@ -116,7 +105,7 @@ export function Footer() {
 
 			<p
 				aria-hidden='true'
-				className='pointer-events-none -mb-[0.22em] select-none text-center font-display text-[24vw] font-semibold leading-none tracking-[-0.06em] text-inverse-foreground/[0.05]'
+				className='pointer-events-none mb-[-0.22em] text-center font-display text-[24vw] leading-none font-semibold tracking-[-0.06em] text-inverse-foreground/5 select-none'
 			>
 				TeaCoder
 			</p>
@@ -161,7 +150,7 @@ function SocialLink({ href, icon, label }: SocialLink) {
 	return (
 		<Link
 			href={href as Route}
-			className='flex size-10 items-center justify-center rounded-full bg-inverse-foreground/[0.08] text-inverse-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground'
+			className='flex size-10 items-center justify-center rounded-full bg-inverse-foreground/8 text-inverse-foreground/70 transition-colors hover:bg-primary hover:text-primary-foreground'
 			target='_blank'
 			referrerPolicy='no-referrer'
 		>

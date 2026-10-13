@@ -3,8 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
-import { ROUTES } from '@/constants/routes'
-
+import { ROUTES } from '@/lib/routes'
 import { cn } from '@/lib/utils'
 
 const DOCUMENTS = [
@@ -66,10 +65,10 @@ export function LegalDocument({
 							BANNER_POSITION[current]
 						)}
 					/>
-					<p className='font-mono text-xs uppercase tracking-[0.18em] text-highlight'>
+					<p className='font-mono text-xs tracking-[0.18em] text-highlight uppercase'>
 						Документы · {edition}
 					</p>
-					<h1 className='mt-4 max-w-3xl text-balance font-display text-display-lg font-medium'>
+					<h1 className='mt-4 max-w-3xl font-display text-display-lg font-medium text-balance'>
 						{title}
 					</h1>
 				</div>
@@ -80,7 +79,7 @@ export function LegalDocument({
 					'page-container mt-12 max-w-3xl space-y-4 text-[15px] leading-7 text-foreground sm:mt-16 sm:text-base sm:leading-8',
 					'[&_h2]:mt-12 [&_h2]:border-t [&_h2]:border-border [&_h2]:pt-8 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-medium [&_h2]:tracking-tight',
 					'[&_ul]:ml-5 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:marker:text-brand',
-					'[&_a]:text-brand [&_a]:underline [&_a]:decoration-brand/30 [&_a]:underline-offset-4 hover:[&_a]:decoration-brand'
+					'[&_a]:text-brand [&_a]:underline [&_a]:decoration-brand/30 [&_a]:underline-offset-4 [&_a]:hover:decoration-brand'
 				)}
 			>
 				{children}
@@ -95,7 +94,7 @@ export function LegalDocument({
 							href={document.href}
 							className='group relative flex flex-col gap-2 rounded-2xl bg-secondary p-6 transition-colors hover:bg-accent'
 						>
-							<ArrowUpRightIcon className='absolute right-5 top-5 size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground' />
+							<ArrowUpRightIcon className='absolute top-5 right-5 size-5 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground' />
 							<span className='pr-8 font-display text-lg font-medium'>
 								{document.title}
 							</span>
