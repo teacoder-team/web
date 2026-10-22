@@ -156,21 +156,36 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 	)
 }
 
+/** Blank line starts a paragraph, a single line break stays inside it. */
+function splitParagraphs(text: string) {
+	return text
+		.replace(/\\n/g, '\n')
+		.replace(/\r\n?/g, '\n')
+		.split(/\n{2,}/)
+		.map(paragraph => paragraph.trim())
+		.filter(Boolean)
+}
+
 function Description({ text }: { text: string }) {
 	const [isExpanded, setIsExpanded] = useState(false)
+	const paragraphs = splitParagraphs(text)
 	const isLong = text.length > DESCRIPTION_PREVIEW_LENGTH
 
 	return (
 		<div className='mt-5'>
 			<div
 				className={cn(
-					'relative text-[17px] leading-relaxed whitespace-pre-line text-foreground/85',
+					'relative space-y-4 text-[17px] leading-relaxed text-foreground/85',
 					isLong &&
 						!isExpanded &&
 						'max-h-56 overflow-hidden mask-[linear-gradient(to_bottom,black_55%,transparent)]'
 				)}
 			>
-				{text}
+				{paragraphs.map((paragraph, index) => (
+					<p key={index} className='whitespace-pre-line'>
+						{paragraph}
+					</p>
+				))}
 			</div>
 			{isLong && (
 				<button
