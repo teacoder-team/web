@@ -19,7 +19,7 @@ export default function CookiePolicyPage() {
 		<LegalDocument
 			current='cookies'
 			title='Политика использования файлов cookie'
-			edition='Редакция от 12 октября 2026'
+			edition='Редакция от 23 октября 2026'
 		>
 			<p>
 				Настоящая Политика использования файлов cookie (далее -
