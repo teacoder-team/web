@@ -34,7 +34,7 @@
  */
 
 /**
- * Провайдер из списка способов оплаты. Без него для BANK_CARD используется YOOKASSA, для CRYPTO — HELEKET. Недоступные сочетания отклоняются.
+ * Провайдер из списка способов оплаты. Без него для BANK_CARD используется YOOKASSA, для CRYPTO - HELEKET. Недоступные сочетания отклоняются.
  */
 export type CreatePaymentPayloadProvider = typeof CreatePaymentPayloadProvider[keyof typeof CreatePaymentPayloadProvider];
 

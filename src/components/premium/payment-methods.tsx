@@ -4,7 +4,10 @@ import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-import { PAYMENT_METHOD_ICONS } from '@/lib/billing/payment-methods'
+import {
+	PAYMENT_METHOD_ICONS,
+	withoutSplit
+} from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { cn } from '@/lib/utils'
 
@@ -19,7 +22,7 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 	const { data: config, isLoading } = useAppConfig()
 	const { field: provider } = useController({ control, name: 'provider' })
 
-	const data = config?.features.payments
+	const data = withoutSplit(config?.features.payments)
 
 	if (isLoading || !data)
 		return (

@@ -74,6 +74,8 @@ export * from './leaderListResponseItem';
 export * from './lessonResponse';
 export * from './lessonResponseAccess';
 export * from './lessonResponseCourse';
+export * from './lessonResponseHomework';
+export * from './lessonResponseResourcesItem';
 export * from './loginPayload';
 export * from './loginResponse';
 export * from './materialsLinkResponse';

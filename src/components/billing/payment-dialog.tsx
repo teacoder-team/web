@@ -16,7 +16,7 @@ import {
 
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { RECURRING_METHODS } from '@/lib/billing/payment-methods'
+import { RECURRING_METHODS, withoutSplit } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { ROUTES } from '@/lib/routes'
 
@@ -97,7 +97,7 @@ export function PaymentDialog({
 
 	const method = form.watch('method')
 	const provider = form.watch('provider')
-	const payments = config?.features.payments
+	const payments = withoutSplit(config?.features.payments)
 	const hasUnstableMethods = Boolean(
 		payments?.some(
 			p =>
@@ -148,7 +148,7 @@ export function PaymentDialog({
 						onSubmit={form.handleSubmit(onSubmit)}
 						className='flex max-h-[calc(100dvh-2rem)] flex-col'
 					>
-						<DialogHeader className='shrink-0 px-6 pb-4 pt-6 sm:px-8 sm:pt-8'>
+						<DialogHeader className='shrink-0 px-6 pt-6 pb-4 sm:px-8 sm:pt-8'>
 							<DialogTitle>Выберите способ оплаты</DialogTitle>
 							{summaryText && (
 								<DialogDescription>
@@ -200,7 +200,7 @@ export function PaymentDialog({
 							)}
 						</div>
 
-						<div className='flex shrink-0 flex-col gap-4 border-t border-border px-6 pb-6 pt-4 sm:px-8 sm:pb-8'>
+						<div className='flex shrink-0 flex-col gap-4 border-t border-border px-6 pt-4 pb-6 sm:px-8 sm:pb-8'>
 							{isSubscription &&
 								method === 'INTERNATIONAL_CARD' &&
 								internationalPrice && (

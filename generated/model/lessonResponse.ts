@@ -34,6 +34,8 @@
  */
 import type { LessonResponseAccess } from './lessonResponseAccess';
 import type { LessonResponseCourse } from './lessonResponseCourse';
+import type { LessonResponseHomework } from './lessonResponseHomework';
+import type { LessonResponseResourcesItem } from './lessonResponseResourcesItem';
 
 /**
  * Урок.
@@ -51,6 +53,9 @@ export interface LessonResponse {
   /** `FREE` - открыт всем, `PREMIUM` - нужна подписка или покупка курса. */
   access: LessonResponseAccess;
   kinescopeId: string | null;
+  homework: LessonResponseHomework;
+  /** Материалы к уроку: официальная документация, статьи, первоисточники - в том порядке, в котором их нужно показывать. Пустой массив, если материалов нет. */
+  resources: LessonResponseResourcesItem[];
   /** Курс урока - чтобы показать программу и заголовок без лишних запросов. */
   course: LessonResponseCourse;
 }

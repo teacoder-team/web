@@ -32,6 +32,7 @@ import { Progress } from '../ui/progress'
 import { Skeleton } from '../ui/skeleton'
 
 import { CoursePrice } from './course-price'
+import { SplitPaymentButton } from './split-payment-button'
 
 interface CourseAsideProps {
 	course: CourseResponse
@@ -134,6 +135,15 @@ export function CourseAside({
 			</Button>
 		)
 
+		const splitButton = payable !== null && currency && (
+			<SplitPaymentButton
+				courseId={course.id}
+				amount={payable}
+				currency={currency}
+				requireAuth={requireAuth}
+			/>
+		)
+
 		if (course.accessMode === 'PREMIUM') {
 			return (
 				<div className='flex flex-col gap-2.5'>
@@ -144,11 +154,17 @@ export function CourseAside({
 						</Link>
 					</Button>
 					{buyButton}
+					{splitButton}
 				</div>
 			)
 		}
 
-		return buyButton
+		return (
+			<div className='flex flex-col gap-2.5'>
+				{buyButton}
+				{splitButton}
+			</div>
+		)
 	}
 
 	return (
