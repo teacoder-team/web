@@ -14,7 +14,10 @@ import { Button } from '@/components/ui/button'
 
 import { getApiError, getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { flattenCourseProgram } from '@/lib/courses/program'
+import {
+	getAvailableLessons,
+	withoutEmptySections
+} from '@/lib/courses/program'
 import { ROUTES } from '@/lib/routes'
 
 import { Logo } from '../shared/logo'
@@ -85,14 +88,26 @@ export function LessonContent({ id }: { id: string }) {
 	if (lessonQuery.isError || !lesson) {
 		const statusCode = getApiError(lessonQuery.error)?.status
 
+		// A lesson that is announced but not released answers 404 - not a failure
+		if (statusCode === 404) {
+			return (
+				<LessonMessage
+					title='Урок ещё не вышел'
+					description='Он появится на платформе позже. Загляните в каталог - там вы найдёте курсы, в которых уроки уже доступны.'
+				>
+					<Button asChild size='lg'>
+						<Link href={ROUTES.COURSES.ROOT}>К курсам</Link>
+					</Button>
+				</LessonMessage>
+			)
+		}
+
 		return (
 			<LessonMessage
 				title={
-					statusCode === 404
-						? 'Урок не найден'
-						: statusCode === 403
-							? 'Урок пока недоступен'
-							: 'Не удалось загрузить урок'
+					statusCode === 403
+						? 'Урок пока недоступен'
+						: 'Не удалось загрузить урок'
 				}
 				description={getErrorMessage(
 					lessonQuery.error,
@@ -113,8 +128,8 @@ export function LessonContent({ id }: { id: string }) {
 		)
 	}
 
-	const program = programQuery.data ?? []
-	const lessons = flattenCourseProgram(program)
+	const program = withoutEmptySections(programQuery.data ?? [])
+	const lessons = getAvailableLessons(program)
 	const index = lessons.findIndex(item => item.id === lesson.id)
 	const section = program.find(
 		item =>

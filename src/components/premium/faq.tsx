@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 
+import { withoutSplit } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { ROUTES } from '@/lib/routes'
 import { formatPrice } from '@/lib/utils'
@@ -130,7 +131,8 @@ export function FAQSection() {
 
 	const premium = config?.features.premium
 	const faqs = getFaqs(
-		config?.features.payments.map(method => method.name) ?? [],
+		withoutSplit(config?.features.payments)?.map(method => method.name) ??
+			[],
 		premium
 			? formatPrice(premium.prices.international, premium.currency)
 			: null

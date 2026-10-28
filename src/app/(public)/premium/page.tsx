@@ -16,11 +16,15 @@ export default async function PremiumPage() {
 	// The pricing block works without the course list, so a failed fetch only hides the grid
 	const courses = await getCoursesQuery().catch(() => [])
 	// Subscription covers PREMIUM courses only; PURCHASE ones are bought separately
-	const included = courses.filter(course => course.accessMode === 'PREMIUM')
+	const included = courses.filter(
+		course =>
+			course.accessMode === 'PREMIUM' ||
+			course.accessMode === 'PREMIUM_OR_PURCHASE'
+	)
 
 	return (
 		<main className='pb-24 sm:pb-32'>
-			<section className='page-container pb-14 pt-16 text-center sm:pb-16 sm:pt-24'>
+			<section className='page-container pt-16 pb-14 text-center sm:pt-24 sm:pb-16'>
 				<p className='inline-flex rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground'>
 					Подписка TeaCoder
 				</p>

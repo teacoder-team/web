@@ -32,10 +32,12 @@ import { Progress } from '../ui/progress'
 import { Skeleton } from '../ui/skeleton'
 
 import { CoursePrice } from './course-price'
+import { SplitPaymentButton } from './split-payment-button'
 
 interface CourseAsideProps {
 	course: CourseResponse
 	lessonCount: number
+	upcomingCount: number
 	sectionCount: number
 	completedCount: number
 	percentage: number
@@ -47,6 +49,7 @@ interface CourseAsideProps {
 export function CourseAside({
 	course,
 	lessonCount,
+	upcomingCount,
 	sectionCount,
 	completedCount,
 	percentage,
@@ -65,6 +68,7 @@ export function CourseAside({
 	const price =
 		payable !== null && currency ? formatPrice(payable, currency) : null
 
+	const isAnnounced = course.release.status === 'ANNOUNCED'
 	const courseUrl = ROUTES.COURSES.SINGLE(course.slug)
 	const isStarted = completedCount > 0
 	const isFinished = lessonCount > 0 && completedCount >= lessonCount
@@ -97,6 +101,20 @@ export function CourseAside({
 			return <Skeleton className='h-12 w-full rounded-full' />
 		}
 
+		if (isAnnounced && course.accessMode !== 'FREE') {
+			return (
+				<div className='flex flex-col gap-3'>
+					<Button size='lg' className='w-full' disabled>
+						Покупка пока недоступна
+					</Button>
+					<p className='text-sm leading-relaxed text-muted-foreground'>
+						Купить курс можно будет, когда он начнёт выходить в
+						раннем доступе или сразу появится на YouTube.
+					</p>
+				</div>
+			)
+		}
+
 		if (lessonCount === 0) {
 			// The YouTube button below becomes the main action then
 			return course.youtubeUrl ? null : (
@@ -121,12 +139,13 @@ export function CourseAside({
 			)
 		}
 
-		const buyButton = price && (
+		const { premium, purchase } = course.entitlements
+		const canBuy = purchase && price !== null
+
+		const buyButton = canBuy && (
 			<Button
 				size='lg'
-				variant={
-					course.accessMode === 'PURCHASE' ? 'default' : 'outline'
-				}
+				variant={premium ? 'outline' : 'default'}
 				className='w-full'
 				onClick={() => requireAuth(() => setIsPaymentOpen(true))}
 			>
@@ -134,21 +153,37 @@ export function CourseAside({
 			</Button>
 		)
 
-		if (course.accessMode === 'PREMIUM') {
-			return (
-				<div className='flex flex-col gap-2.5'>
+		const splitButton = canBuy && payable !== null && currency && (
+			<SplitPaymentButton
+				courseId={course.id}
+				amount={payable}
+				currency={currency}
+				requireAuth={requireAuth}
+			/>
+		)
+
+		if (!premium && !canBuy) {
+			return course.youtubeUrl ? null : (
+				<Button size='lg' className='w-full' disabled>
+					Пока недоступно
+				</Button>
+			)
+		}
+
+		return (
+			<div className='flex flex-col gap-2.5'>
+				{premium && (
 					<Button size='lg' className='w-full' asChild>
 						<Link href={ROUTES.PREMIUM}>
 							Оформить подписку
 							<ArrowRight />
 						</Link>
 					</Button>
-					{buyButton}
-				</div>
-			)
-		}
-
-		return buyButton
+				)}
+				{buyButton}
+				{splitButton}
+			</div>
+		)
 	}
 
 	return (
@@ -173,6 +208,7 @@ export function CourseAside({
 					<AccessSummary
 						course={course}
 						currency={currency}
+						isAnnounced={isAnnounced}
 						hasAccess={hasAccess && !isLoading}
 					/>
 
@@ -233,7 +269,14 @@ export function CourseAside({
 					<MetaRow icon={<BookOpen />} label='Уроки'>
 						{lessonCount > 0
 							? pluralize(lessonCount, LESSON)
-							: 'Только на YouTube'}
+							: upcomingCount > 0 || isAnnounced
+								? 'Скоро'
+								: 'Только на YouTube'}
+						{upcomingCount > 0 && (
+							<span className='block text-xs font-normal text-muted-foreground'>
+								ещё {upcomingCount} скоро
+							</span>
+						)}
 					</MetaRow>
 					{sectionCount > 0 && (
 						<MetaRow icon={<Layers />} label='Разделы'>
@@ -262,10 +305,12 @@ export function CourseAside({
 function AccessSummary({
 	course,
 	currency,
+	isAnnounced,
 	hasAccess
 }: {
 	course: CourseResponse
 	currency: string | undefined
+	isAnnounced: boolean
 	hasAccess: boolean
 }) {
 	const price = (
@@ -296,13 +341,30 @@ function AccessSummary({
 		)
 	}
 
-	if (course.accessMode === 'PREMIUM') {
+	const { premium, purchase } = course.entitlements
+
+	if (isAnnounced) {
+		return (
+			<div>
+				<p className='font-display text-3xl font-medium tracking-tight text-muted-foreground'>
+					Скоро
+				</p>
+				{hasPrice && (
+					<p className='mt-1.5 text-sm text-muted-foreground'>
+						Цена курса: {price}
+					</p>
+				)}
+			</div>
+		)
+	}
+
+	if (premium) {
 		return (
 			<div>
 				<p className='font-display text-3xl font-medium tracking-tight text-brand'>
-					По подписке
+					Доступно по Premium
 				</p>
-				{hasPrice && (
+				{purchase && hasPrice && (
 					<p className='mt-1.5 text-sm text-muted-foreground'>
 						или навсегда за {price}
 					</p>
@@ -311,17 +373,17 @@ function AccessSummary({
 		)
 	}
 
+	if (!purchase || !hasPrice) {
+		return (
+			<p className='font-display text-2xl font-medium tracking-tight text-muted-foreground'>
+				Пока недоступно
+			</p>
+		)
+	}
+
 	return (
 		<p className='font-display text-3xl font-medium tracking-tight'>
-			{hasPrice ? (
-				<CoursePrice
-					price={course.price}
-					discountPrice={course.discountPrice}
-					currency={currency}
-				/>
-			) : (
-				'Покупка'
-			)}
+			{price}
 		</p>
 	)
 }

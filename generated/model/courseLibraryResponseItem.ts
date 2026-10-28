@@ -33,6 +33,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { CourseLibraryResponseItemAccessMode } from './courseLibraryResponseItemAccessMode';
+import type { CourseLibraryResponseItemStatus } from './courseLibraryResponseItemStatus';
 
 /**
  * Карточка курса в каталоге.
@@ -48,10 +49,14 @@ export type CourseLibraryResponseItem = {
   thumbnail: string | null;
   price: number | null;
   discountPrice: number | null;
-  /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме. */
+  /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - только по премиум-подписке, `PURCHASE` - только покупкой курса, `PREMIUM_OR_PURCHASE` - по подписке или покупке на выбор. Купленный курс открыт навсегда в любом режиме, даже если режим потом изменили. */
   accessMode: CourseLibraryResponseItemAccessMode;
+  /** Главный статус курса - его и показывайте, остальные признаки идут отдельными полями. Считается на сервере: `DRAFT` - «В разработке» (публично не отдаётся), `ANNOUNCED` - «Скоро»: курс анонсирован, уроки ещё не выходят и купить его нельзя, `IN_PRODUCTION` - «Выходит поэтапно», `EARLY_ACCESS` - «Ранний доступ» (выходит поэтапно и доступен по подписке или покупке), `COMPLETED` - «Курс завершён», `PUBLICLY_RELEASED` - «Полная версия на YouTube», `ARCHIVED` - «В архиве». */
+  status: CourseLibraryResponseItemStatus;
   /** Есть ли у курса материалы (исходный код). Скачать - `POST /courses/{slug}/materials/link`. */
   hasMaterials: boolean;
   /** Количество опубликованных уроков. */
   lessons: number;
+  /** Сколько уроков анонсировано, но ещё не вышло. */
+  upcomingLessons: number;
 };

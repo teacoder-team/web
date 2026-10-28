@@ -8,6 +8,7 @@ import { ROUTES } from '@/lib/routes'
 import { LESSON, pluralize } from '@/lib/utils'
 
 import { CoursePrice } from './course-price'
+import { CourseStatusBadge } from './course-status-badge'
 
 interface CourseCardProps {
 	course: CourseListResponseItem
@@ -17,8 +18,18 @@ export async function CourseCard({ course }: CourseCardProps) {
 	const config = await getAppConfig()
 	const currency = config?.features.premium.currency
 
+	const isAnnounced = course.status === 'ANNOUNCED'
+	const lessonsLabel =
+		course.lessons > 0
+			? pluralize(course.lessons, LESSON)
+			: isAnnounced
+				? 'Уроки скоро'
+				: 'YouTube'
+
 	const meta = [
-		course.lessons > 0 ? pluralize(course.lessons, LESSON) : 'YouTube',
+		course.upcomingLessons > 0
+			? `${lessonsLabel}, ещё ${course.upcomingLessons} скоро`
+			: lessonsLabel,
 		course.hasMaterials ? 'Исходный код' : null
 	].filter(Boolean)
 
@@ -37,6 +48,10 @@ export async function CourseCard({ course }: CourseCardProps) {
 						className='object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]'
 					/>
 				)}
+				<CourseStatusBadge
+					status={course.status}
+					className='absolute top-3 left-3 bg-popover/90 shadow-card backdrop-blur-md'
+				/>
 			</div>
 
 			<div className='flex flex-1 flex-col p-5 sm:p-6'>
@@ -57,6 +72,7 @@ export async function CourseCard({ course }: CourseCardProps) {
 						{meta.join(' · ')}
 					</span>
 					<AccessLabel
+						isAnnounced={isAnnounced}
 						accessMode={course.accessMode}
 						price={course.price}
 						discountPrice={course.discountPrice}
@@ -69,6 +85,7 @@ export async function CourseCard({ course }: CourseCardProps) {
 }
 
 interface AccessLabelProps {
+	isAnnounced: boolean
 	accessMode: CourseListResponseItem['accessMode']
 	price: number | null
 	discountPrice: number | null
@@ -76,6 +93,7 @@ interface AccessLabelProps {
 }
 
 function AccessLabel({
+	isAnnounced,
 	accessMode,
 	price,
 	discountPrice,
@@ -95,7 +113,15 @@ function AccessLabel({
 		return <span className='font-medium text-success'>Бесплатно</span>
 	}
 
-	if (accessMode === 'PREMIUM') {
+	if (isAnnounced) {
+		return (
+			<span className='font-medium text-muted-foreground'>
+				Покупка скоро
+			</span>
+		)
+	}
+
+	if (accessMode === 'PREMIUM' || accessMode === 'PREMIUM_OR_PURCHASE') {
 		return (
 			<span className='font-medium text-brand'>
 				По подписке

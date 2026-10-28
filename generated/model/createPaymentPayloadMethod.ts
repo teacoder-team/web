@@ -34,7 +34,7 @@
  */
 
 /**
- * Способ оплаты. CRYPTO — криптовалюта. Для Робокассы передайте BANK_CARD и provider: ROBOKASSA; фактический способ уточняется после оплаты.
+ * Способ оплаты. CRYPTO - криптовалюта. Для Робокассы передайте BANK_CARD и provider: ROBOKASSA; фактический способ уточняется после оплаты. YANDEX_SPLIT - Яндекс Сплит, работает только при покупке курса: без `courseId` вернёт 400.
  */
 export type CreatePaymentPayloadMethod = typeof CreatePaymentPayloadMethod[keyof typeof CreatePaymentPayloadMethod];
 

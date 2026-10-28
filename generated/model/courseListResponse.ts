@@ -35,6 +35,6 @@
 import type { CourseListResponseItem } from './courseListResponseItem';
 
 /**
- * Опубликованные курсы.
+ * Опубликованные курсы, кроме архивных.
  */
 export type CourseListResponse = CourseListResponseItem[];

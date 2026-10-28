@@ -13,7 +13,10 @@ import type {
 import { useCourseAccess } from '@/hooks/useCourseAccess'
 import { useCourseProgress } from '@/hooks/useCourseProgress'
 
-import { flattenCourseProgram } from '@/lib/courses/program'
+import {
+	getAvailableLessons,
+	withoutEmptySections
+} from '@/lib/courses/program'
 import { ROUTES } from '@/lib/routes'
 import { LESSON, SECTION, cn, pluralize } from '@/lib/utils'
 
@@ -22,6 +25,7 @@ import { Button } from '../ui/button'
 import { CourseAside } from './course-aside'
 import { CourseOutcomes } from './course-outcomes'
 import { CourseProgram } from './course-program'
+import { CourseStatusBadge } from './course-status-badge'
 
 const DESCRIPTION_PREVIEW_LENGTH = 520
 
@@ -34,8 +38,11 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 	const progress = useCourseProgress(course.id)
 	const access = useCourseAccess(course)
 
-	const flatLessons = flattenCourseProgram(lessons)
-	const sectionCount = lessons.filter(item => 'lessons' in item).length
+	const program = withoutEmptySections(lessons)
+	const flatLessons = getAvailableLessons(program)
+	const upcomingCount = course.release.upcomingLessons
+	const isAnnounced = course.release.status === 'ANNOUNCED'
+	const sectionCount = program.filter(item => 'lessons' in item).length
 	const lessonIds = new Set(flatLessons.map(lesson => lesson.id))
 	const completed = progress.completedLessons.filter(id => lessonIds.has(id))
 
@@ -65,6 +72,7 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 					<CourseAside
 						course={course}
 						lessonCount={flatLessons.length}
+						upcomingCount={upcomingCount}
 						sectionCount={sectionCount}
 						completedCount={completed.length}
 						percentage={
@@ -79,6 +87,10 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 				</aside>
 
 				<div className='min-w-0'>
+					<CourseStatusBadge
+						status={course.release.status}
+						className='mb-5 px-3 py-1.5 text-sm'
+					/>
 					<h1 className='font-serif text-display-xl font-medium tracking-[-0.02em]'>
 						{course.title}
 					</h1>
@@ -104,19 +116,23 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 							<h2 className='font-display text-display-md font-medium'>
 								Программа курса
 							</h2>
-							{flatLessons.length > 0 && (
-								<p className='text-sm text-muted-foreground'>
-									{pluralize(flatLessons.length, LESSON)}
-									{sectionCount > 0 &&
-										` · ${pluralize(sectionCount, SECTION)}`}
-								</p>
-							)}
+							{!isAnnounced &&
+								(flatLessons.length > 0 ||
+									upcomingCount > 0) && (
+									<p className='text-sm text-muted-foreground'>
+										{pluralize(flatLessons.length, LESSON)}
+										{upcomingCount > 0 &&
+											` · ещё ${upcomingCount} скоро`}
+										{sectionCount > 0 &&
+											` · ${pluralize(sectionCount, SECTION)}`}
+									</p>
+								)}
 						</div>
 
 						<div className='mt-6'>
-							{lessons.length > 0 ? (
+							{program.length > 0 && !isAnnounced ? (
 								<CourseProgram
-									program={lessons}
+									program={program}
 									completedLessons={completed}
 									nextLessonId={nextLesson?.id ?? null}
 									isLocked={
@@ -127,12 +143,14 @@ export function CourseDetails({ course, lessons }: CourseDetailsProps) {
 								<div className='flex flex-col items-start gap-4 rounded-2xl border border-border bg-card p-6 sm:flex-row sm:items-center sm:justify-between'>
 									<div>
 										<p className='font-medium'>
-											Курс доступен на YouTube
+											{isAnnounced
+												? 'Программа появится позже'
+												: 'Курс доступен на YouTube'}
 										</p>
 										<p className='mt-1 text-sm text-muted-foreground'>
-											Уроков на платформе пока нет -
-											полная версия опубликована на
-											канале.
+											{isAnnounced
+												? 'Курс анонсирован: список уроков откроется, когда он начнёт выходить.'
+												: 'Уроков на платформе пока нет - полная версия опубликована на канале.'}
 										</p>
 									</div>
 									{course.youtubeUrl && (

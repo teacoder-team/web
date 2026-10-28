@@ -36,5 +36,7 @@ import type { CourseLessonListResponseItem } from './courseLessonListResponseIte
 
 /**
  * Программа курса: секции и отдельные уроки по порядку. Секция содержит массив lessons. Без секций возвращается обычный список уроков.
+ *
+ * Помимо вышедших уроков в программу попадают анонсированные - у них `isAvailable: false` и, если назначена, дата в `plannedReleaseAt`. Неанонсированные черновики не отдаются никому.
  */
 export type CourseLessonListResponse = CourseLessonListResponseItem[];
