@@ -43,7 +43,7 @@ export interface CreatePaymentPayload {
   method: CreatePaymentPayloadMethod;
   /** Провайдер из списка способов оплаты. Без него для BANK_CARD используется YOOKASSA, для CRYPTO - HELEKET. Недоступные сочетания отклоняются. */
   provider?: CreatePaymentPayloadProvider;
-  /** Курс для покупки. Без него оплачивается премиум-подписка. */
+  /** Курс для покупки. Без него оплачивается премиум-подписка. Курс должен продаваться отдельно прямо сейчас - это `entitlements.purchase: true` на странице курса; иначе 404. */
   courseId?: string;
   /** Почта для чека. Нужна, только если у аккаунта нет своей почты. */
   email?: string;

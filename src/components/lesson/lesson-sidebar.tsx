@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Check, Play } from 'lucide-react'
+import { ArrowLeft, Check, Clock, Play } from 'lucide-react'
 import Link from 'next/link'
 
 import type {
@@ -8,9 +8,13 @@ import type {
 	LessonResponseCourse
 } from '@/generated/model'
 
-import type { ProgramLesson } from '@/lib/courses/program'
+import {
+	type ProgramLesson,
+	getAvailableLessons,
+	isLessonAvailable
+} from '@/lib/courses/program'
 import { ROUTES } from '@/lib/routes'
-import { LESSON, cn, plural } from '@/lib/utils'
+import { LESSON, cn, formatShortDate, plural } from '@/lib/utils'
 
 import {
 	Accordion,
@@ -38,9 +42,7 @@ export function LessonSidebar({
 	completedLessons,
 	onNavigate
 }: LessonSidebarProps) {
-	const lessons = program.flatMap(item =>
-		'lessons' in item ? item.lessons : [item]
-	)
+	const lessons = getAvailableLessons(program)
 	const completed = lessons.filter(lesson =>
 		completedLessons.includes(lesson.id)
 	).length
@@ -49,7 +51,9 @@ export function LessonSidebar({
 		: 0
 
 	const numbers = new Map(
-		lessons.map((lesson, index) => [lesson.id, index + 1])
+		program
+			.flatMap(item => ('lessons' in item ? item.lessons : [item]))
+			.map((lesson, index) => [lesson.id, index + 1])
 	)
 	const activeSection = program.find(
 		item =>
@@ -74,7 +78,7 @@ export function LessonSidebar({
 				>
 					<ArrowLeft className='size-4' />К странице курса
 				</Link>
-				<p className='mt-5 font-serif text-xl font-medium leading-snug tracking-[-0.01em]'>
+				<p className='mt-5 font-serif text-xl leading-snug font-medium tracking-[-0.01em]'>
 					{course.title}
 				</p>
 				<div className='mt-4'>
@@ -122,7 +126,7 @@ export function LessonSidebar({
 											completedLessons={completedLessons}
 										/>
 									</AccordionTrigger>
-									<AccordionContent className='pb-2 pt-1'>
+									<AccordionContent className='pt-1 pb-2'>
 										<ul className='space-y-0.5'>
 											{item.lessons.map(lesson => (
 												<LessonLink
@@ -158,10 +162,11 @@ function SectionHeader({
 	lessons: ProgramLesson[]
 	completedLessons: string[]
 }) {
-	const done = lessons.filter(lesson =>
+	const released = lessons.filter(isLessonAvailable)
+	const done = released.filter(lesson =>
 		completedLessons.includes(lesson.id)
 	).length
-	const isDone = done > 0 && done === lessons.length
+	const isDone = done > 0 && done === released.length
 
 	return (
 		<span className='flex min-w-0 flex-1 items-center gap-3'>
@@ -180,11 +185,11 @@ function SectionHeader({
 				)}
 			</span>
 			<span className='min-w-0 flex-1'>
-				<span className='line-clamp-2 font-medium leading-snug text-foreground'>
+				<span className='line-clamp-2 leading-snug font-medium text-foreground'>
 					{title}
 				</span>
 				<span className='mt-0.5 block text-xs font-normal text-muted-foreground'>
-					{done} / {lessons.length} {plural(lessons.length, LESSON)}
+					{done} / {released.length} {plural(released.length, LESSON)}
 				</span>
 			</span>
 		</span>
@@ -208,6 +213,24 @@ function LessonLink({
 }: LessonLinkProps) {
 	const isActive = lesson.id === activeLessonId
 	const isCompleted = completedLessons.includes(lesson.id)
+
+	if (!isLessonAvailable(lesson)) {
+		return (
+			<li className='flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-muted-foreground'>
+				<span className='flex size-6 shrink-0 items-center justify-center rounded-full border border-border'>
+					<Clock className='size-3' />
+				</span>
+				<span className='line-clamp-2 min-w-0 flex-1 leading-snug'>
+					{lesson.title}
+				</span>
+				<span className='shrink-0 text-xs'>
+					{lesson.plannedReleaseAt
+						? formatShortDate(lesson.plannedReleaseAt)
+						: 'Скоро'}
+				</span>
+			</li>
+		)
+	}
 
 	return (
 		<li>

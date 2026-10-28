@@ -1,15 +1,15 @@
 'use client'
 
-import { Check, Lock, Play } from 'lucide-react'
+import { Check, Clock, Lock, Play } from 'lucide-react'
 import type { Route } from 'next'
 import Link from 'next/link'
 
 import type { CourseLessonListResponseItem } from '@/generated/model'
 
 import { useSession } from '@/lib/auth/auth-provider'
-import type { ProgramLesson } from '@/lib/courses/program'
+import { type ProgramLesson, isLessonAvailable } from '@/lib/courses/program'
 import { ROUTES } from '@/lib/routes'
-import { LESSON, cn, pluralize } from '@/lib/utils'
+import { LESSON, cn, formatShortDate, pluralize } from '@/lib/utils'
 
 import {
 	Accordion,
@@ -84,10 +84,12 @@ export function CourseProgram({
 					)
 				}
 
-				const done = item.lessons.filter(lesson =>
+				const released = item.lessons.filter(isLessonAvailable)
+				const upcoming = item.lessons.length - released.length
+				const done = released.filter(lesson =>
 					completedLessons.includes(lesson.id)
 				).length
-				const isDone = done === item.lessons.length && done > 0
+				const isDone = done === released.length && done > 0
 
 				return (
 					<AccordionItem
@@ -119,7 +121,9 @@ export function CourseProgram({
 										{item.title}
 									</span>
 									<span className='mt-0.5 block text-sm font-normal text-muted-foreground'>
-										{pluralize(item.lessons.length, LESSON)}
+										{pluralize(released.length, LESSON)}
+										{upcoming > 0 &&
+											` · ещё ${upcoming} скоро`}
 										{done > 0 &&
 											!isDone &&
 											` · пройдено ${done}`}
@@ -162,8 +166,10 @@ function LessonRow({
 }: LessonRowProps) {
 	const { isAuthorized } = useSession()
 
+	const isAvailable = isLessonAvailable(lesson)
 	const isCompleted = completedLessons.includes(lesson.id)
-	const isNext = lesson.id === nextLessonId && completedLessons.length > 0
+	const isNext =
+		isAvailable && lesson.id === nextLessonId && completedLessons.length > 0
 
 	const href: Route = isAuthorized
 		? ROUTES.COURSES.LESSON(lesson.id)
@@ -184,7 +190,9 @@ function LessonRow({
 							: 'border border-border text-muted-foreground'
 				)}
 			>
-				{isCompleted ? (
+				{!isAvailable ? (
+					<Clock className='size-3.5' />
+				) : isCompleted ? (
 					<Check className='size-3.5' strokeWidth={3} />
 				) : isNext ? (
 					<Play className='size-3 translate-x-px fill-current' />
@@ -195,7 +203,7 @@ function LessonRow({
 			<span
 				className={cn(
 					'min-w-0 flex-1 truncate text-[15px] transition-colors',
-					isCompleted || isLocked
+					isCompleted || isLocked || !isAvailable
 						? 'text-muted-foreground'
 						: 'text-foreground'
 				)}
@@ -207,7 +215,14 @@ function LessonRow({
 					Следующий
 				</span>
 			)}
-			{isLocked && !isCompleted && (
+			{!isAvailable && (
+				<span className='shrink-0 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground'>
+					{lesson.plannedReleaseAt
+						? `Скоро · ${formatShortDate(lesson.plannedReleaseAt)}`
+						: 'Скоро'}
+				</span>
+			)}
+			{isAvailable && isLocked && !isCompleted && (
 				<Lock
 					aria-label='Недоступно'
 					className='size-4 shrink-0 text-muted-foreground'
@@ -223,8 +238,8 @@ function LessonRow({
 
 	return (
 		<li className='border-b border-border last:border-b-0'>
-			{isLocked ? (
-				// Without access the lesson page can't be opened, so no link
+			{isLocked || !isAvailable ? (
+				// No access or not released yet: the lesson page can't be opened, so no link
 				<div className={rowClassName}>{content}</div>
 			) : (
 				<Link

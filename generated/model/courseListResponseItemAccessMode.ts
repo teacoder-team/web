@@ -34,7 +34,7 @@
  */
 
 /**
- * Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме.
+ * Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - только по премиум-подписке, `PURCHASE` - только покупкой курса, `PREMIUM_OR_PURCHASE` - по подписке или покупке на выбор. Купленный курс открыт навсегда в любом режиме, даже если режим потом изменили.
  */
 export type CourseListResponseItemAccessMode = typeof CourseListResponseItemAccessMode[keyof typeof CourseListResponseItemAccessMode];
 
@@ -43,4 +43,5 @@ export const CourseListResponseItemAccessMode = {
   FREE: 'FREE',
   PREMIUM: 'PREMIUM',
   PURCHASE: 'PURCHASE',
+  PREMIUM_OR_PURCHASE: 'PREMIUM_OR_PURCHASE',
 } as const;

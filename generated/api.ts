@@ -70,7 +70,10 @@ import type {
   CreatePaymentResponse,
   EmailChangeResponse,
   ForgotPasswordPayload,
+  GetAdminJobsQueryParams,
   HealthResponse,
+  JobListResponse,
+  JobResponse,
   LeaderListResponse,
   LessonResponse,
   LoginPayload,
@@ -91,9 +94,11 @@ import type {
   PostAuthWebauthnLoginOptionsMutationBodyOne,
   PostAuthWebauthnLoginOptionsMutationBodyThree,
   PostAuthWebauthnLoginOptionsMutationBodyTwo,
+  QueueListResponse,
   RecoveryCodesResponse,
   RecoveryCodesStatusResponse,
   RegisterPayload,
+  ReleaseSyncResponse,
   ResetPasswordPayload,
   RevokeResponse,
   RootResponse,
@@ -315,6 +320,369 @@ export function useGetHealthQuery<TData = Awaited<ReturnType<typeof getHealthQue
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetHealthQueryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Находит уроки с проставленной датой выхода (`planned_release_at`), которые ещё не опубликованы, и ставит их публикацию в очередь. Уроки одного курса с одинаковой датой выходят вместе и попадают в одно письмо подписчикам курса.
+ *
+ * Вызывайте после того, как проставили даты в базе. Запрос идемпотентный: повторный вызов не создаёт дублей и не публикует ничего дважды. Группы с уже прошедшей датой публикуются сразу (`isDue: true`).
+ *
+ * То же самое делает команда `/releases` в админ-боте.
+ * @summary Синхронизация публикаций уроков
+ */
+export const postAdminReleasesSyncMutation = (
+
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<ReleaseSyncResponse>(
+      {url: `/admin/releases/sync`, method: 'POST', signal
+    },
+      options);
+    }
+
+
+
+
+export const getPostAdminReleasesSyncMutationMutationKey = () => ['postAdminReleasesSyncMutation'] as const;
+
+export const getPostAdminReleasesSyncMutationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>, TError,void, TContext>, request?: SecondParameter<typeof apiClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>, TError,void, TContext> => {
+
+const mutationKey = getPostAdminReleasesSyncMutationMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>, void> = () => {
+
+
+          return  postAdminReleasesSyncMutation(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAdminReleasesSyncMutationMutationResult = NonNullable<Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>>
+
+    export type PostAdminReleasesSyncMutationMutationError = ErrorType<unknown>
+
+
+    /**
+ * @summary Синхронизация публикаций уроков
+ */
+export const usePostAdminReleasesSyncMutation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>, TError,void, TContext>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAdminReleasesSyncMutation>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPostAdminReleasesSyncMutationMutationOptions(options), queryClient);
+    }
+
+/**
+ * Все очереди приложения и сколько задач в каждом состоянии. Счётчики читаются из Redis напрямую, поэтому показывают текущее состояние, а не историю. У очередей, которые удаляют выполненные задачи сразу, `completed` почти всегда 0.
+ * @summary Очереди задач
+ */
+export const getAdminQueuesQuery = (
+
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<QueueListResponse>(
+      {url: `/admin/queues`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetAdminQueuesQueryQueryKey = () => {
+    return [
+    `/admin/queues`
+    ] as const;
+    }
+
+
+export const getGetAdminQueuesQueryQueryOptions = <TData = Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError = ErrorType<unknown>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminQueuesQueryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminQueuesQuery>>> = ({ signal }) => getAdminQueuesQuery(requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminQueuesQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminQueuesQuery>>>
+export type GetAdminQueuesQueryQueryError = ErrorType<unknown>
+
+
+export function useGetAdminQueuesQuery<TData = Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError = ErrorType<unknown>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminQueuesQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminQueuesQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminQueuesQuery<TData = Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminQueuesQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminQueuesQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminQueuesQuery<TData = Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Очереди задач
+ */
+
+export function useGetAdminQueuesQuery<TData = Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError = ErrorType<unknown>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminQueuesQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminQueuesQueryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Текущие задачи, сначала новые. Без параметров отдаёт задачи всех очередей в состояниях `waiting`, `active`, `delayed`, `failed` и `completed`; `queue` и `status` сужают выборку.
+ *
+ * Задачи живут в Redis, а не в базе: выполненные обычно удаляются сразу, упавшие хранятся ограниченное время, поэтому список - не журнал, а снимок состояния. Данные задач приходят без секретов и личных данных.
+ * @summary Задачи в очередях
+ */
+export const getAdminJobsQuery = (
+    params?: GetAdminJobsQueryParams,
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<JobListResponse>(
+      {url: `/admin/jobs`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetAdminJobsQueryQueryKey = (params?: GetAdminJobsQueryParams,) => {
+    return [
+    `/admin/jobs`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminJobsQueryQueryOptions = <TData = Awaited<ReturnType<typeof getAdminJobsQuery>>, TError = ErrorType<unknown>>(params?: GetAdminJobsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminJobsQueryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminJobsQuery>>> = ({ signal }) => getAdminJobsQuery(params, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminJobsQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminJobsQuery>>>
+export type GetAdminJobsQueryQueryError = ErrorType<unknown>
+
+
+export function useGetAdminJobsQuery<TData = Awaited<ReturnType<typeof getAdminJobsQuery>>, TError = ErrorType<unknown>>(
+ params: undefined |  GetAdminJobsQueryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminJobsQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminJobsQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminJobsQuery<TData = Awaited<ReturnType<typeof getAdminJobsQuery>>, TError = ErrorType<unknown>>(
+ params?: GetAdminJobsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminJobsQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminJobsQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminJobsQuery<TData = Awaited<ReturnType<typeof getAdminJobsQuery>>, TError = ErrorType<unknown>>(
+ params?: GetAdminJobsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Задачи в очередях
+ */
+
+export function useGetAdminJobsQuery<TData = Awaited<ReturnType<typeof getAdminJobsQuery>>, TError = ErrorType<unknown>>(
+ params?: GetAdminJobsQueryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminJobsQueryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+/**
+ * Одна задача из Redis по очереди и идентификатору. Если задача уже удалена из очереди - 404, а у ещё живущей задачи `status` может быть `unknown`.
+ * @summary Задача
+ */
+export const getAdminJobsByQueueByIdQuery = (
+    id: string,
+    queue: 'email' | 'maintenance' | 'notifications' | 'billing' = 'email',
+ options?: SecondParameter<typeof apiClient>,signal?: AbortSignal
+) => {
+
+
+      return apiClient<JobResponse>(
+      {url: `/admin/jobs/${queue}/${id}`, method: 'GET', signal
+    },
+      options);
+    }
+
+
+
+
+export const getGetAdminJobsByQueueByIdQueryQueryKey = (id: string,
+    queue: 'email' | 'maintenance' | 'notifications' | 'billing' = 'email',) => {
+    return [
+    `/admin/jobs/${queue}/${id}`
+    ] as const;
+    }
+
+
+export const getGetAdminJobsByQueueByIdQueryQueryOptions = <TData = Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError = ErrorType<unknown>>(id: string,
+    queue: 'email' | 'maintenance' | 'notifications' | 'billing' = 'email', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminJobsByQueueByIdQueryQueryKey(id,queue);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>> = ({ signal }) => getAdminJobsByQueueByIdQuery(id,queue, requestOptions, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: queue !== null && queue !== undefined && id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAdminJobsByQueueByIdQueryQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>>
+export type GetAdminJobsByQueueByIdQueryQueryError = ErrorType<unknown>
+
+
+export function useGetAdminJobsByQueueByIdQuery<TData = Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string,
+    queue: undefined |  'email' | 'maintenance' | 'notifications' | 'billing', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminJobsByQueueByIdQuery<TData = Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string,
+    queue?: 'email' | 'maintenance' | 'notifications' | 'billing', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAdminJobsByQueueByIdQuery<TData = Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string,
+    queue?: 'email' | 'maintenance' | 'notifications' | 'billing', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Задача
+ */
+
+export function useGetAdminJobsByQueueByIdQuery<TData = Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError = ErrorType<unknown>>(
+ id: string,
+    queue: 'email' | 'maintenance' | 'notifications' | 'billing' = 'email', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAdminJobsByQueueByIdQuery>>, TError, TData>>, request?: SecondParameter<typeof apiClient>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAdminJobsByQueueByIdQueryQueryOptions(id,queue,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -3338,6 +3706,7 @@ export function useGetBillingMethodsQuery<TData = Awaited<ReturnType<typeof getB
  *
  * **Ответы 409:**
  * - курс уже куплен;
+ * - курс ещё только анонсирован (`status: ANNOUNCED`), продажи не открыты;
  * - по товару уже идёт оплата в статусе `PROCESSING`, например криптовалюта ждёт подтверждений;
  * - параллельный запрос на этот же товар ещё выполняется - повторите через секунду.
  *
@@ -3734,7 +4103,7 @@ export const useDeleteBillingCancelMutation = <TError = ErrorType<unknown>,
     }
 
 /**
- * Все опубликованные курсы, сначала новые. Только данные для карточки в каталоге: цена, режим доступа (`accessMode`) и есть ли материалы.
+ * Все опубликованные курсы, сначала новые. Архивные курсы (`stage: ARCHIVED`) в каталог не попадают - их страница по прямой ссылке остаётся доступной. Только данные для карточки: цена, режим доступа (`accessMode`), главный статус курса (`status`), сколько уроков уже вышло (`lessons`) и сколько анонсировано (`upcomingLessons`), и есть ли материалы.
  * @summary Каталог курсов
  */
 export const getCoursesQuery = (
@@ -3828,7 +4197,7 @@ export function useGetCoursesQuery<TData = Awaited<ReturnType<typeof getCoursesQ
 
 
 /**
- * Курсы, доступные текущему пользователю: опубликованные Premium-курсы при активной подписке и купленные курсы независимо от наличия подписки. Покупка сохраняет доступ, даже если режим курса изменён с PURCHASE на PREMIUM. Курсы с текущим режимом FREE исключены, в том числе ранее купленные. Каждый курс возвращается один раз, сначала новые. Без доступных курсов возвращается пустой массив.
+ * Курсы, доступные текущему пользователю: при активной подписке - опубликованные курсы с режимом `PREMIUM` и `PREMIUM_OR_PURCHASE`, плюс купленные курсы независимо от наличия подписки. Покупка сохраняет доступ, даже если режим курса потом изменили. Архивные курсы остаются в библиотеке. Курсы с текущим режимом FREE исключены, в том числе ранее купленные. Каждый курс возвращается один раз, сначала новые. Без доступных курсов возвращается пустой массив.
  * @summary Библиотека курсов
  */
 export const getCoursesLibraryQuery = (
@@ -3922,7 +4291,7 @@ export function useGetCoursesLibraryQuery<TData = Awaited<ReturnType<typeof getC
 
 
 /**
- * Полная информация об опубликованном курсе и `access` - открыт ли он текущему пользователю и почему (авторизация необязательна). Увеличивает счётчик просмотров - не чаще раза в 30 минут для одного IP.
+ * Полная информация об опубликованном курсе, включая архивный. `release` - стадия выпуска: главный статус, выходят ли ещё уроки и сколько их уже открыто. `entitlements` - как курс можно открыть: подписка, разовая покупка или оба способа. `access` - открыт ли курс текущему пользователю и почему (авторизация необязательна). `youtubeUrl` - бесплатная полная версия на YouTube, если она уже вышла; выход на YouTube не меняет платный доступ к урокам и материалам. Увеличивает счётчик просмотров - не чаще раза в 30 минут для одного IP.
  * @summary Страница курса
  */
 export const getCoursesBySlugQuery = (
@@ -4016,7 +4385,7 @@ export function useGetCoursesBySlugQuery<TData = Awaited<ReturnType<typeof getCo
 
 
 /**
- * Программа курса доступна без авторизации. Без секций возвращается плоский список опубликованных уроков: `id`, `title`, `slug` и `isCompleted` для авторизованного пользователя. При наличии секций верхний массив содержит секции `{ id, title, lessons }` и уроки без секции `{ id, title, slug }` с тем же `isCompleted`. Они отсортированы вместе по `position`; уроки внутри каждой секции - по собственному `position`. При одинаковой позиции порядок определяется по ID. Пустые секции возвращаются с пустым массивом `lessons`. Значения `position` в ответ не включаются. `isCompleted` - пройден ли урок текущим пользователем; возвращается только при авторизации, без неё поля нет. Содержимое урока и проверка доступа - `GET /lessons/{id}`.
+ * Программа курса доступна без авторизации. Помимо вышедших уроков в неё попадают анонсированные - у них `isAvailable: false` и, если назначена, дата в `plannedReleaseAt`; содержимое такого урока не отдаётся, `GET /lessons/{id}` по нему вернёт 404. Неанонсированные черновики не видны никому. Без секций возвращается плоский список уроков: `id`, `title`, `slug`, `isAvailable`, `plannedReleaseAt` и `isCompleted` для авторизованного пользователя. При наличии секций верхний массив содержит секции `{ id, title, lessons }` и уроки без секции `{ id, title, slug }` с тем же `isCompleted`. Они отсортированы вместе по `position`; уроки внутри каждой секции - по собственному `position`. При одинаковой позиции порядок определяется по ID. Пустые секции возвращаются с пустым массивом `lessons`. Значения `position` в ответ не включаются. `isCompleted` - пройден ли урок текущим пользователем; возвращается только при авторизации, без неё поля нет. Содержимое урока и проверка доступа - `GET /lessons/{id}`.
  * @summary Программа курса
  */
 export const getCoursesBySlugLessonsQuery = (
@@ -4110,7 +4479,7 @@ export function useGetCoursesBySlugLessonsQuery<TData = Awaited<ReturnType<typeo
 
 
 /**
- * Выдаёт временную ссылку на архив с материалами (исходным кодом) курса. Доступ - как к закрытым урокам: бесплатный курс, покупка или (в режиме `PREMIUM`) подписка, иначе 403. Если материалов у курса нет (`hasMaterials: false`) - 404.
+ * Выдаёт временную ссылку на архив с материалами (исходным кодом) курса. Доступ - как к закрытым урокам: бесплатный курс, покупка или подписка в режимах `PREMIUM` и `PREMIUM_OR_PURCHASE`, иначе 403. Публикация полной версии на YouTube доступ к материалам не открывает. Если материалов у курса нет (`hasMaterials: false`) - 404.
  * @summary Ссылка на материалы курса
  */
 export const postCoursesBySlugMaterialsLinkMutation = (

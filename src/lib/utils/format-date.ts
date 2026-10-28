@@ -12,6 +12,14 @@ export function formatDate(date: string | Date): string {
 	return `${day} ${month} в ${time}`
 }
 
+/** "2 ноября" - for dates that are clearly in the near future. */
+export function formatShortDate(date: string | Date): string {
+	return new Intl.DateTimeFormat('ru-RU', {
+		day: 'numeric',
+		month: 'long'
+	}).format(new Date(date))
+}
+
 /** "2 ноября 2026" - without the "г." suffix, so it reads inside a sentence. */
 export function formatFullDate(date: string | Date): string {
 	return new Intl.DateTimeFormat('ru-RU', {

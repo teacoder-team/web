@@ -128,7 +128,7 @@ export function SplitPaymentButton({
 							width={1000}
 							height={143}
 							unoptimized
-							className='h-[18px] w-auto'
+							className='h-4.5 w-auto'
 						/>
 					</span>
 					<span className='flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground transition-transform duration-200 group-hover:translate-x-0.5'>

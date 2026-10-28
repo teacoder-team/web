@@ -34,6 +34,8 @@
  */
 import type { CourseResponseAccess } from './courseResponseAccess';
 import type { CourseResponseAccessMode } from './courseResponseAccessMode';
+import type { CourseResponseEntitlements } from './courseResponseEntitlements';
+import type { CourseResponseRelease } from './courseResponseRelease';
 
 /**
  * Курс.
@@ -53,8 +55,12 @@ export interface CourseResponse {
   discountPrice: number | null;
   /** Что вы узнаете на курсе: пункты списка в порядке показа. Пустой массив, если не заполнено. */
   learningOutcomes: string[];
-  /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - по премиум-подписке или покупке курса, `PURCHASE` - только покупкой. Купленный курс открыт навсегда в любом режиме. */
+  /** Как открываются закрытые уроки и материалы: `FREE` - курс полностью бесплатный, `PREMIUM` - только по премиум-подписке, `PURCHASE` - только покупкой курса, `PREMIUM_OR_PURCHASE` - по подписке или покупке на выбор. Купленный курс открыт навсегда в любом режиме, даже если режим потом изменили. */
   accessMode: CourseResponseAccessMode;
+  /** Стадия выпуска курса и прогресс выхода уроков. */
+  release: CourseResponseRelease;
+  /** Как курс можно открыть: подписка, разовая покупка или оба способа. */
+  entitlements: CourseResponseEntitlements;
   /** Есть ли у курса материалы (исходный код). Скачать - `POST /courses/{slug}/materials/link`. */
   hasMaterials: boolean;
   /** Доступ текущего пользователя. Без входа открыт только бесплатный курс (ознакомительные уроки открыты всем в любом случае). */
