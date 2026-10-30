@@ -8,11 +8,22 @@ import { Hero } from '@/components/home/hero'
 import { Manifesto } from '@/components/home/manifesto'
 import { Popular } from '@/components/home/popular'
 import { TelegramCTA } from '@/components/home/telegram-cta'
+import { JsonLd } from '@/components/shared/json-ld'
 
 import { pickPopularCourses } from '@/lib/courses/popular-courses'
+import { ROUTES } from '@/lib/routes'
+import { SEO, pageMetadata } from '@/lib/seo'
+import { itemListSchema } from '@/lib/seo/schema'
 
 export const metadata: Metadata = {
-	title: 'Образовательная платформа по веб разработке'
+	...pageMetadata({
+		title: SEO.name,
+		description: SEO.description,
+		path: ROUTES.HOME
+	}),
+	title: {
+		absolute: 'TeaCoder - курсы по веб-разработке с практикой'
+	}
 }
 
 export default async function HomePage() {
@@ -33,6 +44,15 @@ export default async function HomePage() {
 
 	return (
 		<Fragment>
+			<JsonLd
+				schema={itemListSchema(
+					courses.map(course => ({
+						path: ROUTES.COURSES.SINGLE(course.slug)
+					})),
+					'Популярные курсы TeaCoder'
+				)}
+			/>
+
 			<Hero />
 			<Manifesto />
 			<Popular courses={courses} />

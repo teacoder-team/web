@@ -1,12 +1,31 @@
 import type { Metadata } from 'next'
 
-export const metadata: Metadata = {
-	title: 'Об основателе'
-}
+import { JsonLd } from '@/components/shared/json-ld'
+
+import { ROUTES } from '@/lib/routes'
+import { pageMetadata } from '@/lib/seo'
+import { breadcrumbSchema, personSchema } from '@/lib/seo/schema'
+
+export const metadata: Metadata = pageMetadata({
+	title: 'Об основателе',
+	description:
+		'Вадим - основатель TeaCoder и автор курсов по веб-разработке: путь от первых сайтов в 11 лет до собственной платформы и YouTube-канала.',
+	path: ROUTES.ABOUT,
+	openGraphType: 'profile'
+})
 
 export default function AboutPage() {
 	return (
 		<main className='mx-auto my-20 max-w-4xl'>
+			<JsonLd
+				schema={[
+					personSchema(),
+					breadcrumbSchema([
+						{ name: 'Главная', path: ROUTES.HOME },
+						{ name: 'Об основателе', path: ROUTES.ABOUT }
+					])
+				]}
+			/>
 			<div className='mx-auto max-w-7xl px-4 lg:px-8'>
 				<section className='mx-auto'>
 					<h1 className='text-center text-4xl font-semibold tracking-tight sm:text-5xl'>

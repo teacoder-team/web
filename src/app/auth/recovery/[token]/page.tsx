@@ -4,7 +4,6 @@ import { NewPasswordForm } from '@/components/auth/new-password-form'
 
 export const metadata: Metadata = {
 	title: 'Новый пароль',
-	// The reset token is in the URL - never pass it on to other sites.
 	referrer: 'no-referrer',
 	robots: {
 		index: false,

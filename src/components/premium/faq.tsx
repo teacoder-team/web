@@ -1,11 +1,7 @@
 'use client'
 
-import Link from 'next/link'
-import type { ReactNode } from 'react'
-
 import { withoutSplit } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
-import { ROUTES } from '@/lib/routes'
 import { formatPrice } from '@/lib/utils'
 
 import {
@@ -15,116 +11,7 @@ import {
 	AccordionTrigger
 } from '../ui/accordion'
 
-const linkClassName =
-	'text-foreground underline decoration-border underline-offset-4 transition-colors hover:decoration-foreground'
-
-interface Faq {
-	question: string
-	answer: ReactNode
-}
-
-function getFaqs(
-	paymentMethods: string[],
-	internationalPrice: string | null
-): Faq[] {
-	return [
-		{
-			question: 'Что входит в подписку?',
-			answer: (
-				<>
-					<p>
-						Подписка открывает все курсы с пометкой «По подписке»:
-						закрытые уроки, исходный код и материалы. Если у курса
-						указана ещё и цена, его можно не только смотреть по
-						подписке, но и купить навсегда.
-					</p>
-					<p className='mt-3'>
-						Кроме того, подписка даёт значок{' '}
-						<strong className='font-medium text-foreground'>
-							Premium
-						</strong>{' '}
-						в таблице лидеров.
-					</p>
-				</>
-			)
-		},
-		{
-			question: 'Какие курсы не входят в подписку?',
-			answer: (
-				<p>
-					Курсы, которые продаются только отдельной покупкой, - у них
-					в карточке указана цена без пометки «По подписке». Купленный
-					курс остаётся открытым навсегда. Бесплатные курсы доступны
-					всем без подписки.
-				</p>
-			)
-		},
-		{
-			question: 'Что ещё доступно по подписке?',
-			answer: (
-				<ul className='list-disc space-y-2 pl-5'>
-					<li>
-						Просмотр уроков по разделам - если программа курса
-						разбита на разделы.
-					</li>
-					<li>Домашние задания - если они есть у курса.</li>
-				</ul>
-			)
-		},
-		{
-			question: 'Как можно оплатить подписку?',
-			answer: (
-				<p>
-					{paymentMethods.length > 0
-						? `Доступные способы оплаты: ${paymentMethods.join(', ')}.`
-						: 'Способ оплаты можно выбрать при оформлении подписки.'}
-				</p>
-			)
-		},
-		{
-			question: 'Можно ли оплатить подписку за пределами РФ?',
-			answer: (
-				<p>
-					Да, оплата международными банковскими картами доступна. Вы
-					можете оформить подписку из любой страны. Из-за высокой
-					комиссии международных платёжных систем стоимость подписки
-					при оплате иностранной картой выше
-					{internationalPrice ? (
-						<>
-							{' '}
-							и составляет{' '}
-							<strong className='font-medium text-foreground'>
-								{internationalPrice}
-							</strong>
-						</>
-					) : null}
-					.
-				</p>
-			)
-		},
-		{
-			question: 'Как и когда можно отменить подписку?',
-			answer: (
-				<>
-					<p>
-						Отменить подписку можно в любое время в разделе{' '}
-						<Link
-							href={ROUTES.ACCOUNT.SUBSCRIPTION}
-							className={linkClassName}
-						>
-							«Подписка»
-						</Link>{' '}
-						личного кабинета.
-					</p>
-					<p className='mt-3'>
-						После отмены доступ сохранится до конца уже оплаченного
-						периода.
-					</p>
-				</>
-			)
-		}
-	]
-}
+import { getFaqs } from './faq-items'
 
 export function FAQSection() {
 	const { data: config } = useAppConfig()

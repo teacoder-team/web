@@ -5,10 +5,14 @@ import { LegalDocument } from '@/components/legal/legal-document'
 
 import { env } from '@/lib/config/env'
 import { ROUTES } from '@/lib/routes'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-	title: 'Политика конфиденциальности'
-}
+export const metadata: Metadata = pageMetadata({
+	title: 'Политика конфиденциальности',
+	description:
+		'Какие сведения о пользователях получает TeaCoder, для чего они используются, кому передаются и как защищаются.',
+	path: ROUTES.DOCUMENTS.PRIVACY
+})
 
 const support = (
 	<Link href={`mailto:${env.SUPPORT_EMAIL}`}>{env.SUPPORT_EMAIL}</Link>
