@@ -4,17 +4,43 @@ import { getCoursesQuery } from '@/generated/api'
 
 import { CourseCard } from '@/components/course/course-card'
 import { FAQSection } from '@/components/premium/faq'
+import { getFaqs } from '@/components/premium/faq-items'
 import { Premium } from '@/components/premium/premium'
+import { JsonLd } from '@/components/shared/json-ld'
 
-import { COURSE, pluralize } from '@/lib/utils'
+import { withoutSplit } from '@/lib/billing/payment-methods'
+import { getAppConfig } from '@/lib/config/app-config'
+import { ROUTES } from '@/lib/routes'
+import { pageMetadata } from '@/lib/seo'
+import {
+	breadcrumbSchema,
+	faqSchema,
+	subscriptionSchema
+} from '@/lib/seo/schema'
+import { COURSE, formatPrice, pluralize } from '@/lib/utils'
 
-export const metadata: Metadata = {
-	title: 'Подписка'
-}
+export const metadata: Metadata = pageMetadata({
+	title: 'Подписка Premium',
+	description:
+		'Premium открывает закрытые уроки и исходный код курсов с пометкой «По подписке». Оплата картой, СБП и криптовалютой, отменить можно в любой момент.',
+	path: ROUTES.PREMIUM
+})
 
 export default async function PremiumPage() {
 	// The pricing block works without the course list, so a failed fetch only hides the grid
-	const courses = await getCoursesQuery().catch(() => [])
+	const [courses, config] = await Promise.all([
+		getCoursesQuery().catch(() => []),
+		getAppConfig()
+	])
+
+	const premium = config?.features.premium
+	const faqs = getFaqs(
+		withoutSplit(config?.features.payments)?.map(method => method.name) ??
+			[],
+		premium
+			? formatPrice(premium.prices.international, premium.currency)
+			: null
+	)
 	// Subscription covers PREMIUM courses only; PURCHASE ones are bought separately
 	const included = courses.filter(
 		course =>
@@ -24,6 +50,17 @@ export default async function PremiumPage() {
 
 	return (
 		<main className='pb-24 sm:pb-32'>
+			<JsonLd
+				schema={[
+					subscriptionSchema(premium, ROUTES.PREMIUM),
+					faqSchema(faqs),
+					breadcrumbSchema([
+						{ name: 'Главная', path: ROUTES.HOME },
+						{ name: 'Подписка', path: ROUTES.PREMIUM }
+					])
+				]}
+			/>
+
 			<section className='page-container pt-16 pb-14 text-center sm:pt-24 sm:pb-16'>
 				<p className='inline-flex rounded-full border border-border bg-card px-3.5 py-1.5 text-sm font-medium text-muted-foreground'>
 					Подписка TeaCoder

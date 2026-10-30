@@ -12,7 +12,9 @@ const config: NextConfig = {
 				hostname: '**'
 			}
 		],
-		dangerouslyAllowSVG: false
+		dangerouslyAllowSVG: false,
+		formats: ['image/avif', 'image/webp'],
+		minimumCacheTTL: 2678400
 	},
 	typedRoutes: false,
 	experimental: {

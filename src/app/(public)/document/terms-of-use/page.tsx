@@ -5,10 +5,14 @@ import { LegalDocument } from '@/components/legal/legal-document'
 
 import { env } from '@/lib/config/env'
 import { ROUTES } from '@/lib/routes'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
-	title: 'Пользовательское соглашение'
-}
+export const metadata: Metadata = pageMetadata({
+	title: 'Пользовательское соглашение',
+	description:
+		'Условия использования платформы TeaCoder: доступ к курсам, оплата подписки и курсов, возвраты и права пользователей.',
+	path: ROUTES.DOCUMENTS.TERMS
+})
 
 const support = (
 	<Link href={`mailto:${env.SUPPORT_EMAIL}`}>{env.SUPPORT_EMAIL}</Link>

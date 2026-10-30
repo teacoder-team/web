@@ -7,7 +7,7 @@ interface CourseStatusMeta {
 	variant: NonNullable<BadgeProps['variant']>
 }
 
-/** `DRAFT` never reaches the public API, so it has no label. */
+/** No label for `DRAFT` (never public) and `PUBLICLY_RELEASED` (deliberately not shown). */
 export const COURSE_STATUS: Partial<
 	Record<CourseListResponseItemStatus, CourseStatusMeta>
 > = {
@@ -15,9 +15,5 @@ export const COURSE_STATUS: Partial<
 	IN_PRODUCTION: { label: 'Выходит поэтапно', variant: 'default' },
 	EARLY_ACCESS: { label: 'Ранний доступ', variant: 'default' },
 	COMPLETED: { label: 'Курс завершён', variant: 'success' },
-	PUBLICLY_RELEASED: {
-		label: 'Полная версия на YouTube',
-		variant: 'neutral'
-	},
 	ARCHIVED: { label: 'В архиве', variant: 'outline' }
 }

@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/lib/routes'
 
 export const metadata: Metadata = {
-	title: 'Страница не найдена'
+	title: 'Страница не найдена',
+	description:
+		'Такой страницы на TeaCoder нет. Вернитесь на главную или откройте каталог курсов.',
+	robots: { index: false, follow: true }
 }
 
 export default function NotFoundPage() {

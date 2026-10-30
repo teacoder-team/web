@@ -6,6 +6,7 @@ import { CookieDialog } from '@/components/consent/cookie-dialog'
 import { AnalyticsProvider } from '@/components/providers/analytics-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { JsonLd } from '@/components/shared/json-ld'
 import { Toaster } from '@/components/shared/sonner'
 
 import { YandexMetrikaScript } from '@/lib/analytics/script-providers'
@@ -17,6 +18,7 @@ import { ConsentProvider } from '@/lib/consent/consent-provider'
 import { FingerprintProvider } from '@/lib/fingerprint/fingerprint-provider'
 import { garamond, geist, onest } from '@/lib/fonts'
 import { OG_IMAGE, SEO } from '@/lib/seo'
+import { organizationSchema, websiteSchema } from '@/lib/seo/schema'
 import { cn } from '@/lib/utils'
 
 import '@/assets/styles/globals.css'
@@ -30,6 +32,21 @@ export const metadata: Metadata = {
 	metadataBase: new URL(env.APP_URL),
 	applicationName: SEO.name,
 	keywords: SEO.keywords,
+	authors: [{ name: SEO.name, url: SEO.url }],
+	creator: SEO.name,
+	publisher: SEO.name,
+	category: 'education',
+	robots: {
+		index: true,
+		follow: true,
+		googleBot: {
+			index: true,
+			follow: true,
+			'max-image-preview': 'large',
+			'max-snippet': -1,
+			'max-video-preview': -1
+		}
+	},
 	icons: {
 		icon: '/favicon.ico',
 		shortcut: '/favicon.ico',
@@ -82,6 +99,8 @@ export default async function RootLayout({
 					garamond.variable
 				)}
 			>
+				<JsonLd schema={[organizationSchema(), websiteSchema()]} />
+
 				<QueryProvider>
 					<ConsentProvider
 						initialConsent={parseConsent(

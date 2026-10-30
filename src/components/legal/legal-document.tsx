@@ -4,7 +4,10 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 import { ROUTES } from '@/lib/routes'
+import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema'
 import { cn } from '@/lib/utils'
+
+import { JsonLd } from '../shared/json-ld'
 
 const DOCUMENTS = [
 	{
@@ -48,10 +51,21 @@ export function LegalDocument({
 	edition,
 	children
 }: LegalDocumentProps) {
-	const others = DOCUMENTS.filter(document => document.key !== current)
+	const active = DOCUMENTS.find(item => item.key === current)!
+	const others = DOCUMENTS.filter(item => item.key !== current)
 
 	return (
 		<main className='pb-24 sm:pb-32'>
+			<JsonLd
+				schema={[
+					webPageSchema(title, active.description, active.href),
+					breadcrumbSchema([
+						{ name: 'Главная', path: ROUTES.HOME },
+						{ name: active.title, path: active.href }
+					])
+				]}
+			/>
+
 			<section className='frame-container pt-2'>
 				<div className='relative isolate flex min-h-[260px] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-inverse px-6 py-10 text-inverse-foreground sm:min-h-[320px] sm:px-12 sm:py-14 lg:px-16'>
 					<Image
