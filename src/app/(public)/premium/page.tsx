@@ -8,7 +8,7 @@ import { getFaqs } from '@/components/premium/faq-items'
 import { Premium } from '@/components/premium/premium'
 import { JsonLd } from '@/components/shared/json-ld'
 
-import { withoutSplit } from '@/lib/billing/payment-methods'
+import { payableMethods } from '@/lib/billing/payment-methods'
 import { getAppConfig } from '@/lib/config/app-config'
 import { ROUTES } from '@/lib/routes'
 import { pageMetadata } from '@/lib/seo'
@@ -35,8 +35,9 @@ export default async function PremiumPage() {
 
 	const premium = config?.features.premium
 	const faqs = getFaqs(
-		withoutSplit(config?.features.payments)?.map(method => method.name) ??
-			[],
+		payableMethods(config?.features.payments, true)?.map(
+			method => method.name
+		) ?? [],
 		premium
 			? formatPrice(premium.prices.international, premium.currency)
 			: null

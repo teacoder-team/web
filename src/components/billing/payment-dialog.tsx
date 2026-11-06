@@ -15,7 +15,10 @@ import {
 
 import { getErrorMessage } from '@/lib/api/errors'
 import { useSession } from '@/lib/auth/auth-provider'
-import { RECURRING_METHODS, withoutSplit } from '@/lib/billing/payment-methods'
+import {
+	RECURRING_METHODS,
+	payableMethods
+} from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { ROUTES } from '@/lib/routes'
 
@@ -95,8 +98,8 @@ export function PaymentDialog({
 
 	const method = form.watch('method')
 	const provider = form.watch('provider')
-	const payments = withoutSplit(config?.features.payments)
 	const isSubscription = !courseId
+	const payments = payableMethods(config?.features.payments, isSubscription)
 	const hasAutoRenewal =
 		isSubscription &&
 		(RECURRING_METHODS.includes(method) ||
@@ -148,7 +151,10 @@ export function PaymentDialog({
 						</DialogHeader>
 
 						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 sm:px-8'>
-							<PaymentMethods control={form.control} />
+							<PaymentMethods
+								control={form.control}
+								isSubscription={isSubscription}
+							/>
 
 							{!user?.email && (
 								<FormField

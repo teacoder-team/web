@@ -1,6 +1,6 @@
 'use client'
 
-import { withoutSplit } from '@/lib/billing/payment-methods'
+import { payableMethods } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { formatPrice } from '@/lib/utils'
 
@@ -18,8 +18,9 @@ export function FAQSection() {
 
 	const premium = config?.features.premium
 	const faqs = getFaqs(
-		withoutSplit(config?.features.payments)?.map(method => method.name) ??
-			[],
+		payableMethods(config?.features.payments, true)?.map(
+			method => method.name
+		) ?? [],
 		premium
 			? formatPrice(premium.prices.international, premium.currency)
 			: null
