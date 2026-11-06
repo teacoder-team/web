@@ -29,7 +29,7 @@ export function ProgressStats() {
 		: []
 
 	return (
-		<section className='relative isolate overflow-hidden rounded-3xl bg-inverse p-6 text-inverse-foreground dark:ring-1 dark:ring-border sm:p-8'>
+		<section className='relative isolate overflow-hidden rounded-3xl bg-inverse p-6 text-inverse-foreground sm:p-8 dark:ring-1 dark:ring-border'>
 			<Image
 				src='/images/art/panel-grain.webp'
 				alt=''
@@ -52,7 +52,7 @@ export function ProgressStats() {
 									{tile.label}
 								</p>
 								<p className='mt-2 flex items-baseline gap-2'>
-									<span className='font-display text-[clamp(2rem,1.6rem+1.6vw,3rem)] font-medium tabular-nums leading-none tracking-[-0.04em]'>
+									<span className='font-display text-[clamp(2rem,1.6rem+1.6vw,3rem)] leading-none font-medium tracking-[-0.04em] tabular-nums'>
 										{tile.value}
 									</span>
 									{tile.suffix && (

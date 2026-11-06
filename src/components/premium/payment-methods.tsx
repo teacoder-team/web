@@ -4,10 +4,7 @@ import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-import {
-	PAYMENT_METHOD_ICONS,
-	withoutSplit
-} from '@/lib/billing/payment-methods'
+import { getPaymentIcon, withoutSplit } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { cn } from '@/lib/utils'
 
@@ -54,7 +51,7 @@ export function PaymentMethods({ control }: PaymentMethodsProps) {
 							className='flex flex-col gap-4'
 						>
 							{data.map(method => {
-								const Icon = PAYMENT_METHOD_ICONS[method.id]
+								const Icon = getPaymentIcon(method.id)
 								const key = getOptionKey(method)
 								const isSelected =
 									field.value === method.id &&

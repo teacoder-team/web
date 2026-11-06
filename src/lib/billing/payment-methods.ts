@@ -8,6 +8,7 @@ import type {
 } from '@/generated/model'
 
 import {
+	AlfaIcon,
 	SberbankIcon,
 	SbpIcon,
 	TBankIcon,
@@ -34,17 +35,21 @@ export const withoutSplit = (options: PaymentOption[] | undefined) =>
 /** Methods that can carry a recurring charge for the subscription. */
 export const RECURRING_METHODS: string[] = ['BANK_CARD', 'SBP', 'T_PAY']
 
-export const PAYMENT_METHOD_ICONS: Record<
-	RootResponseFeaturesPaymentsItemId,
-	IconType
+const PAYMENT_METHOD_ICONS: Partial<
+	Record<RootResponseFeaturesPaymentsItemId, IconType>
 > = {
 	BANK_CARD: CreditCardIcon,
 	SBP: SbpIcon,
 	T_PAY: TBankIcon,
 	SBER_PAY: SberbankIcon,
+	ALFA_PAY: AlfaIcon,
 	YOOMONEY: YoomoneyIcon,
 	CRYPTO: BitcoinIcon,
 	INTERNATIONAL_CARD: GlobeIcon,
 	YANDEX_SPLIT: FaYandex,
 	TELEGRAM_STARS: StarIcon
 }
+
+/** A method the backend adds before the frontend knows it still gets an icon. */
+export const getPaymentIcon = (id: RootResponseFeaturesPaymentsItemId) =>
+	PAYMENT_METHOD_ICONS[id] ?? CreditCardIcon

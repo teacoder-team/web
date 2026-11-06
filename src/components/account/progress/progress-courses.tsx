@@ -70,7 +70,7 @@ export function ProgressCourses() {
 						<div className='min-w-0 flex-1'>
 							<Link
 								href={ROUTES.COURSES.SINGLE(course.slug)}
-								className='line-clamp-2 font-medium leading-snug transition-colors hover:text-brand'
+								className='line-clamp-2 leading-snug font-medium transition-colors hover:text-brand'
 							>
 								{course.title}
 							</Link>
@@ -79,7 +79,7 @@ export function ProgressCourses() {
 									value={course.progress}
 									className='flex-1'
 								/>
-								<span className='shrink-0 font-mono text-xs tabular-nums text-muted-foreground'>
+								<span className='shrink-0 font-mono text-xs text-muted-foreground tabular-nums'>
 									{course.progress}%
 								</span>
 							</div>
