@@ -4,7 +4,7 @@ import { FormControl, FormField, FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 
-import { getPaymentIcon, withoutSplit } from '@/lib/billing/payment-methods'
+import { getPaymentIcon, payableMethods } from '@/lib/billing/payment-methods'
 import { useAppConfig } from '@/lib/config/useAppConfig'
 import { cn } from '@/lib/utils'
 
@@ -13,13 +13,17 @@ import { Skeleton } from '../ui/skeleton'
 
 interface PaymentMethodsProps {
 	control: Control<PaymentFormValues>
+	isSubscription: boolean
 }
 
-export function PaymentMethods({ control }: PaymentMethodsProps) {
+export function PaymentMethods({
+	control,
+	isSubscription
+}: PaymentMethodsProps) {
 	const { data: config, isLoading } = useAppConfig()
 	const { field: provider } = useController({ control, name: 'provider' })
 
-	const data = withoutSplit(config?.features.payments)
+	const data = payableMethods(config?.features.payments, isSubscription)
 
 	if (isLoading || !data)
 		return (

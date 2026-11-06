@@ -28,9 +28,22 @@ export const isSplit = (option: PaymentOption) => option.id === 'YANDEX_SPLIT'
 export const findSplit = (options: PaymentOption[] | undefined) =>
 	options?.find(isSplit)
 
-/** Methods listed in the general payment dialog: Split has its own button. */
-export const withoutSplit = (options: PaymentOption[] | undefined) =>
-	options?.filter(option => !isSplit(option))
+/** Methods the subscription cannot use, whatever the API offers. */
+const COURSE_ONLY_METHODS = new Set<string>(['ALFA_PAY'])
+
+/**
+ * Methods listed in the payment dialog: Split always has its own button, and
+ * course-only methods drop out when the subscription is being paid for.
+ */
+export const payableMethods = (
+	options: PaymentOption[] | undefined,
+	isSubscription: boolean
+) =>
+	options?.filter(
+		option =>
+			!isSplit(option) &&
+			!(isSubscription && COURSE_ONLY_METHODS.has(option.id))
+	)
 
 /** Methods that can carry a recurring charge for the subscription. */
 export const RECURRING_METHODS: string[] = ['BANK_CARD', 'SBP', 'T_PAY']
