@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { TriangleAlertIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,7 +20,6 @@ import { useAppConfig } from '@/lib/config/useAppConfig'
 import { ROUTES } from '@/lib/routes'
 
 import { PaymentMethods } from '../premium/payment-methods'
-import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 import { Button } from '../ui/button'
 import {
 	Dialog,
@@ -98,14 +96,6 @@ export function PaymentDialog({
 	const method = form.watch('method')
 	const provider = form.watch('provider')
 	const payments = withoutSplit(config?.features.payments)
-	const hasUnstableMethods = Boolean(
-		payments?.some(
-			p =>
-				p.provider === CreatePaymentPayloadProvider.YOOKASSA &&
-				(p.id === RootResponseFeaturesPaymentsItemId.BANK_CARD ||
-					p.id === RootResponseFeaturesPaymentsItemId.SBP)
-		)
-	)
 	const isSubscription = !courseId
 	const hasAutoRenewal =
 		isSubscription &&
@@ -158,25 +148,6 @@ export function PaymentDialog({
 						</DialogHeader>
 
 						<div className='flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-6 pb-4 sm:px-8'>
-							{hasUnstableMethods && (
-								<Alert variant='warning'>
-									<TriangleAlertIcon className='size-4' />
-									<div>
-										<AlertTitle>
-											Возможны сбои при оплате
-										</AlertTitle>
-										<AlertDescription>
-											Оплата банковской картой и через СБП
-											с помощью ЮKassa временно может
-											работать нестабильно. Если платёж не
-											проходит, воспользуйтесь резервным
-											способом оплаты банковской картой
-											или через СБП.
-										</AlertDescription>
-									</div>
-								</Alert>
-							)}
-
 							<PaymentMethods control={form.control} />
 
 							{!user?.email && (
