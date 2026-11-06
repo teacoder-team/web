@@ -40,7 +40,7 @@ export function Manifesto() {
 		<section className='page-container py-24 sm:py-36'>
 			<p
 				ref={ref}
-				className='max-w-5xl font-display text-[clamp(1.75rem,1.1rem+2.4vw,3.25rem)] font-medium leading-[1.18] tracking-[-0.03em]'
+				className='max-w-5xl font-display text-[clamp(1.75rem,1.1rem+2.4vw,3.25rem)] leading-[1.18] font-medium tracking-[-0.03em]'
 			>
 				{WORDS.map(({ word, accent }, index) => (
 					<Word

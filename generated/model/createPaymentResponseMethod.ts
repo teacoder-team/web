@@ -48,5 +48,6 @@ export const CreatePaymentResponseMethod = {
   CRYPTO: 'CRYPTO',
   INTERNATIONAL_CARD: 'INTERNATIONAL_CARD',
   YANDEX_SPLIT: 'YANDEX_SPLIT',
+  ALFA_PAY: 'ALFA_PAY',
   TELEGRAM_STARS: 'TELEGRAM_STARS',
 } as const;

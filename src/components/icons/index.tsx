@@ -1,3 +1,4 @@
+export * from './alfa-icon'
 export * from './sberbank-icon'
 export * from './sbp-icon'
 export * from './tbank-icon'
